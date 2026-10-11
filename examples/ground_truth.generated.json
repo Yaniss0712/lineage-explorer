@@ -1,0 +1,580 @@
+{
+ "flows": [
+  {
+   "source": "lac_crm.clients_raw",
+   "target": "bv_client.tiers"
+  },
+  {
+   "source": "lac_pret.contrat_raw",
+   "target": "bv_pret.contrat"
+  },
+  {
+   "source": "lac_pret.incident_raw",
+   "target": "bv_pret.incident"
+  },
+  {
+   "source": "lac_pret.contrat_raw",
+   "target": "bv_pret.incident"
+  },
+  {
+   "source": "lac_pret.dossier_raw",
+   "target": "bv_pret.dossier"
+  },
+  {
+   "source": "bv_pret.incident",
+   "target": "dm_pret.synthese_1"
+  },
+  {
+   "source": "bv_client.tiers",
+   "target": "dm_pret.synthese_1"
+  },
+  {
+   "source": "lac_compte.mouvement_raw",
+   "target": "bv_compte.mouvement"
+  },
+  {
+   "source": "lac_compte.frais_raw",
+   "target": "bv_compte.frais"
+  },
+  {
+   "source": "lac_compte.produit_raw",
+   "target": "bv_compte.produit"
+  },
+  {
+   "source": "lac_compte.evenement_raw",
+   "target": "bv_compte.evenement"
+  },
+  {
+   "source": "lac_compte.reglement_raw",
+   "target": "bv_compte.reglement"
+  },
+  {
+   "source": "bv_compte.frais",
+   "target": "bv_compte.frais_enrichi"
+  },
+  {
+   "source": "bv_client.tiers",
+   "target": "bv_compte.frais_enrichi"
+  },
+  {
+   "source": "bv_compte.frais",
+   "target": "dm_compte.synthese_1"
+  },
+  {
+   "source": "bv_compte.mouvement",
+   "target": "dm_compte.synthese_1"
+  },
+  {
+   "source": "bv_client.tiers",
+   "target": "dm_compte.synthese_1"
+  },
+  {
+   "source": "bv_compte.evenement",
+   "target": "dm_compte.synthese_2"
+  },
+  {
+   "source": "bv_compte.reglement",
+   "target": "dm_compte.synthese_2"
+  },
+  {
+   "source": "bv_client.tiers",
+   "target": "dm_compte.synthese_2"
+  },
+  {
+   "source": "lac_carte.dossier_raw",
+   "target": "bv_carte.dossier"
+  },
+  {
+   "source": "lac_carte.demande_raw",
+   "target": "bv_carte.demande"
+  },
+  {
+   "source": "lac_carte.reglement_raw",
+   "target": "bv_carte.reglement"
+  },
+  {
+   "source": "lac_carte.demande_raw",
+   "target": "bv_carte.reglement"
+  },
+  {
+   "source": "lac_carte.produit_raw",
+   "target": "bv_carte.produit"
+  },
+  {
+   "source": "lac_carte.avenant_raw",
+   "target": "bv_carte.avenant"
+  },
+  {
+   "source": "lac_carte.evenement_raw",
+   "target": "bv_carte.evenement"
+  },
+  {
+   "source": "lac_carte.produit_raw",
+   "target": "bv_carte.evenement"
+  },
+  {
+   "source": "bv_carte.demande",
+   "target": "bv_carte.demande_enrichi"
+  },
+  {
+   "source": "bv_client.tiers",
+   "target": "bv_carte.demande_enrichi"
+  },
+  {
+   "source": "bv_carte.reglement",
+   "target": "dm_carte.synthese_1"
+  },
+  {
+   "source": "bv_carte.dossier",
+   "target": "dm_carte.synthese_1"
+  },
+  {
+   "source": "bv_client.tiers",
+   "target": "dm_carte.synthese_1"
+  },
+  {
+   "source": "bv_carte.reglement",
+   "target": "dm_carte.synthese_2"
+  },
+  {
+   "source": "bv_client.tiers",
+   "target": "dm_carte.synthese_2"
+  },
+  {
+   "source": "lac_epargne.offre_raw",
+   "target": "bv_epargne.offre"
+  },
+  {
+   "source": "lac_epargne.evenement_raw",
+   "target": "bv_epargne.evenement"
+  },
+  {
+   "source": "lac_epargne.souscription_raw",
+   "target": "bv_epargne.souscription"
+  },
+  {
+   "source": "bv_epargne.souscription",
+   "target": "bv_epargne.souscription_enrichi"
+  },
+  {
+   "source": "bv_client.tiers",
+   "target": "bv_epargne.souscription_enrichi"
+  },
+  {
+   "source": "bv_epargne.offre",
+   "target": "dm_epargne.synthese_1"
+  },
+  {
+   "source": "bv_epargne.souscription",
+   "target": "dm_epargne.synthese_1"
+  },
+  {
+   "source": "bv_client.tiers",
+   "target": "dm_epargne.synthese_1"
+  },
+  {
+   "source": "bv_epargne.souscription",
+   "target": "dm_epargne.synthese_2"
+  },
+  {
+   "source": "bv_epargne.evenement",
+   "target": "dm_epargne.synthese_2"
+  },
+  {
+   "source": "bv_client.tiers",
+   "target": "dm_epargne.synthese_2"
+  },
+  {
+   "source": "bv_epargne.souscription",
+   "target": "dm_epargne.synthese_3"
+  },
+  {
+   "source": "bv_epargne.offre",
+   "target": "dm_epargne.synthese_3"
+  },
+  {
+   "source": "bv_client.tiers",
+   "target": "dm_epargne.synthese_3"
+  },
+  {
+   "source": "lac_assurance.avenant_raw",
+   "target": "bv_assurance.avenant"
+  },
+  {
+   "source": "lac_assurance.agence_raw",
+   "target": "bv_assurance.agence"
+  },
+  {
+   "source": "lac_assurance.echeance_raw",
+   "target": "bv_assurance.echeance"
+  },
+  {
+   "source": "lac_assurance.avenant_raw",
+   "target": "bv_assurance.echeance"
+  },
+  {
+   "source": "lac_assurance.operation_raw",
+   "target": "bv_assurance.operation"
+  },
+  {
+   "source": "lac_assurance.incident_raw",
+   "target": "bv_assurance.incident"
+  },
+  {
+   "source": "bv_assurance.operation",
+   "target": "bv_assurance.operation_enrichi"
+  },
+  {
+   "source": "bv_client.tiers",
+   "target": "bv_assurance.operation_enrichi"
+  },
+  {
+   "source": "bv_assurance.agence",
+   "target": "dm_assurance.synthese_1"
+  },
+  {
+   "source": "bv_assurance.operation",
+   "target": "dm_assurance.synthese_1"
+  },
+  {
+   "source": "bv_client.tiers",
+   "target": "dm_assurance.synthese_1"
+  },
+  {
+   "source": "bv_assurance.echeance",
+   "target": "dm_assurance.synthese_2"
+  },
+  {
+   "source": "bv_assurance.agence",
+   "target": "dm_assurance.synthese_2"
+  },
+  {
+   "source": "bv_client.tiers",
+   "target": "dm_assurance.synthese_2"
+  },
+  {
+   "source": "lac_paiement.contrat_raw",
+   "target": "bv_paiement.contrat"
+  },
+  {
+   "source": "lac_paiement.produit_raw",
+   "target": "bv_paiement.produit"
+  },
+  {
+   "source": "lac_paiement.contrat_raw",
+   "target": "bv_paiement.produit"
+  },
+  {
+   "source": "lac_paiement.souscription_raw",
+   "target": "bv_paiement.souscription"
+  },
+  {
+   "source": "lac_paiement.operation_raw",
+   "target": "bv_paiement.operation"
+  },
+  {
+   "source": "lac_paiement.reglement_raw",
+   "target": "bv_paiement.reglement"
+  },
+  {
+   "source": "bv_paiement.contrat",
+   "target": "dm_paiement.synthese_1"
+  },
+  {
+   "source": "bv_client.tiers",
+   "target": "dm_paiement.synthese_1"
+  },
+  {
+   "source": "lac_credit.produit_raw",
+   "target": "bv_credit.produit"
+  },
+  {
+   "source": "lac_credit.echeance_raw",
+   "target": "bv_credit.echeance"
+  },
+  {
+   "source": "lac_credit.avenant_raw",
+   "target": "bv_credit.avenant"
+  },
+  {
+   "source": "lac_credit.incident_raw",
+   "target": "bv_credit.incident"
+  },
+  {
+   "source": "lac_credit.produit_raw",
+   "target": "bv_credit.incident"
+  },
+  {
+   "source": "lac_credit.dossier_raw",
+   "target": "bv_credit.dossier"
+  },
+  {
+   "source": "bv_credit.dossier",
+   "target": "bv_credit.dossier_enrichi"
+  },
+  {
+   "source": "bv_client.tiers",
+   "target": "bv_credit.dossier_enrichi"
+  },
+  {
+   "source": "bv_credit.produit",
+   "target": "dm_credit.synthese_1"
+  },
+  {
+   "source": "bv_credit.incident",
+   "target": "dm_credit.synthese_1"
+  },
+  {
+   "source": "bv_client.tiers",
+   "target": "dm_credit.synthese_1"
+  },
+  {
+   "source": "bv_credit.produit",
+   "target": "dm_credit.synthese_2"
+  },
+  {
+   "source": "bv_client.tiers",
+   "target": "dm_credit.synthese_2"
+  },
+  {
+   "source": "bv_credit.produit",
+   "target": "dm_credit.synthese_3"
+  },
+  {
+   "source": "bv_credit.avenant",
+   "target": "dm_credit.synthese_3"
+  },
+  {
+   "source": "bv_client.tiers",
+   "target": "dm_credit.synthese_3"
+  },
+  {
+   "source": "lac_titre.mouvement_raw",
+   "target": "bv_titre.mouvement"
+  },
+  {
+   "source": "lac_titre.frais_raw",
+   "target": "bv_titre.frais"
+  },
+  {
+   "source": "lac_titre.mouvement_raw",
+   "target": "bv_titre.frais"
+  },
+  {
+   "source": "lac_titre.reglement_raw",
+   "target": "bv_titre.reglement"
+  },
+  {
+   "source": "bv_titre.reglement",
+   "target": "bv_titre.reglement_enrichi"
+  },
+  {
+   "source": "bv_client.tiers",
+   "target": "bv_titre.reglement_enrichi"
+  },
+  {
+   "source": "bv_titre.mouvement",
+   "target": "dm_titre.synthese_1"
+  },
+  {
+   "source": "bv_client.tiers",
+   "target": "dm_titre.synthese_1"
+  },
+  {
+   "source": "bv_titre.mouvement",
+   "target": "dm_titre.synthese_2"
+  },
+  {
+   "source": "bv_client.tiers",
+   "target": "dm_titre.synthese_2"
+  },
+  {
+   "source": "lac_garantie.agence_raw",
+   "target": "bv_garantie.agence"
+  },
+  {
+   "source": "lac_garantie.avenant_raw",
+   "target": "bv_garantie.avenant"
+  },
+  {
+   "source": "lac_garantie.dossier_raw",
+   "target": "bv_garantie.dossier"
+  },
+  {
+   "source": "lac_garantie.operation_raw",
+   "target": "bv_garantie.operation"
+  },
+  {
+   "source": "lac_garantie.demande_raw",
+   "target": "bv_garantie.demande"
+  },
+  {
+   "source": "bv_garantie.demande",
+   "target": "bv_garantie.demande_enrichi"
+  },
+  {
+   "source": "bv_client.tiers",
+   "target": "bv_garantie.demande_enrichi"
+  },
+  {
+   "source": "bv_garantie.demande",
+   "target": "dm_garantie.synthese_1"
+  },
+  {
+   "source": "bv_garantie.avenant",
+   "target": "dm_garantie.synthese_1"
+  },
+  {
+   "source": "bv_client.tiers",
+   "target": "dm_garantie.synthese_1"
+  },
+  {
+   "source": "lac_sinistre.frais_raw",
+   "target": "bv_sinistre.frais"
+  },
+  {
+   "source": "lac_sinistre.echeance_raw",
+   "target": "bv_sinistre.echeance"
+  },
+  {
+   "source": "lac_sinistre.produit_raw",
+   "target": "bv_sinistre.produit"
+  },
+  {
+   "source": "lac_sinistre.incident_raw",
+   "target": "bv_sinistre.incident"
+  },
+  {
+   "source": "lac_sinistre.produit_raw",
+   "target": "bv_sinistre.incident"
+  },
+  {
+   "source": "lac_sinistre.demande_raw",
+   "target": "bv_sinistre.demande"
+  },
+  {
+   "source": "lac_sinistre.produit_raw",
+   "target": "bv_sinistre.demande"
+  },
+  {
+   "source": "lac_sinistre.reglement_raw",
+   "target": "bv_sinistre.reglement"
+  },
+  {
+   "source": "bv_sinistre.frais",
+   "target": "dm_sinistre.synthese_1"
+  },
+  {
+   "source": "bv_sinistre.incident",
+   "target": "dm_sinistre.synthese_1"
+  },
+  {
+   "source": "bv_client.tiers",
+   "target": "dm_sinistre.synthese_1"
+  },
+  {
+   "source": "bv_sinistre.reglement",
+   "target": "dm_sinistre.synthese_2"
+  },
+  {
+   "source": "bv_sinistre.produit",
+   "target": "dm_sinistre.synthese_2"
+  },
+  {
+   "source": "bv_client.tiers",
+   "target": "dm_sinistre.synthese_2"
+  },
+  {
+   "source": "bv_sinistre.demande",
+   "target": "dm_sinistre.synthese_3"
+  },
+  {
+   "source": "bv_client.tiers",
+   "target": "dm_sinistre.synthese_3"
+  },
+  {
+   "source": "lac_contentieux.echeance_raw",
+   "target": "bv_contentieux.echeance"
+  },
+  {
+   "source": "lac_contentieux.operation_raw",
+   "target": "bv_contentieux.operation"
+  },
+  {
+   "source": "lac_contentieux.dossier_raw",
+   "target": "bv_contentieux.dossier"
+  },
+  {
+   "source": "lac_contentieux.operation_raw",
+   "target": "bv_contentieux.dossier"
+  },
+  {
+   "source": "lac_contentieux.mouvement_raw",
+   "target": "bv_contentieux.mouvement"
+  },
+  {
+   "source": "bv_contentieux.operation",
+   "target": "bv_contentieux.operation_enrichi"
+  },
+  {
+   "source": "bv_client.tiers",
+   "target": "bv_contentieux.operation_enrichi"
+  },
+  {
+   "source": "bv_contentieux.operation",
+   "target": "dm_contentieux.synthese_1"
+  },
+  {
+   "source": "bv_client.tiers",
+   "target": "dm_contentieux.synthese_1"
+  },
+  {
+   "source": "bv_contentieux.dossier",
+   "target": "dm_contentieux.synthese_2"
+  },
+  {
+   "source": "bv_client.tiers",
+   "target": "dm_contentieux.synthese_2"
+  },
+  {
+   "source": "lac_patrimoine.frais_raw",
+   "target": "bv_patrimoine.frais"
+  },
+  {
+   "source": "lac_patrimoine.avenant_raw",
+   "target": "bv_patrimoine.avenant"
+  },
+  {
+   "source": "lac_patrimoine.evenement_raw",
+   "target": "bv_patrimoine.evenement"
+  },
+  {
+   "source": "bv_patrimoine.avenant",
+   "target": "bv_patrimoine.avenant_enrichi"
+  },
+  {
+   "source": "bv_client.tiers",
+   "target": "bv_patrimoine.avenant_enrichi"
+  },
+  {
+   "source": "bv_patrimoine.avenant",
+   "target": "dm_patrimoine.synthese_1"
+  },
+  {
+   "source": "bv_client.tiers",
+   "target": "dm_patrimoine.synthese_1"
+  },
+  {
+   "source": "bv_patrimoine.frais",
+   "target": "dm_patrimoine.synthese_2"
+  },
+  {
+   "source": "bv_patrimoine.avenant",
+   "target": "dm_patrimoine.synthese_2"
+  },
+  {
+   "source": "bv_client.tiers",
+   "target": "dm_patrimoine.synthese_2"
+  }
+ ]
+}

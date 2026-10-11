@@ -1,0 +1,28 @@
+# Données réelles — ne jamais versionner
+data/
+annotations/
+config.json
+*.db
+*.jsonl
+metadata*.json
+!examples/*.json
+!architecture test/*.json
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Éditeurs
+.vscode/
+.idea/
+.DS_Store
+
+# Outils locaux
+.claude/
+*.tmp
+tools/sensitive_patterns.txt
+
+# Documents internes (non publiés)
+docs/06_workflow_perso_pro.md
+docs/08_decisions_questions.md

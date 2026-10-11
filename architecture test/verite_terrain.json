@@ -1,0 +1,117 @@
+{
+  "comment": "Vrais flux de l'architecture de test (fictive)",
+  "flows": [
+    {
+      "source": "lac_crm.clients_raw",
+      "target": "bv_client.tiers"
+    },
+    {
+      "source": "lac_crm.adresses_raw",
+      "target": "bv_client.tiers"
+    },
+    {
+      "source": "lac_ref.agences_raw",
+      "target": "bv_ref.agences"
+    },
+    {
+      "source": "lac_ref.regions_raw",
+      "target": "bv_ref.agences"
+    },
+    {
+      "source": "lac_ref.produits_raw",
+      "target": "bv_ref.produits"
+    },
+    {
+      "source": "lac_pret.contrats_raw",
+      "target": "bv_pret.contrats"
+    },
+    {
+      "source": "lac_pret.echeances_raw",
+      "target": "bv_pret.echeances"
+    },
+    {
+      "source": "lac_cpt.comptes_raw",
+      "target": "bv_cpt.comptes"
+    },
+    {
+      "source": "lac_cpt.operations_raw",
+      "target": "bv_cpt.operations"
+    },
+    {
+      "source": "lac_ref.canaux_raw",
+      "target": "bv_cpt.operations"
+    },
+    {
+      "source": "bv_pret.contrats",
+      "target": "bv_pret.contrats_enrichis"
+    },
+    {
+      "source": "bv_ref.produits",
+      "target": "bv_pret.contrats_enrichis"
+    },
+    {
+      "source": "bv_client.tiers",
+      "target": "dm_client.vue_360"
+    },
+    {
+      "source": "bv_ref.agences",
+      "target": "dm_client.vue_360"
+    },
+    {
+      "source": "bv_cpt.comptes",
+      "target": "dm_client.vue_360"
+    },
+    {
+      "source": "bv_pret.contrats",
+      "target": "dm_client.vue_360"
+    },
+    {
+      "source": "bv_client.tiers",
+      "target": "dm_pret.encours_client"
+    },
+    {
+      "source": "bv_pret.contrats",
+      "target": "dm_pret.encours_client"
+    },
+    {
+      "source": "bv_pret.echeances",
+      "target": "dm_pret.encours_client"
+    },
+    {
+      "source": "bv_pret.echeances",
+      "target": "dm_pret.impayes"
+    },
+    {
+      "source": "bv_pret.contrats_enrichis",
+      "target": "dm_pret.impayes"
+    },
+    {
+      "source": "bv_ref.agences",
+      "target": "dm_reseau.activite_agence"
+    },
+    {
+      "source": "bv_client.tiers",
+      "target": "dm_reseau.activite_agence"
+    },
+    {
+      "source": "bv_pret.contrats",
+      "target": "dm_reseau.activite_agence"
+    },
+    {
+      "source": "bv_cpt.comptes",
+      "target": "dm_reseau.activite_agence"
+    },
+    {
+      "source": "bv_cpt.operations",
+      "target": "dm_cpt.flux_mensuels"
+    },
+    {
+      "source": "bv_cpt.comptes",
+      "target": "dm_cpt.flux_mensuels"
+    },
+    {
+      "source": "bv_client.tiers",
+      "target": "dm_cpt.flux_mensuels"
+    }
+  ]
+}

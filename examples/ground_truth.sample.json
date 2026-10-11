@@ -1,0 +1,9 @@
+{
+  "comment": "Vérité terrain FICTIVE pour metadata.structure_only.json / metadata.sample.json",
+  "flows": [
+    { "source": "lac_crm.clients_raw", "target": "bv_client.tiers" },
+    { "source": "lac_pret.contrats_raw", "target": "bv_pret.contrats" },
+    { "source": "bv_client.tiers", "target": "dm_pret.encours" },
+    { "source": "bv_pret.contrats", "target": "dm_pret.encours" }
+  ]
+}

@@ -1,0 +1,153 @@
+{
+  "meta": {
+    "format_version": "1.0",
+    "extracted_at": "2026-10-09T10:35:00+02:00",
+    "source": "exemple-fictif-structure-seule",
+    "extractor": "manuel"
+  },
+  "objects": [
+    {
+      "id": "lac_crm.clients_raw",
+      "database": "lac_crm",
+      "name": "clients_raw",
+      "type": "TABLE",
+      "description": "Clients bruts issus du CRM (fictif)",
+      "columns": [
+        {
+          "name": "code_tiers",
+          "type": "string",
+          "is_key": true,
+          "position": 1
+        },
+        {
+          "name": "raison_sociale",
+          "type": "string",
+          "position": 2
+        },
+        {
+          "name": "segment",
+          "type": "string",
+          "position": 3
+        },
+        {
+          "name": "date_chargement",
+          "type": "timestamp",
+          "position": 4
+        }
+      ]
+    },
+    {
+      "id": "lac_pret.contrats_raw",
+      "database": "lac_pret",
+      "name": "contrats_raw",
+      "type": "TABLE",
+      "description": "Contrats de prêt bruts (fictif)",
+      "columns": [
+        {
+          "name": "num_contrat",
+          "type": "string",
+          "is_key": true,
+          "position": 1
+        },
+        {
+          "name": "code_tiers",
+          "type": "string",
+          "position": 2
+        },
+        {
+          "name": "montant",
+          "type": "decimal(18,2)",
+          "position": 3
+        },
+        {
+          "name": "date_signature",
+          "type": "date",
+          "position": 4
+        },
+        {
+          "name": "date_chargement",
+          "type": "timestamp",
+          "position": 5
+        }
+      ]
+    },
+    {
+      "id": "bv_client.tiers",
+      "database": "bv_client",
+      "name": "tiers",
+      "type": "VIEW",
+      "columns": [
+        {
+          "name": "code_tiers_ref",
+          "type": "string",
+          "is_key": true,
+          "position": 1
+        },
+        {
+          "name": "raison_sociale",
+          "type": "string",
+          "position": 2
+        },
+        {
+          "name": "categorie_client",
+          "type": "string",
+          "position": 3
+        }
+      ]
+    },
+    {
+      "id": "bv_pret.contrats",
+      "database": "bv_pret",
+      "name": "contrats",
+      "type": "VIEW",
+      "columns": [
+        {
+          "name": "num_contrat",
+          "type": "string",
+          "is_key": true,
+          "position": 1
+        },
+        {
+          "name": "code_tiers_ref",
+          "type": "string",
+          "position": 2
+        },
+        {
+          "name": "montant_pret",
+          "type": "decimal(18,2)",
+          "position": 3
+        },
+        {
+          "name": "date_signature",
+          "type": "date",
+          "position": 4
+        }
+      ]
+    },
+    {
+      "id": "dm_pret.encours",
+      "database": "dm_pret",
+      "name": "encours",
+      "type": "TABLE",
+      "description": "Encours de prêt par tiers et catégorie (fictif)",
+      "columns": [
+        {
+          "name": "code_tiers_ref",
+          "type": "string",
+          "is_key": true,
+          "position": 1
+        },
+        {
+          "name": "categorie_client",
+          "type": "string",
+          "position": 2
+        },
+        {
+          "name": "montant_encours",
+          "type": "decimal(18,2)",
+          "position": 3
+        }
+      ]
+    }
+  ]
+}

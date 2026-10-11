@@ -1,0 +1,76 @@
+{
+  "meta": {
+    "format_version": "1.0",
+    "extracted_at": "2026-10-09T10:35:00+02:00",
+    "source": "exemple-fictif",
+    "extractor": "manuel"
+  },
+  "objects": [
+    {
+      "id": "lac_crm.clients_raw", "database": "lac_crm", "name": "clients_raw", "type": "TABLE",
+      "description": "Clients bruts issus du CRM (fictif)",
+      "columns": [
+        { "name": "code_tiers", "type": "string", "is_key": true, "position": 1 },
+        { "name": "raison_sociale", "type": "string", "position": 2 },
+        { "name": "segment", "type": "string", "position": 3 },
+        { "name": "date_chargement", "type": "timestamp", "position": 4 }
+      ]
+    },
+    {
+      "id": "lac_pret.contrats_raw", "database": "lac_pret", "name": "contrats_raw", "type": "TABLE",
+      "description": "Contrats de prêt bruts (fictif)",
+      "columns": [
+        { "name": "num_contrat", "type": "string", "is_key": true, "position": 1 },
+        { "name": "code_tiers", "type": "string", "position": 2 },
+        { "name": "montant", "type": "decimal(18,2)", "position": 3 },
+        { "name": "date_signature", "type": "date", "position": 4 },
+        { "name": "date_chargement", "type": "timestamp", "position": 5 }
+      ]
+    },
+    {
+      "id": "bv_client.tiers", "database": "bv_client", "name": "tiers", "type": "VIEW",
+      "sql": "SELECT trim(upper(c.code_tiers)) AS code_tiers_ref, c.raison_sociale, c.segment AS categorie_client FROM lac_crm.clients_raw c",
+      "columns": [
+        { "name": "code_tiers_ref", "type": "string", "is_key": true, "position": 1 },
+        { "name": "raison_sociale", "type": "string", "position": 2 },
+        { "name": "categorie_client", "type": "string", "position": 3 }
+      ]
+    },
+    {
+      "id": "bv_pret.contrats", "database": "bv_pret", "name": "contrats", "type": "VIEW",
+      "sql": "SELECT p.num_contrat, trim(upper(p.code_tiers)) AS code_tiers_ref, p.montant AS montant_pret, p.date_signature FROM lac_pret.contrats_raw p",
+      "columns": [
+        { "name": "num_contrat", "type": "string", "is_key": true, "position": 1 },
+        { "name": "code_tiers_ref", "type": "string", "position": 2 },
+        { "name": "montant_pret", "type": "decimal(18,2)", "position": 3 },
+        { "name": "date_signature", "type": "date", "position": 4 }
+      ]
+    },
+    {
+      "id": "dm_pret.encours", "database": "dm_pret", "name": "encours", "type": "TABLE",
+      "description": "Encours de prêt par tiers et catégorie (fictif)",
+      "sql": "INSERT OVERWRITE TABLE dm_pret.encours SELECT t.code_tiers_ref, t.categorie_client, sum(c.montant_pret) AS montant_encours FROM bv_pret.contrats c JOIN bv_client.tiers t ON c.code_tiers_ref = t.code_tiers_ref GROUP BY t.code_tiers_ref, t.categorie_client",
+      "columns": [
+        { "name": "code_tiers_ref", "type": "string", "is_key": true, "position": 1 },
+        { "name": "categorie_client", "type": "string", "position": 2 },
+        { "name": "montant_encours", "type": "decimal(18,2)", "position": 3 }
+      ]
+    }
+  ],
+  "flows": [
+    {
+      "source": "lac_crm.clients_raw", "target": "bv_client.tiers", "job": "job_alim_bv_tiers",
+      "column_mapping": [
+        { "source": "code_tiers", "target": "code_tiers_ref", "transformation": "trim(upper(code_tiers))" },
+        { "source": "segment", "target": "categorie_client", "transformation": "renommage" }
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "a": "bv_pret.contrats", "a_column": "code_tiers_ref",
+      "b": "bv_client.tiers", "b_column": "code_tiers_ref",
+      "comment": "Jointure de référence tiers ↔ contrats"
+    }
+  ]
+}

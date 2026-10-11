@@ -1,0 +1,8635 @@
+{
+ "meta": {
+  "format_version": "1.0",
+  "extracted_at": "2026-10-09T10:35:00+02:00",
+  "source": "generateur-fictif",
+  "extractor": "generate_sample.py --domains 12 --seed 42"
+ },
+ "objects": [
+  {
+   "id": "lac_crm.clients_raw",
+   "database": "lac_crm",
+   "name": "clients_raw",
+   "type": "TABLE",
+   "description": "Clients bruts (fictif)",
+   "columns": [
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "raison_sociale",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "segment",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "date_creation",
+     "type": "date",
+     "position": 4
+    },
+    {
+     "name": "code_postal",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "pays",
+     "type": "string",
+     "position": 6
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 7
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 8
+    }
+   ]
+  },
+  {
+   "id": "bv_client.tiers",
+   "database": "bv_client",
+   "name": "tiers",
+   "type": "VIEW",
+   "description": "Référentiel tiers (fictif)",
+   "columns": [
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "raison_sociale",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "categorie_client",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "date_creation",
+     "type": "date",
+     "position": 4
+    },
+    {
+     "name": "code_postal",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "pays",
+     "type": "string",
+     "position": 6
+    }
+   ]
+  },
+  {
+   "id": "lac_pret.contrat_raw",
+   "database": "lac_pret",
+   "name": "contrat_raw",
+   "type": "TABLE",
+   "description": "contrat bruts (pret, fictif)",
+   "columns": [
+    {
+     "name": "num_contrat",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "date_effet",
+     "type": "date",
+     "position": 3
+    },
+    {
+     "name": "nb_contrat",
+     "type": "int",
+     "position": 4
+    },
+    {
+     "name": "type_contrat",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "taux_contrat",
+     "type": "decimal(9,6)",
+     "position": 6
+    },
+    {
+     "name": "motif_contrat",
+     "type": "string",
+     "position": 7
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 8
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 9
+    }
+   ]
+  },
+  {
+   "id": "bv_pret.contrat",
+   "database": "bv_pret",
+   "name": "contrat",
+   "type": "VIEW",
+   "description": "contrat (pret, fictif)",
+   "columns": [
+    {
+     "name": "num_contrat",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "date_effet",
+     "type": "date",
+     "position": 3
+    },
+    {
+     "name": "nb_contrat",
+     "type": "int",
+     "position": 4
+    },
+    {
+     "name": "type_contrat",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "taux_contrat",
+     "type": "decimal(9,6)",
+     "position": 6
+    },
+    {
+     "name": "motif_contrat",
+     "type": "string",
+     "position": 7
+    },
+    {
+     "name": "ind_qualite_contrat",
+     "type": "int",
+     "position": 8
+    }
+   ]
+  },
+  {
+   "id": "lac_pret.incident_raw",
+   "database": "lac_pret",
+   "name": "incident_raw",
+   "type": "TABLE",
+   "description": "incident bruts (pret, fictif)",
+   "columns": [
+    {
+     "name": "num_incident",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "mode_incident",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "categorie",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "devise_incident",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "montant_incident",
+     "type": "decimal(18,2)",
+     "position": 6
+    },
+    {
+     "name": "nb_incident",
+     "type": "int",
+     "position": 7
+    },
+    {
+     "name": "date_fin",
+     "type": "date",
+     "position": 8
+    },
+    {
+     "name": "date_debut",
+     "type": "date",
+     "position": 9
+    },
+    {
+     "name": "solde",
+     "type": "decimal(18,2)",
+     "position": 10
+    },
+    {
+     "name": "statut",
+     "type": "string",
+     "position": 11
+    },
+    {
+     "name": "libelle",
+     "type": "string",
+     "position": 12
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 13
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 14
+    }
+   ]
+  },
+  {
+   "id": "bv_pret.incident",
+   "database": "bv_pret",
+   "name": "incident",
+   "type": "VIEW",
+   "description": "incident (pret, fictif)",
+   "columns": [
+    {
+     "name": "num_incident",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "categorie",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "devise_incident",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "cd_incident_4",
+     "type": "decimal(18,2)",
+     "position": 5
+    },
+    {
+     "name": "nb_incident",
+     "type": "int",
+     "position": 6
+    },
+    {
+     "name": "date_fin",
+     "type": "date",
+     "position": 7
+    },
+    {
+     "name": "date_debut",
+     "type": "date",
+     "position": 8
+    },
+    {
+     "name": "solde",
+     "type": "decimal(18,2)",
+     "position": 9
+    },
+    {
+     "name": "date_effet",
+     "type": "date",
+     "position": 10
+    },
+    {
+     "name": "taux_contrat",
+     "type": "decimal(9,6)",
+     "position": 11
+    },
+    {
+     "name": "num_contrat",
+     "type": "string",
+     "position": 12
+    },
+    {
+     "name": "ind_qualite_incident",
+     "type": "int",
+     "position": 13
+    }
+   ]
+  },
+  {
+   "id": "lac_pret.dossier_raw",
+   "database": "lac_pret",
+   "name": "dossier_raw",
+   "type": "TABLE",
+   "description": "dossier bruts (pret, fictif)",
+   "columns": [
+    {
+     "name": "num_dossier",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "periodicite_dossier",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "motif",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "devise",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "date_debut",
+     "type": "date",
+     "position": 6
+    },
+    {
+     "name": "nb_dossier",
+     "type": "int",
+     "position": 7
+    },
+    {
+     "name": "categorie",
+     "type": "string",
+     "position": 8
+    },
+    {
+     "name": "code",
+     "type": "string",
+     "position": 9
+    },
+    {
+     "name": "libelle",
+     "type": "string",
+     "position": 10
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 11
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 12
+    }
+   ]
+  },
+  {
+   "id": "bv_pret.dossier",
+   "database": "bv_pret",
+   "name": "dossier",
+   "type": "VIEW",
+   "description": "dossier (pret, fictif)",
+   "columns": [
+    {
+     "name": "num_dossier",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "periodicite_dossier",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "motif",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "date_debut",
+     "type": "date",
+     "position": 5
+    },
+    {
+     "name": "nb_dossier",
+     "type": "int",
+     "position": 6
+    },
+    {
+     "name": "categorie",
+     "type": "string",
+     "position": 7
+    },
+    {
+     "name": "ind_qualite_dossier",
+     "type": "int",
+     "position": 8
+    }
+   ]
+  },
+  {
+   "id": "dm_pret.synthese_1",
+   "database": "dm_pret",
+   "name": "synthese_1",
+   "type": "TABLE",
+   "description": "Mart pret n°1 (fictif)",
+   "columns": [
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "categorie_client",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "raison_sociale",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "date_fin",
+     "type": "date",
+     "position": 4
+    },
+    {
+     "name": "devise_incident",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "nb_incident",
+     "type": "int",
+     "position": 6
+    },
+    {
+     "name": "total_incident",
+     "type": "decimal(18,2)",
+     "position": 7
+    },
+    {
+     "name": "nb_incident_actifs",
+     "type": "int",
+     "position": 8
+    }
+   ]
+  },
+  {
+   "id": "lac_compte.mouvement_raw",
+   "database": "lac_compte",
+   "name": "mouvement_raw",
+   "type": "TABLE",
+   "description": "mouvement bruts (compte, fictif)",
+   "columns": [
+    {
+     "name": "num_mouvement",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "solde_mouvement",
+     "type": "decimal(18,2)",
+     "position": 3
+    },
+    {
+     "name": "indice_mouvement",
+     "type": "decimal(9,4)",
+     "position": 4
+    },
+    {
+     "name": "nb",
+     "type": "int",
+     "position": 5
+    },
+    {
+     "name": "duree_mouvement",
+     "type": "int",
+     "position": 6
+    },
+    {
+     "name": "type_mouvement",
+     "type": "string",
+     "position": 7
+    },
+    {
+     "name": "mode",
+     "type": "string",
+     "position": 8
+    },
+    {
+     "name": "motif_mouvement",
+     "type": "string",
+     "position": 9
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 10
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 11
+    }
+   ]
+  },
+  {
+   "id": "bv_compte.mouvement",
+   "database": "bv_compte",
+   "name": "mouvement",
+   "type": "VIEW",
+   "description": "mouvement (compte, fictif)",
+   "columns": [
+    {
+     "name": "num_mouvement",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "mt_mouvement_2",
+     "type": "decimal(18,2)",
+     "position": 3
+    },
+    {
+     "name": "indice_mouvement",
+     "type": "decimal(9,4)",
+     "position": 4
+    },
+    {
+     "name": "nb",
+     "type": "int",
+     "position": 5
+    },
+    {
+     "name": "duree_mouvement",
+     "type": "int",
+     "position": 6
+    },
+    {
+     "name": "type_mouvement",
+     "type": "string",
+     "position": 7
+    },
+    {
+     "name": "mode",
+     "type": "string",
+     "position": 8
+    },
+    {
+     "name": "motif_mouvement",
+     "type": "string",
+     "position": 9
+    },
+    {
+     "name": "ind_qualite_mouvement",
+     "type": "int",
+     "position": 10
+    }
+   ]
+  },
+  {
+   "id": "lac_compte.frais_raw",
+   "database": "lac_compte",
+   "name": "frais_raw",
+   "type": "TABLE",
+   "description": "frais bruts (compte, fictif)",
+   "columns": [
+    {
+     "name": "num_frais",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "montant",
+     "type": "decimal(18,2)",
+     "position": 3
+    },
+    {
+     "name": "motif",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "type_frais",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "taux_frais",
+     "type": "decimal(9,6)",
+     "position": 6
+    },
+    {
+     "name": "periodicite_frais",
+     "type": "string",
+     "position": 7
+    },
+    {
+     "name": "mode_frais",
+     "type": "string",
+     "position": 8
+    },
+    {
+     "name": "code",
+     "type": "string",
+     "position": 9
+    },
+    {
+     "name": "statut",
+     "type": "string",
+     "position": 10
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 11
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 12
+    }
+   ]
+  },
+  {
+   "id": "bv_compte.frais",
+   "database": "bv_compte",
+   "name": "frais",
+   "type": "VIEW",
+   "description": "frais (compte, fictif)",
+   "columns": [
+    {
+     "name": "num_frais",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "mt_frais_2",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "ind_frais_3",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "lib_frais_4",
+     "type": "decimal(9,6)",
+     "position": 5
+    },
+    {
+     "name": "periodicite_frais",
+     "type": "string",
+     "position": 6
+    },
+    {
+     "name": "valeur_frais_6",
+     "type": "string",
+     "position": 7
+    },
+    {
+     "name": "ind_qualite_frais",
+     "type": "int",
+     "position": 8
+    }
+   ]
+  },
+  {
+   "id": "lac_compte.produit_raw",
+   "database": "lac_compte",
+   "name": "produit_raw",
+   "type": "TABLE",
+   "description": "produit bruts (compte, fictif)",
+   "columns": [
+    {
+     "name": "num_produit",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "montant_produit",
+     "type": "decimal(18,2)",
+     "position": 3
+    },
+    {
+     "name": "taux_produit",
+     "type": "decimal(9,6)",
+     "position": 4
+    },
+    {
+     "name": "date_debut_produit",
+     "type": "date",
+     "position": 5
+    },
+    {
+     "name": "categorie",
+     "type": "string",
+     "position": 6
+    },
+    {
+     "name": "solde",
+     "type": "decimal(18,2)",
+     "position": 7
+    },
+    {
+     "name": "duree",
+     "type": "int",
+     "position": 8
+    },
+    {
+     "name": "indice_produit",
+     "type": "decimal(9,4)",
+     "position": 9
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 10
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 11
+    }
+   ]
+  },
+  {
+   "id": "bv_compte.produit",
+   "database": "bv_compte",
+   "name": "produit",
+   "type": "VIEW",
+   "description": "produit (compte, fictif)",
+   "columns": [
+    {
+     "name": "num_produit",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "montant_produit",
+     "type": "decimal(18,2)",
+     "position": 3
+    },
+    {
+     "name": "taux_produit",
+     "type": "decimal(9,6)",
+     "position": 4
+    },
+    {
+     "name": "date_debut_produit",
+     "type": "date",
+     "position": 5
+    },
+    {
+     "name": "categorie",
+     "type": "string",
+     "position": 6
+    },
+    {
+     "name": "val_produit_6",
+     "type": "decimal(18,2)",
+     "position": 7
+    },
+    {
+     "name": "ind_qualite_produit",
+     "type": "int",
+     "position": 8
+    }
+   ]
+  },
+  {
+   "id": "lac_compte.evenement_raw",
+   "database": "lac_compte",
+   "name": "evenement_raw",
+   "type": "TABLE",
+   "description": "evenement bruts (compte, fictif)",
+   "columns": [
+    {
+     "name": "num_evenement",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "date_fin_evenement",
+     "type": "date",
+     "position": 3
+    },
+    {
+     "name": "type_evenement",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "solde_evenement",
+     "type": "decimal(18,2)",
+     "position": 5
+    },
+    {
+     "name": "indice_evenement",
+     "type": "decimal(9,4)",
+     "position": 6
+    },
+    {
+     "name": "motif_evenement",
+     "type": "string",
+     "position": 7
+    },
+    {
+     "name": "periodicite_evenement",
+     "type": "string",
+     "position": 8
+    },
+    {
+     "name": "date_debut_evenement",
+     "type": "date",
+     "position": 9
+    },
+    {
+     "name": "date_effet",
+     "type": "date",
+     "position": 10
+    },
+    {
+     "name": "mode_evenement",
+     "type": "string",
+     "position": 11
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 12
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 13
+    }
+   ]
+  },
+  {
+   "id": "bv_compte.evenement",
+   "database": "bv_compte",
+   "name": "evenement",
+   "type": "VIEW",
+   "description": "evenement (compte, fictif)",
+   "columns": [
+    {
+     "name": "num_evenement",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "mt_evenement_2",
+     "type": "date",
+     "position": 3
+    },
+    {
+     "name": "type_evenement",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "solde_evenement",
+     "type": "decimal(18,2)",
+     "position": 5
+    },
+    {
+     "name": "indice_evenement",
+     "type": "decimal(9,4)",
+     "position": 6
+    },
+    {
+     "name": "motif_evenement",
+     "type": "string",
+     "position": 7
+    },
+    {
+     "name": "periodicite_evenement",
+     "type": "string",
+     "position": 8
+    },
+    {
+     "name": "flag_evenement_8",
+     "type": "date",
+     "position": 9
+    },
+    {
+     "name": "date_effet",
+     "type": "date",
+     "position": 10
+    },
+    {
+     "name": "mode_evenement",
+     "type": "string",
+     "position": 11
+    },
+    {
+     "name": "ind_qualite_evenement",
+     "type": "int",
+     "position": 12
+    }
+   ]
+  },
+  {
+   "id": "lac_compte.reglement_raw",
+   "database": "lac_compte",
+   "name": "reglement_raw",
+   "type": "TABLE",
+   "description": "reglement bruts (compte, fictif)",
+   "columns": [
+    {
+     "name": "num_reglement",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "duree_reglement",
+     "type": "int",
+     "position": 3
+    },
+    {
+     "name": "motif_reglement",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "date_fin",
+     "type": "date",
+     "position": 5
+    },
+    {
+     "name": "date_debut",
+     "type": "date",
+     "position": 6
+    },
+    {
+     "name": "libelle",
+     "type": "string",
+     "position": 7
+    },
+    {
+     "name": "code",
+     "type": "string",
+     "position": 8
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 9
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 10
+    }
+   ]
+  },
+  {
+   "id": "bv_compte.reglement",
+   "database": "bv_compte",
+   "name": "reglement",
+   "type": "VIEW",
+   "description": "reglement (compte, fictif)",
+   "columns": [
+    {
+     "name": "num_reglement",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "duree_reglement",
+     "type": "int",
+     "position": 3
+    },
+    {
+     "name": "motif_reglement",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "lib_reglement_4",
+     "type": "date",
+     "position": 5
+    },
+    {
+     "name": "date_debut",
+     "type": "date",
+     "position": 6
+    },
+    {
+     "name": "ind_qualite_reglement",
+     "type": "int",
+     "position": 7
+    }
+   ]
+  },
+  {
+   "id": "bv_compte.frais_enrichi",
+   "database": "bv_compte",
+   "name": "frais_enrichi",
+   "type": "VIEW",
+   "description": "",
+   "columns": [
+    {
+     "name": "num_frais",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "mt_frais_2",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "ind_frais_3",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "lib_frais_4",
+     "type": "decimal(9,6)",
+     "position": 5
+    },
+    {
+     "name": "periodicite_frais",
+     "type": "string",
+     "position": 6
+    },
+    {
+     "name": "valeur_frais_6",
+     "type": "string",
+     "position": 7
+    },
+    {
+     "name": "ind_qualite_frais",
+     "type": "int",
+     "position": 8
+    },
+    {
+     "name": "categorie_client",
+     "type": "string",
+     "position": 9
+    },
+    {
+     "name": "score_compte",
+     "type": "decimal(9,4)",
+     "position": 10
+    }
+   ]
+  },
+  {
+   "id": "dm_compte.synthese_1",
+   "database": "dm_compte",
+   "name": "synthese_1",
+   "type": "TABLE",
+   "description": "Mart compte n°1 (fictif)",
+   "columns": [
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "categorie_client",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "raison_sociale",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "valeur_frais_6",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "mt_frais_2",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "ind_qualite_frais",
+     "type": "int",
+     "position": 6
+    },
+    {
+     "name": "total_frais",
+     "type": "decimal(18,2)",
+     "position": 7
+    },
+    {
+     "name": "nb_frais_actifs",
+     "type": "int",
+     "position": 8
+    },
+    {
+     "name": "mt_mouvement_2",
+     "type": "decimal(18,2)",
+     "position": 9
+    },
+    {
+     "name": "ind_qualite_mouvement",
+     "type": "int",
+     "position": 10
+    },
+    {
+     "name": "indice_mouvement",
+     "type": "decimal(9,4)",
+     "position": 11
+    },
+    {
+     "name": "mode",
+     "type": "string",
+     "position": 12
+    },
+    {
+     "name": "total_mouvement",
+     "type": "decimal(18,2)",
+     "position": 13
+    },
+    {
+     "name": "nb_mouvement_actifs",
+     "type": "int",
+     "position": 14
+    }
+   ]
+  },
+  {
+   "id": "dm_compte.synthese_2",
+   "database": "dm_compte",
+   "name": "synthese_2",
+   "type": "TABLE",
+   "description": "Mart compte n°2 (fictif)",
+   "columns": [
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "categorie_client",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "raison_sociale",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "flag_evenement_8",
+     "type": "date",
+     "position": 4
+    },
+    {
+     "name": "mt_evenement_2",
+     "type": "date",
+     "position": 5
+    },
+    {
+     "name": "total_evenement",
+     "type": "decimal(18,2)",
+     "position": 6
+    },
+    {
+     "name": "nb_evenement_actifs",
+     "type": "int",
+     "position": 7
+    },
+    {
+     "name": "date_debut",
+     "type": "date",
+     "position": 8
+    },
+    {
+     "name": "duree_reglement",
+     "type": "int",
+     "position": 9
+    },
+    {
+     "name": "total_reglement",
+     "type": "decimal(18,2)",
+     "position": 10
+    },
+    {
+     "name": "nb_reglement_actifs",
+     "type": "int",
+     "position": 11
+    }
+   ]
+  },
+  {
+   "id": "lac_carte.dossier_raw",
+   "database": "lac_carte",
+   "name": "dossier_raw",
+   "type": "TABLE",
+   "description": "dossier bruts (carte, fictif)",
+   "columns": [
+    {
+     "name": "num_dossier",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "indice",
+     "type": "decimal(9,4)",
+     "position": 3
+    },
+    {
+     "name": "nb_dossier",
+     "type": "int",
+     "position": 4
+    },
+    {
+     "name": "duree_dossier",
+     "type": "int",
+     "position": 5
+    },
+    {
+     "name": "solde_dossier",
+     "type": "decimal(18,2)",
+     "position": 6
+    },
+    {
+     "name": "devise",
+     "type": "string",
+     "position": 7
+    },
+    {
+     "name": "montant_dossier",
+     "type": "decimal(18,2)",
+     "position": 8
+    },
+    {
+     "name": "canal",
+     "type": "string",
+     "position": 9
+    },
+    {
+     "name": "mode_dossier",
+     "type": "string",
+     "position": 10
+    },
+    {
+     "name": "motif_dossier",
+     "type": "string",
+     "position": 11
+    },
+    {
+     "name": "libelle",
+     "type": "string",
+     "position": 12
+    },
+    {
+     "name": "code",
+     "type": "string",
+     "position": 13
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 14
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 15
+    }
+   ]
+  },
+  {
+   "id": "bv_carte.dossier",
+   "database": "bv_carte",
+   "name": "dossier",
+   "type": "VIEW",
+   "description": "dossier (carte, fictif)",
+   "columns": [
+    {
+     "name": "num_dossier",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "indice",
+     "type": "decimal(9,4)",
+     "position": 3
+    },
+    {
+     "name": "duree_dossier",
+     "type": "int",
+     "position": 4
+    },
+    {
+     "name": "solde_dossier",
+     "type": "decimal(18,2)",
+     "position": 5
+    },
+    {
+     "name": "devise",
+     "type": "string",
+     "position": 6
+    },
+    {
+     "name": "montant_dossier",
+     "type": "decimal(18,2)",
+     "position": 7
+    },
+    {
+     "name": "canal",
+     "type": "string",
+     "position": 8
+    },
+    {
+     "name": "mode_dossier",
+     "type": "string",
+     "position": 9
+    },
+    {
+     "name": "motif_dossier",
+     "type": "string",
+     "position": 10
+    },
+    {
+     "name": "ind_qualite_dossier",
+     "type": "int",
+     "position": 11
+    }
+   ]
+  },
+  {
+   "id": "lac_carte.demande_raw",
+   "database": "lac_carte",
+   "name": "demande_raw",
+   "type": "TABLE",
+   "description": "demande bruts (carte, fictif)",
+   "columns": [
+    {
+     "name": "num_demande",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "motif",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "duree",
+     "type": "int",
+     "position": 4
+    },
+    {
+     "name": "solde_demande",
+     "type": "decimal(18,2)",
+     "position": 5
+    },
+    {
+     "name": "date_fin",
+     "type": "date",
+     "position": 6
+    },
+    {
+     "name": "nb_demande",
+     "type": "int",
+     "position": 7
+    },
+    {
+     "name": "indice_demande",
+     "type": "decimal(9,4)",
+     "position": 8
+    },
+    {
+     "name": "devise_demande",
+     "type": "string",
+     "position": 9
+    },
+    {
+     "name": "date_effet_demande",
+     "type": "date",
+     "position": 10
+    },
+    {
+     "name": "date_debut_demande",
+     "type": "date",
+     "position": 11
+    },
+    {
+     "name": "libelle",
+     "type": "string",
+     "position": 12
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 13
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 14
+    }
+   ]
+  },
+  {
+   "id": "bv_carte.demande",
+   "database": "bv_carte",
+   "name": "demande",
+   "type": "VIEW",
+   "description": "demande (carte, fictif)",
+   "columns": [
+    {
+     "name": "num_demande",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "cd_demande_2",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "duree",
+     "type": "int",
+     "position": 4
+    },
+    {
+     "name": "solde_demande",
+     "type": "decimal(18,2)",
+     "position": 5
+    },
+    {
+     "name": "date_fin",
+     "type": "date",
+     "position": 6
+    },
+    {
+     "name": "nb_demande",
+     "type": "int",
+     "position": 7
+    },
+    {
+     "name": "valeur_demande_7",
+     "type": "string",
+     "position": 8
+    },
+    {
+     "name": "date_effet_demande",
+     "type": "date",
+     "position": 9
+    },
+    {
+     "name": "date_debut_demande",
+     "type": "date",
+     "position": 10
+    },
+    {
+     "name": "ind_qualite_demande",
+     "type": "int",
+     "position": 11
+    }
+   ]
+  },
+  {
+   "id": "lac_carte.reglement_raw",
+   "database": "lac_carte",
+   "name": "reglement_raw",
+   "type": "TABLE",
+   "description": "reglement bruts (carte, fictif)",
+   "columns": [
+    {
+     "name": "num_reglement",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "solde",
+     "type": "decimal(18,2)",
+     "position": 3
+    },
+    {
+     "name": "indice_reglement",
+     "type": "decimal(9,4)",
+     "position": 4
+    },
+    {
+     "name": "taux_reglement",
+     "type": "decimal(9,6)",
+     "position": 5
+    },
+    {
+     "name": "devise_reglement",
+     "type": "string",
+     "position": 6
+    },
+    {
+     "name": "libelle",
+     "type": "string",
+     "position": 7
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 8
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 9
+    }
+   ]
+  },
+  {
+   "id": "bv_carte.reglement",
+   "database": "bv_carte",
+   "name": "reglement",
+   "type": "VIEW",
+   "description": "reglement (carte, fictif)",
+   "columns": [
+    {
+     "name": "num_reglement",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "solde",
+     "type": "decimal(18,2)",
+     "position": 3
+    },
+    {
+     "name": "flag_reglement_3",
+     "type": "decimal(9,4)",
+     "position": 4
+    },
+    {
+     "name": "taux_reglement",
+     "type": "decimal(9,6)",
+     "position": 5
+    },
+    {
+     "name": "motif",
+     "type": "string",
+     "position": 6
+    },
+    {
+     "name": "libelle",
+     "type": "string",
+     "position": 7
+    },
+    {
+     "name": "indice_demande",
+     "type": "decimal(9,4)",
+     "position": 8
+    },
+    {
+     "name": "num_demande",
+     "type": "string",
+     "position": 9
+    },
+    {
+     "name": "ind_qualite_reglement",
+     "type": "int",
+     "position": 10
+    }
+   ]
+  },
+  {
+   "id": "lac_carte.produit_raw",
+   "database": "lac_carte",
+   "name": "produit_raw",
+   "type": "TABLE",
+   "description": "produit bruts (carte, fictif)",
+   "columns": [
+    {
+     "name": "num_produit",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "mode",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "nb_produit",
+     "type": "int",
+     "position": 4
+    },
+    {
+     "name": "type_produit",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "date_effet",
+     "type": "date",
+     "position": 6
+    },
+    {
+     "name": "indice",
+     "type": "decimal(9,4)",
+     "position": 7
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 8
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 9
+    }
+   ]
+  },
+  {
+   "id": "bv_carte.produit",
+   "database": "bv_carte",
+   "name": "produit",
+   "type": "VIEW",
+   "description": "produit (carte, fictif)",
+   "columns": [
+    {
+     "name": "num_produit",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "mode",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "qte_produit_3",
+     "type": "int",
+     "position": 4
+    },
+    {
+     "name": "type_produit",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "date_effet",
+     "type": "date",
+     "position": 6
+    },
+    {
+     "name": "indice",
+     "type": "decimal(9,4)",
+     "position": 7
+    },
+    {
+     "name": "ind_qualite_produit",
+     "type": "int",
+     "position": 8
+    }
+   ]
+  },
+  {
+   "id": "lac_carte.avenant_raw",
+   "database": "lac_carte",
+   "name": "avenant_raw",
+   "type": "TABLE",
+   "description": "avenant bruts (carte, fictif)",
+   "columns": [
+    {
+     "name": "num_avenant",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "type",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "duree_avenant",
+     "type": "int",
+     "position": 4
+    },
+    {
+     "name": "motif_avenant",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "periodicite",
+     "type": "string",
+     "position": 6
+    },
+    {
+     "name": "code",
+     "type": "string",
+     "position": 7
+    },
+    {
+     "name": "libelle",
+     "type": "string",
+     "position": 8
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 9
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 10
+    }
+   ]
+  },
+  {
+   "id": "bv_carte.avenant",
+   "database": "bv_carte",
+   "name": "avenant",
+   "type": "VIEW",
+   "description": "avenant (carte, fictif)",
+   "columns": [
+    {
+     "name": "num_avenant",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "duree_avenant",
+     "type": "int",
+     "position": 3
+    },
+    {
+     "name": "motif_avenant",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "qte_avenant_4",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "ind_qualite_avenant",
+     "type": "int",
+     "position": 6
+    }
+   ]
+  },
+  {
+   "id": "lac_carte.evenement_raw",
+   "database": "lac_carte",
+   "name": "evenement_raw",
+   "type": "TABLE",
+   "description": "evenement bruts (carte, fictif)",
+   "columns": [
+    {
+     "name": "num_evenement",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "date_debut",
+     "type": "date",
+     "position": 3
+    },
+    {
+     "name": "type",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "indice",
+     "type": "decimal(9,4)",
+     "position": 5
+    },
+    {
+     "name": "categorie",
+     "type": "string",
+     "position": 6
+    },
+    {
+     "name": "libelle",
+     "type": "string",
+     "position": 7
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 8
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 9
+    }
+   ]
+  },
+  {
+   "id": "bv_carte.evenement",
+   "database": "bv_carte",
+   "name": "evenement",
+   "type": "VIEW",
+   "description": "evenement (carte, fictif)",
+   "columns": [
+    {
+     "name": "num_evenement",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "mt_evenement_2",
+     "type": "date",
+     "position": 3
+    },
+    {
+     "name": "type",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "indice",
+     "type": "decimal(9,4)",
+     "position": 5
+    },
+    {
+     "name": "categorie",
+     "type": "string",
+     "position": 6
+    },
+    {
+     "name": "type_produit",
+     "type": "string",
+     "position": 7
+    },
+    {
+     "name": "mode",
+     "type": "string",
+     "position": 8
+    },
+    {
+     "name": "date_effet",
+     "type": "date",
+     "position": 9
+    },
+    {
+     "name": "num_produit",
+     "type": "string",
+     "position": 10
+    },
+    {
+     "name": "ind_qualite_evenement",
+     "type": "int",
+     "position": 11
+    }
+   ]
+  },
+  {
+   "id": "bv_carte.demande_enrichi",
+   "database": "bv_carte",
+   "name": "demande_enrichi",
+   "type": "VIEW",
+   "description": "",
+   "columns": [
+    {
+     "name": "num_demande",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "cd_demande_2",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "duree",
+     "type": "int",
+     "position": 4
+    },
+    {
+     "name": "solde_demande",
+     "type": "decimal(18,2)",
+     "position": 5
+    },
+    {
+     "name": "date_fin",
+     "type": "date",
+     "position": 6
+    },
+    {
+     "name": "nb_demande",
+     "type": "int",
+     "position": 7
+    },
+    {
+     "name": "valeur_demande_7",
+     "type": "string",
+     "position": 8
+    },
+    {
+     "name": "date_effet_demande",
+     "type": "date",
+     "position": 9
+    },
+    {
+     "name": "date_debut_demande",
+     "type": "date",
+     "position": 10
+    },
+    {
+     "name": "ind_qualite_demande",
+     "type": "int",
+     "position": 11
+    },
+    {
+     "name": "categorie_client",
+     "type": "string",
+     "position": 12
+    },
+    {
+     "name": "score_carte",
+     "type": "decimal(9,4)",
+     "position": 13
+    }
+   ]
+  },
+  {
+   "id": "dm_carte.synthese_1",
+   "database": "dm_carte",
+   "name": "synthese_1",
+   "type": "TABLE",
+   "description": "Mart carte n°1 (fictif)",
+   "columns": [
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "categorie_client",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "raison_sociale",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "indice_demande",
+     "type": "decimal(9,4)",
+     "position": 4
+    },
+    {
+     "name": "ind_qualite_reglement",
+     "type": "int",
+     "position": 5
+    },
+    {
+     "name": "libelle",
+     "type": "string",
+     "position": 6
+    },
+    {
+     "name": "total_reglement",
+     "type": "decimal(18,2)",
+     "position": 7
+    },
+    {
+     "name": "nb_reglement_actifs",
+     "type": "int",
+     "position": 8
+    },
+    {
+     "name": "ind_qualite_dossier",
+     "type": "int",
+     "position": 9
+    },
+    {
+     "name": "canal",
+     "type": "string",
+     "position": 10
+    },
+    {
+     "name": "indice",
+     "type": "decimal(9,4)",
+     "position": 11
+    },
+    {
+     "name": "total_dossier",
+     "type": "decimal(18,2)",
+     "position": 12
+    },
+    {
+     "name": "nb_dossier_actifs",
+     "type": "int",
+     "position": 13
+    }
+   ]
+  },
+  {
+   "id": "dm_carte.synthese_2",
+   "database": "dm_carte",
+   "name": "synthese_2",
+   "type": "TABLE",
+   "description": "Mart carte n°2 (fictif)",
+   "columns": [
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "categorie_client",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "raison_sociale",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "libelle",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "solde",
+     "type": "decimal(18,2)",
+     "position": 5
+    },
+    {
+     "name": "total_reglement",
+     "type": "decimal(18,2)",
+     "position": 6
+    },
+    {
+     "name": "nb_reglement_actifs",
+     "type": "int",
+     "position": 7
+    }
+   ]
+  },
+  {
+   "id": "lac_epargne.offre_raw",
+   "database": "lac_epargne",
+   "name": "offre_raw",
+   "type": "TABLE",
+   "description": "offre bruts (epargne, fictif)",
+   "columns": [
+    {
+     "name": "num_offre",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "motif_offre",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "date_fin_offre",
+     "type": "date",
+     "position": 4
+    },
+    {
+     "name": "canal_offre",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "mode",
+     "type": "string",
+     "position": 6
+    },
+    {
+     "name": "taux",
+     "type": "decimal(9,6)",
+     "position": 7
+    },
+    {
+     "name": "periodicite",
+     "type": "string",
+     "position": 8
+    },
+    {
+     "name": "devise",
+     "type": "string",
+     "position": 9
+    },
+    {
+     "name": "duree_offre",
+     "type": "int",
+     "position": 10
+    },
+    {
+     "name": "solde_offre",
+     "type": "decimal(18,2)",
+     "position": 11
+    },
+    {
+     "name": "statut",
+     "type": "string",
+     "position": 12
+    },
+    {
+     "name": "code",
+     "type": "string",
+     "position": 13
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 14
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 15
+    }
+   ]
+  },
+  {
+   "id": "bv_epargne.offre",
+   "database": "bv_epargne",
+   "name": "offre",
+   "type": "VIEW",
+   "description": "offre (epargne, fictif)",
+   "columns": [
+    {
+     "name": "num_offre",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "motif_offre",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "date_fin_offre",
+     "type": "date",
+     "position": 4
+    },
+    {
+     "name": "mode",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "taux",
+     "type": "decimal(9,6)",
+     "position": 6
+    },
+    {
+     "name": "periodicite",
+     "type": "string",
+     "position": 7
+    },
+    {
+     "name": "devise",
+     "type": "string",
+     "position": 8
+    },
+    {
+     "name": "duree_offre",
+     "type": "int",
+     "position": 9
+    },
+    {
+     "name": "solde_offre",
+     "type": "decimal(18,2)",
+     "position": 10
+    },
+    {
+     "name": "ind_qualite_offre",
+     "type": "int",
+     "position": 11
+    }
+   ]
+  },
+  {
+   "id": "lac_epargne.evenement_raw",
+   "database": "lac_epargne",
+   "name": "evenement_raw",
+   "type": "TABLE",
+   "description": "evenement bruts (epargne, fictif)",
+   "columns": [
+    {
+     "name": "num_evenement",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "date_debut_evenement",
+     "type": "date",
+     "position": 3
+    },
+    {
+     "name": "canal_evenement",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "periodicite",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "solde",
+     "type": "decimal(18,2)",
+     "position": 6
+    },
+    {
+     "name": "date_fin_evenement",
+     "type": "date",
+     "position": 7
+    },
+    {
+     "name": "mode_evenement",
+     "type": "string",
+     "position": 8
+    },
+    {
+     "name": "montant",
+     "type": "decimal(18,2)",
+     "position": 9
+    },
+    {
+     "name": "statut",
+     "type": "string",
+     "position": 10
+    },
+    {
+     "name": "libelle",
+     "type": "string",
+     "position": 11
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 12
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 13
+    }
+   ]
+  },
+  {
+   "id": "bv_epargne.evenement",
+   "database": "bv_epargne",
+   "name": "evenement",
+   "type": "VIEW",
+   "description": "evenement (epargne, fictif)",
+   "columns": [
+    {
+     "name": "num_evenement",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "date_debut_evenement",
+     "type": "date",
+     "position": 3
+    },
+    {
+     "name": "canal_evenement",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "periodicite",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "solde",
+     "type": "decimal(18,2)",
+     "position": 6
+    },
+    {
+     "name": "date_fin_evenement",
+     "type": "date",
+     "position": 7
+    },
+    {
+     "name": "montant",
+     "type": "decimal(18,2)",
+     "position": 8
+    },
+    {
+     "name": "ind_qualite_evenement",
+     "type": "int",
+     "position": 9
+    }
+   ]
+  },
+  {
+   "id": "lac_epargne.souscription_raw",
+   "database": "lac_epargne",
+   "name": "souscription_raw",
+   "type": "TABLE",
+   "description": "souscription bruts (epargne, fictif)",
+   "columns": [
+    {
+     "name": "num_souscription",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "solde",
+     "type": "decimal(18,2)",
+     "position": 3
+    },
+    {
+     "name": "montant",
+     "type": "decimal(18,2)",
+     "position": 4
+    },
+    {
+     "name": "periodicite_souscription",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "duree",
+     "type": "int",
+     "position": 6
+    },
+    {
+     "name": "date_effet_souscription",
+     "type": "date",
+     "position": 7
+    },
+    {
+     "name": "code",
+     "type": "string",
+     "position": 8
+    },
+    {
+     "name": "statut",
+     "type": "string",
+     "position": 9
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 10
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 11
+    }
+   ]
+  },
+  {
+   "id": "bv_epargne.souscription",
+   "database": "bv_epargne",
+   "name": "souscription",
+   "type": "VIEW",
+   "description": "souscription (epargne, fictif)",
+   "columns": [
+    {
+     "name": "num_souscription",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "solde",
+     "type": "decimal(18,2)",
+     "position": 3
+    },
+    {
+     "name": "montant",
+     "type": "decimal(18,2)",
+     "position": 4
+    },
+    {
+     "name": "periodicite_souscription",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "duree",
+     "type": "int",
+     "position": 6
+    },
+    {
+     "name": "mt_souscription_6",
+     "type": "date",
+     "position": 7
+    },
+    {
+     "name": "ind_qualite_souscription",
+     "type": "int",
+     "position": 8
+    }
+   ]
+  },
+  {
+   "id": "bv_epargne.souscription_enrichi",
+   "database": "bv_epargne",
+   "name": "souscription_enrichi",
+   "type": "VIEW",
+   "description": "",
+   "columns": [
+    {
+     "name": "num_souscription",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "solde",
+     "type": "decimal(18,2)",
+     "position": 3
+    },
+    {
+     "name": "montant",
+     "type": "decimal(18,2)",
+     "position": 4
+    },
+    {
+     "name": "periodicite_souscription",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "duree",
+     "type": "int",
+     "position": 6
+    },
+    {
+     "name": "mt_souscription_6",
+     "type": "date",
+     "position": 7
+    },
+    {
+     "name": "ind_qualite_souscription",
+     "type": "int",
+     "position": 8
+    },
+    {
+     "name": "categorie_client",
+     "type": "string",
+     "position": 9
+    },
+    {
+     "name": "score_epargne",
+     "type": "decimal(9,4)",
+     "position": 10
+    }
+   ]
+  },
+  {
+   "id": "dm_epargne.synthese_1",
+   "database": "dm_epargne",
+   "name": "synthese_1",
+   "type": "TABLE",
+   "description": "Mart epargne n°1 (fictif)",
+   "columns": [
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "categorie_client",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "raison_sociale",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "solde_offre",
+     "type": "decimal(18,2)",
+     "position": 4
+    },
+    {
+     "name": "mode",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "total_offre",
+     "type": "decimal(18,2)",
+     "position": 6
+    },
+    {
+     "name": "nb_offre_actifs",
+     "type": "int",
+     "position": 7
+    },
+    {
+     "name": "ind_qualite_souscription",
+     "type": "int",
+     "position": 8
+    },
+    {
+     "name": "mt_souscription_6",
+     "type": "date",
+     "position": 9
+    },
+    {
+     "name": "periodicite_souscription",
+     "type": "string",
+     "position": 10
+    },
+    {
+     "name": "total_souscription",
+     "type": "decimal(18,2)",
+     "position": 11
+    },
+    {
+     "name": "nb_souscription_actifs",
+     "type": "int",
+     "position": 12
+    }
+   ]
+  },
+  {
+   "id": "dm_epargne.synthese_2",
+   "database": "dm_epargne",
+   "name": "synthese_2",
+   "type": "TABLE",
+   "description": "Mart epargne n°2 (fictif)",
+   "columns": [
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "categorie_client",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "raison_sociale",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "duree",
+     "type": "int",
+     "position": 4
+    },
+    {
+     "name": "montant",
+     "type": "decimal(18,2)",
+     "position": 5
+    },
+    {
+     "name": "ind_qualite_souscription",
+     "type": "int",
+     "position": 6
+    },
+    {
+     "name": "mt_souscription_6",
+     "type": "date",
+     "position": 7
+    },
+    {
+     "name": "total_souscription",
+     "type": "decimal(18,2)",
+     "position": 8
+    },
+    {
+     "name": "nb_souscription_actifs",
+     "type": "int",
+     "position": 9
+    },
+    {
+     "name": "ind_qualite_evenement",
+     "type": "int",
+     "position": 10
+    },
+    {
+     "name": "canal_evenement",
+     "type": "string",
+     "position": 11
+    },
+    {
+     "name": "periodicite",
+     "type": "string",
+     "position": 12
+    },
+    {
+     "name": "total_evenement",
+     "type": "decimal(18,2)",
+     "position": 13
+    },
+    {
+     "name": "nb_evenement_actifs",
+     "type": "int",
+     "position": 14
+    }
+   ]
+  },
+  {
+   "id": "dm_epargne.synthese_3",
+   "database": "dm_epargne",
+   "name": "synthese_3",
+   "type": "TABLE",
+   "description": "Mart epargne n°3 (fictif)",
+   "columns": [
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "categorie_client",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "raison_sociale",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "duree",
+     "type": "int",
+     "position": 4
+    },
+    {
+     "name": "solde",
+     "type": "decimal(18,2)",
+     "position": 5
+    },
+    {
+     "name": "periodicite_souscription",
+     "type": "string",
+     "position": 6
+    },
+    {
+     "name": "total_souscription",
+     "type": "decimal(18,2)",
+     "position": 7
+    },
+    {
+     "name": "nb_souscription_actifs",
+     "type": "int",
+     "position": 8
+    },
+    {
+     "name": "periodicite",
+     "type": "string",
+     "position": 9
+    },
+    {
+     "name": "devise",
+     "type": "string",
+     "position": 10
+    },
+    {
+     "name": "total_offre",
+     "type": "decimal(18,2)",
+     "position": 11
+    },
+    {
+     "name": "nb_offre_actifs",
+     "type": "int",
+     "position": 12
+    }
+   ]
+  },
+  {
+   "id": "lac_assurance.avenant_raw",
+   "database": "lac_assurance",
+   "name": "avenant_raw",
+   "type": "TABLE",
+   "description": "avenant bruts (assurance, fictif)",
+   "columns": [
+    {
+     "name": "num_avenant",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "categorie_avenant",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "type_avenant",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "nb_avenant",
+     "type": "int",
+     "position": 5
+    },
+    {
+     "name": "periodicite_avenant",
+     "type": "string",
+     "position": 6
+    },
+    {
+     "name": "duree_avenant",
+     "type": "int",
+     "position": 7
+    },
+    {
+     "name": "statut",
+     "type": "string",
+     "position": 8
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 9
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 10
+    }
+   ]
+  },
+  {
+   "id": "bv_assurance.avenant",
+   "database": "bv_assurance",
+   "name": "avenant",
+   "type": "VIEW",
+   "description": "avenant (assurance, fictif)",
+   "columns": [
+    {
+     "name": "num_avenant",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "type_avenant",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "nb_avenant",
+     "type": "int",
+     "position": 4
+    },
+    {
+     "name": "val_avenant_4",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "duree_avenant",
+     "type": "int",
+     "position": 6
+    },
+    {
+     "name": "ind_qualite_avenant",
+     "type": "int",
+     "position": 7
+    }
+   ]
+  },
+  {
+   "id": "lac_assurance.agence_raw",
+   "database": "lac_assurance",
+   "name": "agence_raw",
+   "type": "TABLE",
+   "description": "agence bruts (assurance, fictif)",
+   "columns": [
+    {
+     "name": "num_agence",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "categorie",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "devise",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "periodicite_agence",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "date_fin_agence",
+     "type": "date",
+     "position": 6
+    },
+    {
+     "name": "mode_agence",
+     "type": "string",
+     "position": 7
+    },
+    {
+     "name": "type_agence",
+     "type": "string",
+     "position": 8
+    },
+    {
+     "name": "code",
+     "type": "string",
+     "position": 9
+    },
+    {
+     "name": "statut",
+     "type": "string",
+     "position": 10
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 11
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 12
+    }
+   ]
+  },
+  {
+   "id": "bv_assurance.agence",
+   "database": "bv_assurance",
+   "name": "agence",
+   "type": "VIEW",
+   "description": "agence (assurance, fictif)",
+   "columns": [
+    {
+     "name": "num_agence",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "categorie",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "qte_agence_3",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "date_fin_agence",
+     "type": "date",
+     "position": 5
+    },
+    {
+     "name": "type_agence",
+     "type": "string",
+     "position": 6
+    },
+    {
+     "name": "ind_qualite_agence",
+     "type": "int",
+     "position": 7
+    }
+   ]
+  },
+  {
+   "id": "lac_assurance.echeance_raw",
+   "database": "lac_assurance",
+   "name": "echeance_raw",
+   "type": "TABLE",
+   "description": "echeance bruts (assurance, fictif)",
+   "columns": [
+    {
+     "name": "num_echeance",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "devise_echeance",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "nb_echeance",
+     "type": "int",
+     "position": 4
+    },
+    {
+     "name": "indice_echeance",
+     "type": "decimal(9,4)",
+     "position": 5
+    },
+    {
+     "name": "date_effet_echeance",
+     "type": "date",
+     "position": 6
+    },
+    {
+     "name": "statut",
+     "type": "string",
+     "position": 7
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 8
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 9
+    }
+   ]
+  },
+  {
+   "id": "bv_assurance.echeance",
+   "database": "bv_assurance",
+   "name": "echeance",
+   "type": "VIEW",
+   "description": "echeance (assurance, fictif)",
+   "columns": [
+    {
+     "name": "num_echeance",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "devise_echeance",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "indice_echeance",
+     "type": "decimal(9,4)",
+     "position": 4
+    },
+    {
+     "name": "flag_echeance_4",
+     "type": "date",
+     "position": 5
+    },
+    {
+     "name": "type_avenant",
+     "type": "string",
+     "position": 6
+    },
+    {
+     "name": "categorie_avenant",
+     "type": "string",
+     "position": 7
+    },
+    {
+     "name": "duree_avenant",
+     "type": "int",
+     "position": 8
+    },
+    {
+     "name": "num_avenant",
+     "type": "string",
+     "position": 9
+    },
+    {
+     "name": "ind_qualite_echeance",
+     "type": "int",
+     "position": 10
+    }
+   ]
+  },
+  {
+   "id": "lac_assurance.operation_raw",
+   "database": "lac_assurance",
+   "name": "operation_raw",
+   "type": "TABLE",
+   "description": "operation bruts (assurance, fictif)",
+   "columns": [
+    {
+     "name": "num_operation",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "date_effet",
+     "type": "date",
+     "position": 3
+    },
+    {
+     "name": "duree_operation",
+     "type": "int",
+     "position": 4
+    },
+    {
+     "name": "devise_operation",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "montant_operation",
+     "type": "decimal(18,2)",
+     "position": 6
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 7
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 8
+    }
+   ]
+  },
+  {
+   "id": "bv_assurance.operation",
+   "database": "bv_assurance",
+   "name": "operation",
+   "type": "VIEW",
+   "description": "operation (assurance, fictif)",
+   "columns": [
+    {
+     "name": "num_operation",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "date_effet",
+     "type": "date",
+     "position": 3
+    },
+    {
+     "name": "duree_operation",
+     "type": "int",
+     "position": 4
+    },
+    {
+     "name": "devise_operation",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "montant_operation",
+     "type": "decimal(18,2)",
+     "position": 6
+    },
+    {
+     "name": "ind_qualite_operation",
+     "type": "int",
+     "position": 7
+    }
+   ]
+  },
+  {
+   "id": "lac_assurance.incident_raw",
+   "database": "lac_assurance",
+   "name": "incident_raw",
+   "type": "TABLE",
+   "description": "incident bruts (assurance, fictif)",
+   "columns": [
+    {
+     "name": "num_incident",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "duree_incident",
+     "type": "int",
+     "position": 3
+    },
+    {
+     "name": "categorie",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "devise_incident",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "nb",
+     "type": "int",
+     "position": 6
+    },
+    {
+     "name": "solde_incident",
+     "type": "decimal(18,2)",
+     "position": 7
+    },
+    {
+     "name": "taux_incident",
+     "type": "decimal(9,6)",
+     "position": 8
+    },
+    {
+     "name": "canal",
+     "type": "string",
+     "position": 9
+    },
+    {
+     "name": "montant_incident",
+     "type": "decimal(18,2)",
+     "position": 10
+    },
+    {
+     "name": "type",
+     "type": "string",
+     "position": 11
+    },
+    {
+     "name": "code",
+     "type": "string",
+     "position": 12
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 13
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 14
+    }
+   ]
+  },
+  {
+   "id": "bv_assurance.incident",
+   "database": "bv_assurance",
+   "name": "incident",
+   "type": "VIEW",
+   "description": "incident (assurance, fictif)",
+   "columns": [
+    {
+     "name": "num_incident",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "duree_incident",
+     "type": "int",
+     "position": 3
+    },
+    {
+     "name": "categorie",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "cd_incident_4",
+     "type": "int",
+     "position": 5
+    },
+    {
+     "name": "solde_incident",
+     "type": "decimal(18,2)",
+     "position": 6
+    },
+    {
+     "name": "taux_incident",
+     "type": "decimal(9,6)",
+     "position": 7
+    },
+    {
+     "name": "canal",
+     "type": "string",
+     "position": 8
+    },
+    {
+     "name": "montant_incident",
+     "type": "decimal(18,2)",
+     "position": 9
+    },
+    {
+     "name": "type",
+     "type": "string",
+     "position": 10
+    },
+    {
+     "name": "ind_qualite_incident",
+     "type": "int",
+     "position": 11
+    }
+   ]
+  },
+  {
+   "id": "bv_assurance.operation_enrichi",
+   "database": "bv_assurance",
+   "name": "operation_enrichi",
+   "type": "VIEW",
+   "description": "",
+   "columns": [
+    {
+     "name": "num_operation",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "date_effet",
+     "type": "date",
+     "position": 3
+    },
+    {
+     "name": "duree_operation",
+     "type": "int",
+     "position": 4
+    },
+    {
+     "name": "devise_operation",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "montant_operation",
+     "type": "decimal(18,2)",
+     "position": 6
+    },
+    {
+     "name": "ind_qualite_operation",
+     "type": "int",
+     "position": 7
+    },
+    {
+     "name": "categorie_client",
+     "type": "string",
+     "position": 8
+    },
+    {
+     "name": "score_assurance",
+     "type": "decimal(9,4)",
+     "position": 9
+    }
+   ]
+  },
+  {
+   "id": "dm_assurance.synthese_1",
+   "database": "dm_assurance",
+   "name": "synthese_1",
+   "type": "TABLE",
+   "description": "Mart assurance n°1 (fictif)",
+   "columns": [
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "categorie_client",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "raison_sociale",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "ind_qualite_agence",
+     "type": "int",
+     "position": 4
+    },
+    {
+     "name": "date_fin_agence",
+     "type": "date",
+     "position": 5
+    },
+    {
+     "name": "total_agence",
+     "type": "decimal(18,2)",
+     "position": 6
+    },
+    {
+     "name": "nb_agence_actifs",
+     "type": "int",
+     "position": 7
+    },
+    {
+     "name": "ind_qualite_operation",
+     "type": "int",
+     "position": 8
+    },
+    {
+     "name": "montant_operation",
+     "type": "decimal(18,2)",
+     "position": 9
+    },
+    {
+     "name": "duree_operation",
+     "type": "int",
+     "position": 10
+    },
+    {
+     "name": "devise_operation",
+     "type": "string",
+     "position": 11
+    },
+    {
+     "name": "total_operation",
+     "type": "decimal(18,2)",
+     "position": 12
+    },
+    {
+     "name": "nb_operation_actifs",
+     "type": "int",
+     "position": 13
+    }
+   ]
+  },
+  {
+   "id": "dm_assurance.synthese_2",
+   "database": "dm_assurance",
+   "name": "synthese_2",
+   "type": "TABLE",
+   "description": "Mart assurance n°2 (fictif)",
+   "columns": [
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "categorie_client",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "raison_sociale",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "categorie_avenant",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "type_avenant",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "total_echeance",
+     "type": "decimal(18,2)",
+     "position": 6
+    },
+    {
+     "name": "nb_echeance_actifs",
+     "type": "int",
+     "position": 7
+    },
+    {
+     "name": "type_agence",
+     "type": "string",
+     "position": 8
+    },
+    {
+     "name": "ind_qualite_agence",
+     "type": "int",
+     "position": 9
+    },
+    {
+     "name": "total_agence",
+     "type": "decimal(18,2)",
+     "position": 10
+    },
+    {
+     "name": "nb_agence_actifs",
+     "type": "int",
+     "position": 11
+    }
+   ]
+  },
+  {
+   "id": "lac_paiement.contrat_raw",
+   "database": "lac_paiement",
+   "name": "contrat_raw",
+   "type": "TABLE",
+   "description": "contrat bruts (paiement, fictif)",
+   "columns": [
+    {
+     "name": "num_contrat",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "type",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "categorie",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "solde_contrat",
+     "type": "decimal(18,2)",
+     "position": 5
+    },
+    {
+     "name": "date_debut_contrat",
+     "type": "date",
+     "position": 6
+    },
+    {
+     "name": "devise",
+     "type": "string",
+     "position": 7
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 8
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 9
+    }
+   ]
+  },
+  {
+   "id": "bv_paiement.contrat",
+   "database": "bv_paiement",
+   "name": "contrat",
+   "type": "VIEW",
+   "description": "contrat (paiement, fictif)",
+   "columns": [
+    {
+     "name": "num_contrat",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "type",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "categorie",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "solde_contrat",
+     "type": "decimal(18,2)",
+     "position": 5
+    },
+    {
+     "name": "date_debut_contrat",
+     "type": "date",
+     "position": 6
+    },
+    {
+     "name": "devise",
+     "type": "string",
+     "position": 7
+    },
+    {
+     "name": "ind_qualite_contrat",
+     "type": "int",
+     "position": 8
+    }
+   ]
+  },
+  {
+   "id": "lac_paiement.produit_raw",
+   "database": "lac_paiement",
+   "name": "produit_raw",
+   "type": "TABLE",
+   "description": "produit bruts (paiement, fictif)",
+   "columns": [
+    {
+     "name": "num_produit",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "montant",
+     "type": "decimal(18,2)",
+     "position": 3
+    },
+    {
+     "name": "taux_produit",
+     "type": "decimal(9,6)",
+     "position": 4
+    },
+    {
+     "name": "solde_produit",
+     "type": "decimal(18,2)",
+     "position": 5
+    },
+    {
+     "name": "duree_produit",
+     "type": "int",
+     "position": 6
+    },
+    {
+     "name": "date_fin",
+     "type": "date",
+     "position": 7
+    },
+    {
+     "name": "categorie_produit",
+     "type": "string",
+     "position": 8
+    },
+    {
+     "name": "devise_produit",
+     "type": "string",
+     "position": 9
+    },
+    {
+     "name": "statut",
+     "type": "string",
+     "position": 10
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 11
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 12
+    }
+   ]
+  },
+  {
+   "id": "bv_paiement.produit",
+   "database": "bv_paiement",
+   "name": "produit",
+   "type": "VIEW",
+   "description": "produit (paiement, fictif)",
+   "columns": [
+    {
+     "name": "num_produit",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "montant",
+     "type": "decimal(18,2)",
+     "position": 3
+    },
+    {
+     "name": "taux_produit",
+     "type": "decimal(9,6)",
+     "position": 4
+    },
+    {
+     "name": "solde_produit",
+     "type": "decimal(18,2)",
+     "position": 5
+    },
+    {
+     "name": "duree_produit",
+     "type": "int",
+     "position": 6
+    },
+    {
+     "name": "date_fin",
+     "type": "date",
+     "position": 7
+    },
+    {
+     "name": "devise_produit",
+     "type": "string",
+     "position": 8
+    },
+    {
+     "name": "devise",
+     "type": "string",
+     "position": 9
+    },
+    {
+     "name": "solde_contrat",
+     "type": "decimal(18,2)",
+     "position": 10
+    },
+    {
+     "name": "type",
+     "type": "string",
+     "position": 11
+    },
+    {
+     "name": "num_contrat",
+     "type": "string",
+     "position": 12
+    },
+    {
+     "name": "ind_qualite_produit",
+     "type": "int",
+     "position": 13
+    }
+   ]
+  },
+  {
+   "id": "lac_paiement.souscription_raw",
+   "database": "lac_paiement",
+   "name": "souscription_raw",
+   "type": "TABLE",
+   "description": "souscription bruts (paiement, fictif)",
+   "columns": [
+    {
+     "name": "num_souscription",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "canal_souscription",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "duree_souscription",
+     "type": "int",
+     "position": 4
+    },
+    {
+     "name": "date_debut_souscription",
+     "type": "date",
+     "position": 5
+    },
+    {
+     "name": "nb",
+     "type": "int",
+     "position": 6
+    },
+    {
+     "name": "solde_souscription",
+     "type": "decimal(18,2)",
+     "position": 7
+    },
+    {
+     "name": "libelle",
+     "type": "string",
+     "position": 8
+    },
+    {
+     "name": "statut",
+     "type": "string",
+     "position": 9
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 10
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 11
+    }
+   ]
+  },
+  {
+   "id": "bv_paiement.souscription",
+   "database": "bv_paiement",
+   "name": "souscription",
+   "type": "VIEW",
+   "description": "souscription (paiement, fictif)",
+   "columns": [
+    {
+     "name": "num_souscription",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "canal_souscription",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "duree_souscription",
+     "type": "int",
+     "position": 4
+    },
+    {
+     "name": "date_debut_souscription",
+     "type": "date",
+     "position": 5
+    },
+    {
+     "name": "nb",
+     "type": "int",
+     "position": 6
+    },
+    {
+     "name": "solde_souscription",
+     "type": "decimal(18,2)",
+     "position": 7
+    },
+    {
+     "name": "ind_qualite_souscription",
+     "type": "int",
+     "position": 8
+    }
+   ]
+  },
+  {
+   "id": "lac_paiement.operation_raw",
+   "database": "lac_paiement",
+   "name": "operation_raw",
+   "type": "TABLE",
+   "description": "operation bruts (paiement, fictif)",
+   "columns": [
+    {
+     "name": "num_operation",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "indice_operation",
+     "type": "decimal(9,4)",
+     "position": 3
+    },
+    {
+     "name": "taux",
+     "type": "decimal(9,6)",
+     "position": 4
+    },
+    {
+     "name": "devise_operation",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "periodicite_operation",
+     "type": "string",
+     "position": 6
+    },
+    {
+     "name": "date_fin_operation",
+     "type": "date",
+     "position": 7
+    },
+    {
+     "name": "date_effet_operation",
+     "type": "date",
+     "position": 8
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 9
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 10
+    }
+   ]
+  },
+  {
+   "id": "bv_paiement.operation",
+   "database": "bv_paiement",
+   "name": "operation",
+   "type": "VIEW",
+   "description": "operation (paiement, fictif)",
+   "columns": [
+    {
+     "name": "num_operation",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "indice_operation",
+     "type": "decimal(9,4)",
+     "position": 3
+    },
+    {
+     "name": "lib_operation_3",
+     "type": "decimal(9,6)",
+     "position": 4
+    },
+    {
+     "name": "val_operation_4",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "periodicite_operation",
+     "type": "string",
+     "position": 6
+    },
+    {
+     "name": "date_fin_operation",
+     "type": "date",
+     "position": 7
+    },
+    {
+     "name": "val_operation_7",
+     "type": "date",
+     "position": 8
+    },
+    {
+     "name": "ind_qualite_operation",
+     "type": "int",
+     "position": 9
+    }
+   ]
+  },
+  {
+   "id": "lac_paiement.reglement_raw",
+   "database": "lac_paiement",
+   "name": "reglement_raw",
+   "type": "TABLE",
+   "description": "reglement bruts (paiement, fictif)",
+   "columns": [
+    {
+     "name": "num_reglement",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "taux",
+     "type": "decimal(9,6)",
+     "position": 3
+    },
+    {
+     "name": "canal_reglement",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "type_reglement",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "indice_reglement",
+     "type": "decimal(9,4)",
+     "position": 6
+    },
+    {
+     "name": "duree_reglement",
+     "type": "int",
+     "position": 7
+    },
+    {
+     "name": "motif_reglement",
+     "type": "string",
+     "position": 8
+    },
+    {
+     "name": "devise_reglement",
+     "type": "string",
+     "position": 9
+    },
+    {
+     "name": "solde_reglement",
+     "type": "decimal(18,2)",
+     "position": 10
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 11
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 12
+    }
+   ]
+  },
+  {
+   "id": "bv_paiement.reglement",
+   "database": "bv_paiement",
+   "name": "reglement",
+   "type": "VIEW",
+   "description": "reglement (paiement, fictif)",
+   "columns": [
+    {
+     "name": "num_reglement",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "taux",
+     "type": "decimal(9,6)",
+     "position": 3
+    },
+    {
+     "name": "canal_reglement",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "mt_reglement_4",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "indice_reglement",
+     "type": "decimal(9,4)",
+     "position": 6
+    },
+    {
+     "name": "lib_reglement_6",
+     "type": "string",
+     "position": 7
+    },
+    {
+     "name": "devise_reglement",
+     "type": "string",
+     "position": 8
+    },
+    {
+     "name": "solde_reglement",
+     "type": "decimal(18,2)",
+     "position": 9
+    },
+    {
+     "name": "ind_qualite_reglement",
+     "type": "int",
+     "position": 10
+    }
+   ]
+  },
+  {
+   "id": "dm_paiement.synthese_1",
+   "database": "dm_paiement",
+   "name": "synthese_1",
+   "type": "TABLE",
+   "description": "Mart paiement n°1 (fictif)",
+   "columns": [
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "categorie_client",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "raison_sociale",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "solde_contrat",
+     "type": "decimal(18,2)",
+     "position": 4
+    },
+    {
+     "name": "devise",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "total_contrat",
+     "type": "decimal(18,2)",
+     "position": 6
+    },
+    {
+     "name": "nb_contrat_actifs",
+     "type": "int",
+     "position": 7
+    }
+   ]
+  },
+  {
+   "id": "lac_credit.produit_raw",
+   "database": "lac_credit",
+   "name": "produit_raw",
+   "type": "TABLE",
+   "description": "produit bruts (credit, fictif)",
+   "columns": [
+    {
+     "name": "num_produit",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "categorie",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "solde",
+     "type": "decimal(18,2)",
+     "position": 4
+    },
+    {
+     "name": "mode_produit",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "devise_produit",
+     "type": "string",
+     "position": 6
+    },
+    {
+     "name": "date_effet",
+     "type": "date",
+     "position": 7
+    },
+    {
+     "name": "type",
+     "type": "string",
+     "position": 8
+    },
+    {
+     "name": "taux_produit",
+     "type": "decimal(9,6)",
+     "position": 9
+    },
+    {
+     "name": "montant_produit",
+     "type": "decimal(18,2)",
+     "position": 10
+    },
+    {
+     "name": "date_fin",
+     "type": "date",
+     "position": 11
+    },
+    {
+     "name": "code",
+     "type": "string",
+     "position": 12
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 13
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 14
+    }
+   ]
+  },
+  {
+   "id": "bv_credit.produit",
+   "database": "bv_credit",
+   "name": "produit",
+   "type": "VIEW",
+   "description": "produit (credit, fictif)",
+   "columns": [
+    {
+     "name": "num_produit",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "categorie",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "flag_produit_3",
+     "type": "decimal(18,2)",
+     "position": 4
+    },
+    {
+     "name": "mode_produit",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "devise_produit",
+     "type": "string",
+     "position": 6
+    },
+    {
+     "name": "date_effet",
+     "type": "date",
+     "position": 7
+    },
+    {
+     "name": "taux_produit",
+     "type": "decimal(9,6)",
+     "position": 8
+    },
+    {
+     "name": "mt_produit_8",
+     "type": "decimal(18,2)",
+     "position": 9
+    },
+    {
+     "name": "date_fin",
+     "type": "date",
+     "position": 10
+    },
+    {
+     "name": "ind_qualite_produit",
+     "type": "int",
+     "position": 11
+    }
+   ]
+  },
+  {
+   "id": "lac_credit.echeance_raw",
+   "database": "lac_credit",
+   "name": "echeance_raw",
+   "type": "TABLE",
+   "description": "echeance bruts (credit, fictif)",
+   "columns": [
+    {
+     "name": "num_echeance",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "duree_echeance",
+     "type": "int",
+     "position": 3
+    },
+    {
+     "name": "devise",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "nb",
+     "type": "int",
+     "position": 5
+    },
+    {
+     "name": "date_debut_echeance",
+     "type": "date",
+     "position": 6
+    },
+    {
+     "name": "date_fin_echeance",
+     "type": "date",
+     "position": 7
+    },
+    {
+     "name": "date_effet_echeance",
+     "type": "date",
+     "position": 8
+    },
+    {
+     "name": "libelle",
+     "type": "string",
+     "position": 9
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 10
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 11
+    }
+   ]
+  },
+  {
+   "id": "bv_credit.echeance",
+   "database": "bv_credit",
+   "name": "echeance",
+   "type": "VIEW",
+   "description": "echeance (credit, fictif)",
+   "columns": [
+    {
+     "name": "num_echeance",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "devise",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "nb",
+     "type": "int",
+     "position": 4
+    },
+    {
+     "name": "date_fin_echeance",
+     "type": "date",
+     "position": 5
+    },
+    {
+     "name": "date_effet_echeance",
+     "type": "date",
+     "position": 6
+    },
+    {
+     "name": "ind_qualite_echeance",
+     "type": "int",
+     "position": 7
+    }
+   ]
+  },
+  {
+   "id": "lac_credit.avenant_raw",
+   "database": "lac_credit",
+   "name": "avenant_raw",
+   "type": "TABLE",
+   "description": "avenant bruts (credit, fictif)",
+   "columns": [
+    {
+     "name": "num_avenant",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "type_avenant",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "canal_avenant",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "categorie_avenant",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "date_effet_avenant",
+     "type": "date",
+     "position": 6
+    },
+    {
+     "name": "motif_avenant",
+     "type": "string",
+     "position": 7
+    },
+    {
+     "name": "statut",
+     "type": "string",
+     "position": 8
+    },
+    {
+     "name": "libelle",
+     "type": "string",
+     "position": 9
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 10
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 11
+    }
+   ]
+  },
+  {
+   "id": "bv_credit.avenant",
+   "database": "bv_credit",
+   "name": "avenant",
+   "type": "VIEW",
+   "description": "avenant (credit, fictif)",
+   "columns": [
+    {
+     "name": "num_avenant",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "type_avenant",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "canal_avenant",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "qte_avenant_4",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "date_effet_avenant",
+     "type": "date",
+     "position": 6
+    },
+    {
+     "name": "motif_avenant",
+     "type": "string",
+     "position": 7
+    },
+    {
+     "name": "ind_qualite_avenant",
+     "type": "int",
+     "position": 8
+    }
+   ]
+  },
+  {
+   "id": "lac_credit.incident_raw",
+   "database": "lac_credit",
+   "name": "incident_raw",
+   "type": "TABLE",
+   "description": "incident bruts (credit, fictif)",
+   "columns": [
+    {
+     "name": "num_incident",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "duree_incident",
+     "type": "int",
+     "position": 3
+    },
+    {
+     "name": "date_effet",
+     "type": "date",
+     "position": 4
+    },
+    {
+     "name": "taux_incident",
+     "type": "decimal(9,6)",
+     "position": 5
+    },
+    {
+     "name": "motif_incident",
+     "type": "string",
+     "position": 6
+    },
+    {
+     "name": "nb",
+     "type": "int",
+     "position": 7
+    },
+    {
+     "name": "libelle",
+     "type": "string",
+     "position": 8
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 9
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 10
+    }
+   ]
+  },
+  {
+   "id": "bv_credit.incident",
+   "database": "bv_credit",
+   "name": "incident",
+   "type": "VIEW",
+   "description": "incident (credit, fictif)",
+   "columns": [
+    {
+     "name": "num_incident",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "duree_incident",
+     "type": "int",
+     "position": 3
+    },
+    {
+     "name": "date_effet",
+     "type": "date",
+     "position": 4
+    },
+    {
+     "name": "taux_incident",
+     "type": "decimal(9,6)",
+     "position": 5
+    },
+    {
+     "name": "motif_incident",
+     "type": "string",
+     "position": 6
+    },
+    {
+     "name": "nb",
+     "type": "int",
+     "position": 7
+    },
+    {
+     "name": "montant_produit",
+     "type": "decimal(18,2)",
+     "position": 8
+    },
+    {
+     "name": "taux_produit",
+     "type": "decimal(9,6)",
+     "position": 9
+    },
+    {
+     "name": "code",
+     "type": "string",
+     "position": 10
+    },
+    {
+     "name": "num_produit",
+     "type": "string",
+     "position": 11
+    },
+    {
+     "name": "ind_qualite_incident",
+     "type": "int",
+     "position": 12
+    }
+   ]
+  },
+  {
+   "id": "lac_credit.dossier_raw",
+   "database": "lac_credit",
+   "name": "dossier_raw",
+   "type": "TABLE",
+   "description": "dossier bruts (credit, fictif)",
+   "columns": [
+    {
+     "name": "num_dossier",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "mode",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "devise_dossier",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "montant_dossier",
+     "type": "decimal(18,2)",
+     "position": 5
+    },
+    {
+     "name": "solde_dossier",
+     "type": "decimal(18,2)",
+     "position": 6
+    },
+    {
+     "name": "type",
+     "type": "string",
+     "position": 7
+    },
+    {
+     "name": "categorie_dossier",
+     "type": "string",
+     "position": 8
+    },
+    {
+     "name": "canal",
+     "type": "string",
+     "position": 9
+    },
+    {
+     "name": "date_effet",
+     "type": "date",
+     "position": 10
+    },
+    {
+     "name": "libelle",
+     "type": "string",
+     "position": 11
+    },
+    {
+     "name": "statut",
+     "type": "string",
+     "position": 12
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 13
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 14
+    }
+   ]
+  },
+  {
+   "id": "bv_credit.dossier",
+   "database": "bv_credit",
+   "name": "dossier",
+   "type": "VIEW",
+   "description": "dossier (credit, fictif)",
+   "columns": [
+    {
+     "name": "num_dossier",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "mode",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "valeur_dossier_3",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "montant_dossier",
+     "type": "decimal(18,2)",
+     "position": 5
+    },
+    {
+     "name": "solde_dossier",
+     "type": "decimal(18,2)",
+     "position": 6
+    },
+    {
+     "name": "categorie_dossier",
+     "type": "string",
+     "position": 7
+    },
+    {
+     "name": "qte_dossier_7",
+     "type": "date",
+     "position": 8
+    },
+    {
+     "name": "ind_qualite_dossier",
+     "type": "int",
+     "position": 9
+    }
+   ]
+  },
+  {
+   "id": "bv_credit.dossier_enrichi",
+   "database": "bv_credit",
+   "name": "dossier_enrichi",
+   "type": "VIEW",
+   "description": "",
+   "columns": [
+    {
+     "name": "num_dossier",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "mode",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "valeur_dossier_3",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "montant_dossier",
+     "type": "decimal(18,2)",
+     "position": 5
+    },
+    {
+     "name": "solde_dossier",
+     "type": "decimal(18,2)",
+     "position": 6
+    },
+    {
+     "name": "categorie_dossier",
+     "type": "string",
+     "position": 7
+    },
+    {
+     "name": "qte_dossier_7",
+     "type": "date",
+     "position": 8
+    },
+    {
+     "name": "ind_qualite_dossier",
+     "type": "int",
+     "position": 9
+    },
+    {
+     "name": "categorie_client",
+     "type": "string",
+     "position": 10
+    },
+    {
+     "name": "score_credit",
+     "type": "decimal(9,4)",
+     "position": 11
+    }
+   ]
+  },
+  {
+   "id": "dm_credit.synthese_1",
+   "database": "dm_credit",
+   "name": "synthese_1",
+   "type": "TABLE",
+   "description": "Mart credit n°1 (fictif)",
+   "columns": [
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "categorie_client",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "raison_sociale",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "ind_qualite_produit",
+     "type": "int",
+     "position": 4
+    },
+    {
+     "name": "date_fin",
+     "type": "date",
+     "position": 5
+    },
+    {
+     "name": "total_produit",
+     "type": "decimal(18,2)",
+     "position": 6
+    },
+    {
+     "name": "nb_produit_actifs",
+     "type": "int",
+     "position": 7
+    },
+    {
+     "name": "taux_incident",
+     "type": "decimal(9,6)",
+     "position": 8
+    },
+    {
+     "name": "taux_produit",
+     "type": "decimal(9,6)",
+     "position": 9
+    },
+    {
+     "name": "total_incident",
+     "type": "decimal(18,2)",
+     "position": 10
+    },
+    {
+     "name": "nb_incident_actifs",
+     "type": "int",
+     "position": 11
+    }
+   ]
+  },
+  {
+   "id": "dm_credit.synthese_2",
+   "database": "dm_credit",
+   "name": "synthese_2",
+   "type": "TABLE",
+   "description": "Mart credit n°2 (fictif)",
+   "columns": [
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "categorie_client",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "raison_sociale",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "date_effet",
+     "type": "date",
+     "position": 4
+    },
+    {
+     "name": "taux_produit",
+     "type": "decimal(9,6)",
+     "position": 5
+    },
+    {
+     "name": "ind_qualite_produit",
+     "type": "int",
+     "position": 6
+    },
+    {
+     "name": "total_produit",
+     "type": "decimal(18,2)",
+     "position": 7
+    },
+    {
+     "name": "nb_produit_actifs",
+     "type": "int",
+     "position": 8
+    }
+   ]
+  },
+  {
+   "id": "dm_credit.synthese_3",
+   "database": "dm_credit",
+   "name": "synthese_3",
+   "type": "TABLE",
+   "description": "Mart credit n°3 (fictif)",
+   "columns": [
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "categorie_client",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "raison_sociale",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "ind_qualite_produit",
+     "type": "int",
+     "position": 4
+    },
+    {
+     "name": "mt_produit_8",
+     "type": "decimal(18,2)",
+     "position": 5
+    },
+    {
+     "name": "mode_produit",
+     "type": "string",
+     "position": 6
+    },
+    {
+     "name": "taux_produit",
+     "type": "decimal(9,6)",
+     "position": 7
+    },
+    {
+     "name": "total_produit",
+     "type": "decimal(18,2)",
+     "position": 8
+    },
+    {
+     "name": "nb_produit_actifs",
+     "type": "int",
+     "position": 9
+    },
+    {
+     "name": "date_effet_avenant",
+     "type": "date",
+     "position": 10
+    },
+    {
+     "name": "motif_avenant",
+     "type": "string",
+     "position": 11
+    },
+    {
+     "name": "type_avenant",
+     "type": "string",
+     "position": 12
+    },
+    {
+     "name": "qte_avenant_4",
+     "type": "string",
+     "position": 13
+    },
+    {
+     "name": "total_avenant",
+     "type": "decimal(18,2)",
+     "position": 14
+    },
+    {
+     "name": "nb_avenant_actifs",
+     "type": "int",
+     "position": 15
+    }
+   ]
+  },
+  {
+   "id": "lac_titre.mouvement_raw",
+   "database": "lac_titre",
+   "name": "mouvement_raw",
+   "type": "TABLE",
+   "description": "mouvement bruts (titre, fictif)",
+   "columns": [
+    {
+     "name": "num_mouvement",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "date_effet",
+     "type": "date",
+     "position": 3
+    },
+    {
+     "name": "type_mouvement",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "taux_mouvement",
+     "type": "decimal(9,6)",
+     "position": 5
+    },
+    {
+     "name": "date_fin_mouvement",
+     "type": "date",
+     "position": 6
+    },
+    {
+     "name": "devise_mouvement",
+     "type": "string",
+     "position": 7
+    },
+    {
+     "name": "motif_mouvement",
+     "type": "string",
+     "position": 8
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 9
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 10
+    }
+   ]
+  },
+  {
+   "id": "bv_titre.mouvement",
+   "database": "bv_titre",
+   "name": "mouvement",
+   "type": "VIEW",
+   "description": "mouvement (titre, fictif)",
+   "columns": [
+    {
+     "name": "num_mouvement",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "date_effet",
+     "type": "date",
+     "position": 3
+    },
+    {
+     "name": "type_mouvement",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "taux_mouvement",
+     "type": "decimal(9,6)",
+     "position": 5
+    },
+    {
+     "name": "date_fin_mouvement",
+     "type": "date",
+     "position": 6
+    },
+    {
+     "name": "devise_mouvement",
+     "type": "string",
+     "position": 7
+    },
+    {
+     "name": "qte_mouvement_7",
+     "type": "string",
+     "position": 8
+    },
+    {
+     "name": "ind_qualite_mouvement",
+     "type": "int",
+     "position": 9
+    }
+   ]
+  },
+  {
+   "id": "lac_titre.frais_raw",
+   "database": "lac_titre",
+   "name": "frais_raw",
+   "type": "TABLE",
+   "description": "frais bruts (titre, fictif)",
+   "columns": [
+    {
+     "name": "num_frais",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "categorie_frais",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "canal_frais",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "motif_frais",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "duree_frais",
+     "type": "int",
+     "position": 6
+    },
+    {
+     "name": "date_effet",
+     "type": "date",
+     "position": 7
+    },
+    {
+     "name": "periodicite",
+     "type": "string",
+     "position": 8
+    },
+    {
+     "name": "nb",
+     "type": "int",
+     "position": 9
+    },
+    {
+     "name": "indice_frais",
+     "type": "decimal(9,4)",
+     "position": 10
+    },
+    {
+     "name": "statut",
+     "type": "string",
+     "position": 11
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 12
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 13
+    }
+   ]
+  },
+  {
+   "id": "bv_titre.frais",
+   "database": "bv_titre",
+   "name": "frais",
+   "type": "VIEW",
+   "description": "frais (titre, fictif)",
+   "columns": [
+    {
+     "name": "num_frais",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "canal_frais",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "duree_frais",
+     "type": "int",
+     "position": 4
+    },
+    {
+     "name": "date_effet",
+     "type": "date",
+     "position": 5
+    },
+    {
+     "name": "periodicite",
+     "type": "string",
+     "position": 6
+    },
+    {
+     "name": "mt_frais_6",
+     "type": "decimal(9,4)",
+     "position": 7
+    },
+    {
+     "name": "date_fin_mouvement",
+     "type": "date",
+     "position": 8
+    },
+    {
+     "name": "type_mouvement",
+     "type": "string",
+     "position": 9
+    },
+    {
+     "name": "motif_mouvement",
+     "type": "string",
+     "position": 10
+    },
+    {
+     "name": "num_mouvement",
+     "type": "string",
+     "position": 11
+    },
+    {
+     "name": "ind_qualite_frais",
+     "type": "int",
+     "position": 12
+    }
+   ]
+  },
+  {
+   "id": "lac_titre.reglement_raw",
+   "database": "lac_titre",
+   "name": "reglement_raw",
+   "type": "TABLE",
+   "description": "reglement bruts (titre, fictif)",
+   "columns": [
+    {
+     "name": "num_reglement",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "mode",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "montant",
+     "type": "decimal(18,2)",
+     "position": 4
+    },
+    {
+     "name": "canal",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "motif",
+     "type": "string",
+     "position": 6
+    },
+    {
+     "name": "type_reglement",
+     "type": "string",
+     "position": 7
+    },
+    {
+     "name": "periodicite",
+     "type": "string",
+     "position": 8
+    },
+    {
+     "name": "devise_reglement",
+     "type": "string",
+     "position": 9
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 10
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 11
+    }
+   ]
+  },
+  {
+   "id": "bv_titre.reglement",
+   "database": "bv_titre",
+   "name": "reglement",
+   "type": "VIEW",
+   "description": "reglement (titre, fictif)",
+   "columns": [
+    {
+     "name": "num_reglement",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "mode",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "montant",
+     "type": "decimal(18,2)",
+     "position": 4
+    },
+    {
+     "name": "canal",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "motif",
+     "type": "string",
+     "position": 6
+    },
+    {
+     "name": "mt_reglement_6",
+     "type": "string",
+     "position": 7
+    },
+    {
+     "name": "devise_reglement",
+     "type": "string",
+     "position": 8
+    },
+    {
+     "name": "ind_qualite_reglement",
+     "type": "int",
+     "position": 9
+    }
+   ]
+  },
+  {
+   "id": "bv_titre.reglement_enrichi",
+   "database": "bv_titre",
+   "name": "reglement_enrichi",
+   "type": "VIEW",
+   "description": "",
+   "columns": [
+    {
+     "name": "num_reglement",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "mode",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "montant",
+     "type": "decimal(18,2)",
+     "position": 4
+    },
+    {
+     "name": "canal",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "motif",
+     "type": "string",
+     "position": 6
+    },
+    {
+     "name": "mt_reglement_6",
+     "type": "string",
+     "position": 7
+    },
+    {
+     "name": "devise_reglement",
+     "type": "string",
+     "position": 8
+    },
+    {
+     "name": "ind_qualite_reglement",
+     "type": "int",
+     "position": 9
+    },
+    {
+     "name": "categorie_client",
+     "type": "string",
+     "position": 10
+    },
+    {
+     "name": "score_titre",
+     "type": "decimal(9,4)",
+     "position": 11
+    }
+   ]
+  },
+  {
+   "id": "dm_titre.synthese_1",
+   "database": "dm_titre",
+   "name": "synthese_1",
+   "type": "TABLE",
+   "description": "Mart titre n°1 (fictif)",
+   "columns": [
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "categorie_client",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "raison_sociale",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "taux_mouvement",
+     "type": "decimal(9,6)",
+     "position": 4
+    },
+    {
+     "name": "qte_mouvement_7",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "date_fin_mouvement",
+     "type": "date",
+     "position": 6
+    },
+    {
+     "name": "total_mouvement",
+     "type": "decimal(18,2)",
+     "position": 7
+    },
+    {
+     "name": "nb_mouvement_actifs",
+     "type": "int",
+     "position": 8
+    }
+   ]
+  },
+  {
+   "id": "dm_titre.synthese_2",
+   "database": "dm_titre",
+   "name": "synthese_2",
+   "type": "TABLE",
+   "description": "Mart titre n°2 (fictif)",
+   "columns": [
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "categorie_client",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "raison_sociale",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "ind_qualite_mouvement",
+     "type": "int",
+     "position": 4
+    },
+    {
+     "name": "devise_mouvement",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "total_mouvement",
+     "type": "decimal(18,2)",
+     "position": 6
+    },
+    {
+     "name": "nb_mouvement_actifs",
+     "type": "int",
+     "position": 7
+    }
+   ]
+  },
+  {
+   "id": "lac_garantie.agence_raw",
+   "database": "lac_garantie",
+   "name": "agence_raw",
+   "type": "TABLE",
+   "description": "agence bruts (garantie, fictif)",
+   "columns": [
+    {
+     "name": "num_agence",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "canal_agence",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "type",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "devise",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "date_debut",
+     "type": "date",
+     "position": 6
+    },
+    {
+     "name": "taux",
+     "type": "decimal(9,6)",
+     "position": 7
+    },
+    {
+     "name": "date_effet",
+     "type": "date",
+     "position": 8
+    },
+    {
+     "name": "periodicite",
+     "type": "string",
+     "position": 9
+    },
+    {
+     "name": "libelle",
+     "type": "string",
+     "position": 10
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 11
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 12
+    }
+   ]
+  },
+  {
+   "id": "bv_garantie.agence",
+   "database": "bv_garantie",
+   "name": "agence",
+   "type": "VIEW",
+   "description": "agence (garantie, fictif)",
+   "columns": [
+    {
+     "name": "num_agence",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "valeur_agence_2",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "type",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "devise",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "date_debut",
+     "type": "date",
+     "position": 6
+    },
+    {
+     "name": "taux",
+     "type": "decimal(9,6)",
+     "position": 7
+    },
+    {
+     "name": "date_effet",
+     "type": "date",
+     "position": 8
+    },
+    {
+     "name": "periodicite",
+     "type": "string",
+     "position": 9
+    },
+    {
+     "name": "ind_qualite_agence",
+     "type": "int",
+     "position": 10
+    }
+   ]
+  },
+  {
+   "id": "lac_garantie.avenant_raw",
+   "database": "lac_garantie",
+   "name": "avenant_raw",
+   "type": "TABLE",
+   "description": "avenant bruts (garantie, fictif)",
+   "columns": [
+    {
+     "name": "num_avenant",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "duree",
+     "type": "int",
+     "position": 3
+    },
+    {
+     "name": "motif_avenant",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "indice",
+     "type": "decimal(9,4)",
+     "position": 5
+    },
+    {
+     "name": "date_effet_avenant",
+     "type": "date",
+     "position": 6
+    },
+    {
+     "name": "montant_avenant",
+     "type": "decimal(18,2)",
+     "position": 7
+    },
+    {
+     "name": "canal",
+     "type": "string",
+     "position": 8
+    },
+    {
+     "name": "statut",
+     "type": "string",
+     "position": 9
+    },
+    {
+     "name": "code",
+     "type": "string",
+     "position": 10
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 11
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 12
+    }
+   ]
+  },
+  {
+   "id": "bv_garantie.avenant",
+   "database": "bv_garantie",
+   "name": "avenant",
+   "type": "VIEW",
+   "description": "avenant (garantie, fictif)",
+   "columns": [
+    {
+     "name": "num_avenant",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "duree",
+     "type": "int",
+     "position": 3
+    },
+    {
+     "name": "motif_avenant",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "indice",
+     "type": "decimal(9,4)",
+     "position": 5
+    },
+    {
+     "name": "montant_avenant",
+     "type": "decimal(18,2)",
+     "position": 6
+    },
+    {
+     "name": "canal",
+     "type": "string",
+     "position": 7
+    },
+    {
+     "name": "ind_qualite_avenant",
+     "type": "int",
+     "position": 8
+    }
+   ]
+  },
+  {
+   "id": "lac_garantie.dossier_raw",
+   "database": "lac_garantie",
+   "name": "dossier_raw",
+   "type": "TABLE",
+   "description": "dossier bruts (garantie, fictif)",
+   "columns": [
+    {
+     "name": "num_dossier",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "periodicite_dossier",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "date_debut",
+     "type": "date",
+     "position": 4
+    },
+    {
+     "name": "motif",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "type",
+     "type": "string",
+     "position": 6
+    },
+    {
+     "name": "categorie",
+     "type": "string",
+     "position": 7
+    },
+    {
+     "name": "mode",
+     "type": "string",
+     "position": 8
+    },
+    {
+     "name": "date_fin",
+     "type": "date",
+     "position": 9
+    },
+    {
+     "name": "libelle",
+     "type": "string",
+     "position": 10
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 11
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 12
+    }
+   ]
+  },
+  {
+   "id": "bv_garantie.dossier",
+   "database": "bv_garantie",
+   "name": "dossier",
+   "type": "VIEW",
+   "description": "dossier (garantie, fictif)",
+   "columns": [
+    {
+     "name": "num_dossier",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "periodicite_dossier",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "date_debut",
+     "type": "date",
+     "position": 4
+    },
+    {
+     "name": "motif",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "type",
+     "type": "string",
+     "position": 6
+    },
+    {
+     "name": "categorie",
+     "type": "string",
+     "position": 7
+    },
+    {
+     "name": "date_fin",
+     "type": "date",
+     "position": 8
+    },
+    {
+     "name": "ind_qualite_dossier",
+     "type": "int",
+     "position": 9
+    }
+   ]
+  },
+  {
+   "id": "lac_garantie.operation_raw",
+   "database": "lac_garantie",
+   "name": "operation_raw",
+   "type": "TABLE",
+   "description": "operation bruts (garantie, fictif)",
+   "columns": [
+    {
+     "name": "num_operation",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "type",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "montant_operation",
+     "type": "decimal(18,2)",
+     "position": 4
+    },
+    {
+     "name": "date_fin_operation",
+     "type": "date",
+     "position": 5
+    },
+    {
+     "name": "solde",
+     "type": "decimal(18,2)",
+     "position": 6
+    },
+    {
+     "name": "duree_operation",
+     "type": "int",
+     "position": 7
+    },
+    {
+     "name": "taux_operation",
+     "type": "decimal(9,6)",
+     "position": 8
+    },
+    {
+     "name": "date_effet_operation",
+     "type": "date",
+     "position": 9
+    },
+    {
+     "name": "motif_operation",
+     "type": "string",
+     "position": 10
+    },
+    {
+     "name": "indice",
+     "type": "decimal(9,4)",
+     "position": 11
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 12
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 13
+    }
+   ]
+  },
+  {
+   "id": "bv_garantie.operation",
+   "database": "bv_garantie",
+   "name": "operation",
+   "type": "VIEW",
+   "description": "operation (garantie, fictif)",
+   "columns": [
+    {
+     "name": "num_operation",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "type",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "lib_operation_3",
+     "type": "decimal(18,2)",
+     "position": 4
+    },
+    {
+     "name": "date_fin_operation",
+     "type": "date",
+     "position": 5
+    },
+    {
+     "name": "solde",
+     "type": "decimal(18,2)",
+     "position": 6
+    },
+    {
+     "name": "taux_operation",
+     "type": "decimal(9,6)",
+     "position": 7
+    },
+    {
+     "name": "qte_operation_7",
+     "type": "date",
+     "position": 8
+    },
+    {
+     "name": "indice",
+     "type": "decimal(9,4)",
+     "position": 9
+    },
+    {
+     "name": "ind_qualite_operation",
+     "type": "int",
+     "position": 10
+    }
+   ]
+  },
+  {
+   "id": "lac_garantie.demande_raw",
+   "database": "lac_garantie",
+   "name": "demande_raw",
+   "type": "TABLE",
+   "description": "demande bruts (garantie, fictif)",
+   "columns": [
+    {
+     "name": "num_demande",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "montant",
+     "type": "decimal(18,2)",
+     "position": 3
+    },
+    {
+     "name": "nb_demande",
+     "type": "int",
+     "position": 4
+    },
+    {
+     "name": "indice_demande",
+     "type": "decimal(9,4)",
+     "position": 5
+    },
+    {
+     "name": "date_debut_demande",
+     "type": "date",
+     "position": 6
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 7
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 8
+    }
+   ]
+  },
+  {
+   "id": "bv_garantie.demande",
+   "database": "bv_garantie",
+   "name": "demande",
+   "type": "VIEW",
+   "description": "demande (garantie, fictif)",
+   "columns": [
+    {
+     "name": "num_demande",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "montant",
+     "type": "decimal(18,2)",
+     "position": 3
+    },
+    {
+     "name": "nb_demande",
+     "type": "int",
+     "position": 4
+    },
+    {
+     "name": "indice_demande",
+     "type": "decimal(9,4)",
+     "position": 5
+    },
+    {
+     "name": "date_debut_demande",
+     "type": "date",
+     "position": 6
+    },
+    {
+     "name": "ind_qualite_demande",
+     "type": "int",
+     "position": 7
+    }
+   ]
+  },
+  {
+   "id": "bv_garantie.demande_enrichi",
+   "database": "bv_garantie",
+   "name": "demande_enrichi",
+   "type": "VIEW",
+   "description": "",
+   "columns": [
+    {
+     "name": "num_demande",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "montant",
+     "type": "decimal(18,2)",
+     "position": 3
+    },
+    {
+     "name": "nb_demande",
+     "type": "int",
+     "position": 4
+    },
+    {
+     "name": "indice_demande",
+     "type": "decimal(9,4)",
+     "position": 5
+    },
+    {
+     "name": "date_debut_demande",
+     "type": "date",
+     "position": 6
+    },
+    {
+     "name": "ind_qualite_demande",
+     "type": "int",
+     "position": 7
+    },
+    {
+     "name": "categorie_client",
+     "type": "string",
+     "position": 8
+    },
+    {
+     "name": "score_garantie",
+     "type": "decimal(9,4)",
+     "position": 9
+    }
+   ]
+  },
+  {
+   "id": "dm_garantie.synthese_1",
+   "database": "dm_garantie",
+   "name": "synthese_1",
+   "type": "TABLE",
+   "description": "Mart garantie n°1 (fictif)",
+   "columns": [
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "categorie_client",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "raison_sociale",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "montant",
+     "type": "decimal(18,2)",
+     "position": 4
+    },
+    {
+     "name": "indice_demande",
+     "type": "decimal(9,4)",
+     "position": 5
+    },
+    {
+     "name": "nb_demande",
+     "type": "int",
+     "position": 6
+    },
+    {
+     "name": "ind_qualite_demande",
+     "type": "int",
+     "position": 7
+    },
+    {
+     "name": "total_demande",
+     "type": "decimal(18,2)",
+     "position": 8
+    },
+    {
+     "name": "nb_demande_actifs",
+     "type": "int",
+     "position": 9
+    },
+    {
+     "name": "montant_avenant",
+     "type": "decimal(18,2)",
+     "position": 10
+    },
+    {
+     "name": "ind_qualite_avenant",
+     "type": "int",
+     "position": 11
+    },
+    {
+     "name": "total_avenant",
+     "type": "decimal(18,2)",
+     "position": 12
+    },
+    {
+     "name": "nb_avenant_actifs",
+     "type": "int",
+     "position": 13
+    }
+   ]
+  },
+  {
+   "id": "lac_sinistre.frais_raw",
+   "database": "lac_sinistre",
+   "name": "frais_raw",
+   "type": "TABLE",
+   "description": "frais bruts (sinistre, fictif)",
+   "columns": [
+    {
+     "name": "num_frais",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "motif_frais",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "canal",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "nb_frais",
+     "type": "int",
+     "position": 5
+    },
+    {
+     "name": "taux",
+     "type": "decimal(9,6)",
+     "position": 6
+    },
+    {
+     "name": "code",
+     "type": "string",
+     "position": 7
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 8
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 9
+    }
+   ]
+  },
+  {
+   "id": "bv_sinistre.frais",
+   "database": "bv_sinistre",
+   "name": "frais",
+   "type": "VIEW",
+   "description": "frais (sinistre, fictif)",
+   "columns": [
+    {
+     "name": "num_frais",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "motif_frais",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "canal",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "nb_frais",
+     "type": "int",
+     "position": 5
+    },
+    {
+     "name": "taux",
+     "type": "decimal(9,6)",
+     "position": 6
+    },
+    {
+     "name": "ind_qualite_frais",
+     "type": "int",
+     "position": 7
+    }
+   ]
+  },
+  {
+   "id": "lac_sinistre.echeance_raw",
+   "database": "lac_sinistre",
+   "name": "echeance_raw",
+   "type": "TABLE",
+   "description": "echeance bruts (sinistre, fictif)",
+   "columns": [
+    {
+     "name": "num_echeance",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "date_fin",
+     "type": "date",
+     "position": 3
+    },
+    {
+     "name": "indice_echeance",
+     "type": "decimal(9,4)",
+     "position": 4
+    },
+    {
+     "name": "date_effet_echeance",
+     "type": "date",
+     "position": 5
+    },
+    {
+     "name": "duree_echeance",
+     "type": "int",
+     "position": 6
+    },
+    {
+     "name": "periodicite",
+     "type": "string",
+     "position": 7
+    },
+    {
+     "name": "date_debut",
+     "type": "date",
+     "position": 8
+    },
+    {
+     "name": "devise_echeance",
+     "type": "string",
+     "position": 9
+    },
+    {
+     "name": "type_echeance",
+     "type": "string",
+     "position": 10
+    },
+    {
+     "name": "mode_echeance",
+     "type": "string",
+     "position": 11
+    },
+    {
+     "name": "libelle",
+     "type": "string",
+     "position": 12
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 13
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 14
+    }
+   ]
+  },
+  {
+   "id": "bv_sinistre.echeance",
+   "database": "bv_sinistre",
+   "name": "echeance",
+   "type": "VIEW",
+   "description": "echeance (sinistre, fictif)",
+   "columns": [
+    {
+     "name": "num_echeance",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "date_fin",
+     "type": "date",
+     "position": 3
+    },
+    {
+     "name": "indice_echeance",
+     "type": "decimal(9,4)",
+     "position": 4
+    },
+    {
+     "name": "date_effet_echeance",
+     "type": "date",
+     "position": 5
+    },
+    {
+     "name": "duree_echeance",
+     "type": "int",
+     "position": 6
+    },
+    {
+     "name": "date_debut",
+     "type": "date",
+     "position": 7
+    },
+    {
+     "name": "devise_echeance",
+     "type": "string",
+     "position": 8
+    },
+    {
+     "name": "type_echeance",
+     "type": "string",
+     "position": 9
+    },
+    {
+     "name": "val_echeance_9",
+     "type": "string",
+     "position": 10
+    },
+    {
+     "name": "ind_qualite_echeance",
+     "type": "int",
+     "position": 11
+    }
+   ]
+  },
+  {
+   "id": "lac_sinistre.produit_raw",
+   "database": "lac_sinistre",
+   "name": "produit_raw",
+   "type": "TABLE",
+   "description": "produit bruts (sinistre, fictif)",
+   "columns": [
+    {
+     "name": "num_produit",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "taux_produit",
+     "type": "decimal(9,6)",
+     "position": 3
+    },
+    {
+     "name": "solde_produit",
+     "type": "decimal(18,2)",
+     "position": 4
+    },
+    {
+     "name": "canal",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "periodicite_produit",
+     "type": "string",
+     "position": 6
+    },
+    {
+     "name": "date_debut_produit",
+     "type": "date",
+     "position": 7
+    },
+    {
+     "name": "indice_produit",
+     "type": "decimal(9,4)",
+     "position": 8
+    },
+    {
+     "name": "devise_produit",
+     "type": "string",
+     "position": 9
+    },
+    {
+     "name": "mode_produit",
+     "type": "string",
+     "position": 10
+    },
+    {
+     "name": "duree_produit",
+     "type": "int",
+     "position": 11
+    },
+    {
+     "name": "code",
+     "type": "string",
+     "position": 12
+    },
+    {
+     "name": "libelle",
+     "type": "string",
+     "position": 13
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 14
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 15
+    }
+   ]
+  },
+  {
+   "id": "bv_sinistre.produit",
+   "database": "bv_sinistre",
+   "name": "produit",
+   "type": "VIEW",
+   "description": "produit (sinistre, fictif)",
+   "columns": [
+    {
+     "name": "num_produit",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "taux_produit",
+     "type": "decimal(9,6)",
+     "position": 3
+    },
+    {
+     "name": "solde_produit",
+     "type": "decimal(18,2)",
+     "position": 4
+    },
+    {
+     "name": "canal",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "periodicite_produit",
+     "type": "string",
+     "position": 6
+    },
+    {
+     "name": "date_debut_produit",
+     "type": "date",
+     "position": 7
+    },
+    {
+     "name": "cd_produit_7",
+     "type": "decimal(9,4)",
+     "position": 8
+    },
+    {
+     "name": "devise_produit",
+     "type": "string",
+     "position": 9
+    },
+    {
+     "name": "mode_produit",
+     "type": "string",
+     "position": 10
+    },
+    {
+     "name": "duree_produit",
+     "type": "int",
+     "position": 11
+    },
+    {
+     "name": "ind_qualite_produit",
+     "type": "int",
+     "position": 12
+    }
+   ]
+  },
+  {
+   "id": "lac_sinistre.incident_raw",
+   "database": "lac_sinistre",
+   "name": "incident_raw",
+   "type": "TABLE",
+   "description": "incident bruts (sinistre, fictif)",
+   "columns": [
+    {
+     "name": "num_incident",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "solde_incident",
+     "type": "decimal(18,2)",
+     "position": 3
+    },
+    {
+     "name": "type_incident",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "motif_incident",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "montant_incident",
+     "type": "decimal(18,2)",
+     "position": 6
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 7
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 8
+    }
+   ]
+  },
+  {
+   "id": "bv_sinistre.incident",
+   "database": "bv_sinistre",
+   "name": "incident",
+   "type": "VIEW",
+   "description": "incident (sinistre, fictif)",
+   "columns": [
+    {
+     "name": "num_incident",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "solde_incident",
+     "type": "decimal(18,2)",
+     "position": 3
+    },
+    {
+     "name": "type_incident",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "mt_incident_4",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "qte_incident_5",
+     "type": "decimal(18,2)",
+     "position": 6
+    },
+    {
+     "name": "libelle",
+     "type": "string",
+     "position": 7
+    },
+    {
+     "name": "solde_produit",
+     "type": "decimal(18,2)",
+     "position": 8
+    },
+    {
+     "name": "num_produit",
+     "type": "string",
+     "position": 9
+    },
+    {
+     "name": "ind_qualite_incident",
+     "type": "int",
+     "position": 10
+    }
+   ]
+  },
+  {
+   "id": "lac_sinistre.demande_raw",
+   "database": "lac_sinistre",
+   "name": "demande_raw",
+   "type": "TABLE",
+   "description": "demande bruts (sinistre, fictif)",
+   "columns": [
+    {
+     "name": "num_demande",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "periodicite_demande",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "motif_demande",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "date_fin_demande",
+     "type": "date",
+     "position": 5
+    },
+    {
+     "name": "date_effet_demande",
+     "type": "date",
+     "position": 6
+    },
+    {
+     "name": "canal_demande",
+     "type": "string",
+     "position": 7
+    },
+    {
+     "name": "categorie",
+     "type": "string",
+     "position": 8
+    },
+    {
+     "name": "statut",
+     "type": "string",
+     "position": 9
+    },
+    {
+     "name": "code",
+     "type": "string",
+     "position": 10
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 11
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 12
+    }
+   ]
+  },
+  {
+   "id": "bv_sinistre.demande",
+   "database": "bv_sinistre",
+   "name": "demande",
+   "type": "VIEW",
+   "description": "demande (sinistre, fictif)",
+   "columns": [
+    {
+     "name": "num_demande",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "periodicite_demande",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "motif_demande",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "date_fin_demande",
+     "type": "date",
+     "position": 5
+    },
+    {
+     "name": "date_effet_demande",
+     "type": "date",
+     "position": 6
+    },
+    {
+     "name": "canal_demande",
+     "type": "string",
+     "position": 7
+    },
+    {
+     "name": "categorie",
+     "type": "string",
+     "position": 8
+    },
+    {
+     "name": "indice_produit",
+     "type": "decimal(9,4)",
+     "position": 9
+    },
+    {
+     "name": "solde_produit",
+     "type": "decimal(18,2)",
+     "position": 10
+    },
+    {
+     "name": "taux_produit",
+     "type": "decimal(9,6)",
+     "position": 11
+    },
+    {
+     "name": "num_produit",
+     "type": "string",
+     "position": 12
+    },
+    {
+     "name": "ind_qualite_demande",
+     "type": "int",
+     "position": 13
+    }
+   ]
+  },
+  {
+   "id": "lac_sinistre.reglement_raw",
+   "database": "lac_sinistre",
+   "name": "reglement_raw",
+   "type": "TABLE",
+   "description": "reglement bruts (sinistre, fictif)",
+   "columns": [
+    {
+     "name": "num_reglement",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "devise_reglement",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "nb",
+     "type": "int",
+     "position": 4
+    },
+    {
+     "name": "periodicite_reglement",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "date_fin_reglement",
+     "type": "date",
+     "position": 6
+    },
+    {
+     "name": "mode",
+     "type": "string",
+     "position": 7
+    },
+    {
+     "name": "duree_reglement",
+     "type": "int",
+     "position": 8
+    },
+    {
+     "name": "type_reglement",
+     "type": "string",
+     "position": 9
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 10
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 11
+    }
+   ]
+  },
+  {
+   "id": "bv_sinistre.reglement",
+   "database": "bv_sinistre",
+   "name": "reglement",
+   "type": "VIEW",
+   "description": "reglement (sinistre, fictif)",
+   "columns": [
+    {
+     "name": "num_reglement",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "val_reglement_2",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "nb",
+     "type": "int",
+     "position": 4
+    },
+    {
+     "name": "periodicite_reglement",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "date_fin_reglement",
+     "type": "date",
+     "position": 6
+    },
+    {
+     "name": "mode",
+     "type": "string",
+     "position": 7
+    },
+    {
+     "name": "duree_reglement",
+     "type": "int",
+     "position": 8
+    },
+    {
+     "name": "type_reglement",
+     "type": "string",
+     "position": 9
+    },
+    {
+     "name": "ind_qualite_reglement",
+     "type": "int",
+     "position": 10
+    }
+   ]
+  },
+  {
+   "id": "dm_sinistre.synthese_1",
+   "database": "dm_sinistre",
+   "name": "synthese_1",
+   "type": "TABLE",
+   "description": "Mart sinistre n°1 (fictif)",
+   "columns": [
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "categorie_client",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "raison_sociale",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "canal",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "taux",
+     "type": "decimal(9,6)",
+     "position": 5
+    },
+    {
+     "name": "total_frais",
+     "type": "decimal(18,2)",
+     "position": 6
+    },
+    {
+     "name": "nb_frais_actifs",
+     "type": "int",
+     "position": 7
+    },
+    {
+     "name": "num_produit",
+     "type": "string",
+     "position": 8
+    },
+    {
+     "name": "libelle",
+     "type": "string",
+     "position": 9
+    },
+    {
+     "name": "solde_incident",
+     "type": "decimal(18,2)",
+     "position": 10
+    },
+    {
+     "name": "qte_incident_5",
+     "type": "decimal(18,2)",
+     "position": 11
+    },
+    {
+     "name": "total_incident",
+     "type": "decimal(18,2)",
+     "position": 12
+    },
+    {
+     "name": "nb_incident_actifs",
+     "type": "int",
+     "position": 13
+    }
+   ]
+  },
+  {
+   "id": "dm_sinistre.synthese_2",
+   "database": "dm_sinistre",
+   "name": "synthese_2",
+   "type": "TABLE",
+   "description": "Mart sinistre n°2 (fictif)",
+   "columns": [
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "categorie_client",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "raison_sociale",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "duree_reglement",
+     "type": "int",
+     "position": 4
+    },
+    {
+     "name": "type_reglement",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "total_reglement",
+     "type": "decimal(18,2)",
+     "position": 6
+    },
+    {
+     "name": "nb_reglement_actifs",
+     "type": "int",
+     "position": 7
+    },
+    {
+     "name": "solde_produit",
+     "type": "decimal(18,2)",
+     "position": 8
+    },
+    {
+     "name": "duree_produit",
+     "type": "int",
+     "position": 9
+    },
+    {
+     "name": "total_produit",
+     "type": "decimal(18,2)",
+     "position": 10
+    },
+    {
+     "name": "nb_produit_actifs",
+     "type": "int",
+     "position": 11
+    }
+   ]
+  },
+  {
+   "id": "dm_sinistre.synthese_3",
+   "database": "dm_sinistre",
+   "name": "synthese_3",
+   "type": "TABLE",
+   "description": "Mart sinistre n°3 (fictif)",
+   "columns": [
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "categorie_client",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "raison_sociale",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "date_effet_demande",
+     "type": "date",
+     "position": 4
+    },
+    {
+     "name": "categorie",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "num_produit",
+     "type": "string",
+     "position": 6
+    },
+    {
+     "name": "date_fin_demande",
+     "type": "date",
+     "position": 7
+    },
+    {
+     "name": "total_demande",
+     "type": "decimal(18,2)",
+     "position": 8
+    },
+    {
+     "name": "nb_demande_actifs",
+     "type": "int",
+     "position": 9
+    }
+   ]
+  },
+  {
+   "id": "lac_contentieux.echeance_raw",
+   "database": "lac_contentieux",
+   "name": "echeance_raw",
+   "type": "TABLE",
+   "description": "echeance bruts (contentieux, fictif)",
+   "columns": [
+    {
+     "name": "num_echeance",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "solde_echeance",
+     "type": "decimal(18,2)",
+     "position": 3
+    },
+    {
+     "name": "categorie",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "periodicite_echeance",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "motif",
+     "type": "string",
+     "position": 6
+    },
+    {
+     "name": "taux",
+     "type": "decimal(9,6)",
+     "position": 7
+    },
+    {
+     "name": "code",
+     "type": "string",
+     "position": 8
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 9
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 10
+    }
+   ]
+  },
+  {
+   "id": "bv_contentieux.echeance",
+   "database": "bv_contentieux",
+   "name": "echeance",
+   "type": "VIEW",
+   "description": "echeance (contentieux, fictif)",
+   "columns": [
+    {
+     "name": "num_echeance",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "categorie",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "periodicite_echeance",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "motif",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "cd_echeance_5",
+     "type": "decimal(9,6)",
+     "position": 6
+    },
+    {
+     "name": "ind_qualite_echeance",
+     "type": "int",
+     "position": 7
+    }
+   ]
+  },
+  {
+   "id": "lac_contentieux.operation_raw",
+   "database": "lac_contentieux",
+   "name": "operation_raw",
+   "type": "TABLE",
+   "description": "operation bruts (contentieux, fictif)",
+   "columns": [
+    {
+     "name": "num_operation",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "indice",
+     "type": "decimal(9,4)",
+     "position": 3
+    },
+    {
+     "name": "date_effet_operation",
+     "type": "date",
+     "position": 4
+    },
+    {
+     "name": "motif_operation",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "solde_operation",
+     "type": "decimal(18,2)",
+     "position": 6
+    },
+    {
+     "name": "statut",
+     "type": "string",
+     "position": 7
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 8
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 9
+    }
+   ]
+  },
+  {
+   "id": "bv_contentieux.operation",
+   "database": "bv_contentieux",
+   "name": "operation",
+   "type": "VIEW",
+   "description": "operation (contentieux, fictif)",
+   "columns": [
+    {
+     "name": "num_operation",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "indice",
+     "type": "decimal(9,4)",
+     "position": 3
+    },
+    {
+     "name": "date_effet_operation",
+     "type": "date",
+     "position": 4
+    },
+    {
+     "name": "motif_operation",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "solde_operation",
+     "type": "decimal(18,2)",
+     "position": 6
+    },
+    {
+     "name": "ind_qualite_operation",
+     "type": "int",
+     "position": 7
+    }
+   ]
+  },
+  {
+   "id": "lac_contentieux.dossier_raw",
+   "database": "lac_contentieux",
+   "name": "dossier_raw",
+   "type": "TABLE",
+   "description": "dossier bruts (contentieux, fictif)",
+   "columns": [
+    {
+     "name": "num_dossier",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "categorie",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "date_effet",
+     "type": "date",
+     "position": 4
+    },
+    {
+     "name": "canal_dossier",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "mode",
+     "type": "string",
+     "position": 6
+    },
+    {
+     "name": "code",
+     "type": "string",
+     "position": 7
+    },
+    {
+     "name": "libelle",
+     "type": "string",
+     "position": 8
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 9
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 10
+    }
+   ]
+  },
+  {
+   "id": "bv_contentieux.dossier",
+   "database": "bv_contentieux",
+   "name": "dossier",
+   "type": "VIEW",
+   "description": "dossier (contentieux, fictif)",
+   "columns": [
+    {
+     "name": "num_dossier",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "categorie",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "date_effet",
+     "type": "date",
+     "position": 4
+    },
+    {
+     "name": "canal_dossier",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "mode",
+     "type": "string",
+     "position": 6
+    },
+    {
+     "name": "statut",
+     "type": "string",
+     "position": 7
+    },
+    {
+     "name": "date_effet_operation",
+     "type": "date",
+     "position": 8
+    },
+    {
+     "name": "num_operation",
+     "type": "string",
+     "position": 9
+    },
+    {
+     "name": "ind_qualite_dossier",
+     "type": "int",
+     "position": 10
+    }
+   ]
+  },
+  {
+   "id": "lac_contentieux.mouvement_raw",
+   "database": "lac_contentieux",
+   "name": "mouvement_raw",
+   "type": "TABLE",
+   "description": "mouvement bruts (contentieux, fictif)",
+   "columns": [
+    {
+     "name": "num_mouvement",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "date_effet_mouvement",
+     "type": "date",
+     "position": 3
+    },
+    {
+     "name": "type",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "indice_mouvement",
+     "type": "decimal(9,4)",
+     "position": 5
+    },
+    {
+     "name": "devise",
+     "type": "string",
+     "position": 6
+    },
+    {
+     "name": "statut",
+     "type": "string",
+     "position": 7
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 8
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 9
+    }
+   ]
+  },
+  {
+   "id": "bv_contentieux.mouvement",
+   "database": "bv_contentieux",
+   "name": "mouvement",
+   "type": "VIEW",
+   "description": "mouvement (contentieux, fictif)",
+   "columns": [
+    {
+     "name": "num_mouvement",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "valeur_mouvement_2",
+     "type": "date",
+     "position": 3
+    },
+    {
+     "name": "cd_mouvement_3",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "indice_mouvement",
+     "type": "decimal(9,4)",
+     "position": 5
+    },
+    {
+     "name": "devise",
+     "type": "string",
+     "position": 6
+    },
+    {
+     "name": "ind_qualite_mouvement",
+     "type": "int",
+     "position": 7
+    }
+   ]
+  },
+  {
+   "id": "bv_contentieux.operation_enrichi",
+   "database": "bv_contentieux",
+   "name": "operation_enrichi",
+   "type": "VIEW",
+   "description": "",
+   "columns": [
+    {
+     "name": "num_operation",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "indice",
+     "type": "decimal(9,4)",
+     "position": 3
+    },
+    {
+     "name": "date_effet_operation",
+     "type": "date",
+     "position": 4
+    },
+    {
+     "name": "motif_operation",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "solde_operation",
+     "type": "decimal(18,2)",
+     "position": 6
+    },
+    {
+     "name": "ind_qualite_operation",
+     "type": "int",
+     "position": 7
+    },
+    {
+     "name": "categorie_client",
+     "type": "string",
+     "position": 8
+    },
+    {
+     "name": "score_contentieux",
+     "type": "decimal(9,4)",
+     "position": 9
+    }
+   ]
+  },
+  {
+   "id": "dm_contentieux.synthese_1",
+   "database": "dm_contentieux",
+   "name": "synthese_1",
+   "type": "TABLE",
+   "description": "Mart contentieux n°1 (fictif)",
+   "columns": [
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "categorie_client",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "raison_sociale",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "motif_operation",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "solde_operation",
+     "type": "decimal(18,2)",
+     "position": 5
+    },
+    {
+     "name": "indice",
+     "type": "decimal(9,4)",
+     "position": 6
+    },
+    {
+     "name": "total_operation",
+     "type": "decimal(18,2)",
+     "position": 7
+    },
+    {
+     "name": "nb_operation_actifs",
+     "type": "int",
+     "position": 8
+    }
+   ]
+  },
+  {
+   "id": "dm_contentieux.synthese_2",
+   "database": "dm_contentieux",
+   "name": "synthese_2",
+   "type": "TABLE",
+   "description": "Mart contentieux n°2 (fictif)",
+   "columns": [
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "categorie_client",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "raison_sociale",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "num_operation",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "date_effet_operation",
+     "type": "date",
+     "position": 5
+    },
+    {
+     "name": "canal_dossier",
+     "type": "string",
+     "position": 6
+    },
+    {
+     "name": "date_effet",
+     "type": "date",
+     "position": 7
+    },
+    {
+     "name": "total_dossier",
+     "type": "decimal(18,2)",
+     "position": 8
+    },
+    {
+     "name": "nb_dossier_actifs",
+     "type": "int",
+     "position": 9
+    }
+   ]
+  },
+  {
+   "id": "lac_patrimoine.frais_raw",
+   "database": "lac_patrimoine",
+   "name": "frais_raw",
+   "type": "TABLE",
+   "description": "frais bruts (patrimoine, fictif)",
+   "columns": [
+    {
+     "name": "num_frais",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "type_frais",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "montant",
+     "type": "decimal(18,2)",
+     "position": 4
+    },
+    {
+     "name": "date_debut_frais",
+     "type": "date",
+     "position": 5
+    },
+    {
+     "name": "solde_frais",
+     "type": "decimal(18,2)",
+     "position": 6
+    },
+    {
+     "name": "nb",
+     "type": "int",
+     "position": 7
+    },
+    {
+     "name": "duree_frais",
+     "type": "int",
+     "position": 8
+    },
+    {
+     "name": "devise_frais",
+     "type": "string",
+     "position": 9
+    },
+    {
+     "name": "date_effet",
+     "type": "date",
+     "position": 10
+    },
+    {
+     "name": "libelle",
+     "type": "string",
+     "position": 11
+    },
+    {
+     "name": "statut",
+     "type": "string",
+     "position": 12
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 13
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 14
+    }
+   ]
+  },
+  {
+   "id": "bv_patrimoine.frais",
+   "database": "bv_patrimoine",
+   "name": "frais",
+   "type": "VIEW",
+   "description": "frais (patrimoine, fictif)",
+   "columns": [
+    {
+     "name": "num_frais",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "qte_frais_2",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "montant",
+     "type": "decimal(18,2)",
+     "position": 4
+    },
+    {
+     "name": "date_debut_frais",
+     "type": "date",
+     "position": 5
+    },
+    {
+     "name": "solde_frais",
+     "type": "decimal(18,2)",
+     "position": 6
+    },
+    {
+     "name": "nb",
+     "type": "int",
+     "position": 7
+    },
+    {
+     "name": "duree_frais",
+     "type": "int",
+     "position": 8
+    },
+    {
+     "name": "date_effet",
+     "type": "date",
+     "position": 9
+    },
+    {
+     "name": "ind_qualite_frais",
+     "type": "int",
+     "position": 10
+    }
+   ]
+  },
+  {
+   "id": "lac_patrimoine.avenant_raw",
+   "database": "lac_patrimoine",
+   "name": "avenant_raw",
+   "type": "TABLE",
+   "description": "avenant bruts (patrimoine, fictif)",
+   "columns": [
+    {
+     "name": "num_avenant",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "date_effet_avenant",
+     "type": "date",
+     "position": 3
+    },
+    {
+     "name": "indice_avenant",
+     "type": "decimal(9,4)",
+     "position": 4
+    },
+    {
+     "name": "canal",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "solde",
+     "type": "decimal(18,2)",
+     "position": 6
+    },
+    {
+     "name": "type",
+     "type": "string",
+     "position": 7
+    },
+    {
+     "name": "periodicite_avenant",
+     "type": "string",
+     "position": 8
+    },
+    {
+     "name": "code",
+     "type": "string",
+     "position": 9
+    },
+    {
+     "name": "statut",
+     "type": "string",
+     "position": 10
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 11
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 12
+    }
+   ]
+  },
+  {
+   "id": "bv_patrimoine.avenant",
+   "database": "bv_patrimoine",
+   "name": "avenant",
+   "type": "VIEW",
+   "description": "avenant (patrimoine, fictif)",
+   "columns": [
+    {
+     "name": "num_avenant",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "date_effet_avenant",
+     "type": "date",
+     "position": 3
+    },
+    {
+     "name": "indice_avenant",
+     "type": "decimal(9,4)",
+     "position": 4
+    },
+    {
+     "name": "canal",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "solde",
+     "type": "decimal(18,2)",
+     "position": 6
+    },
+    {
+     "name": "qte_avenant_6",
+     "type": "string",
+     "position": 7
+    },
+    {
+     "name": "ind_qualite_avenant",
+     "type": "int",
+     "position": 8
+    }
+   ]
+  },
+  {
+   "id": "lac_patrimoine.evenement_raw",
+   "database": "lac_patrimoine",
+   "name": "evenement_raw",
+   "type": "TABLE",
+   "description": "evenement bruts (patrimoine, fictif)",
+   "columns": [
+    {
+     "name": "num_evenement",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "indice",
+     "type": "decimal(9,4)",
+     "position": 3
+    },
+    {
+     "name": "devise",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "date_debut_evenement",
+     "type": "date",
+     "position": 5
+    },
+    {
+     "name": "mode_evenement",
+     "type": "string",
+     "position": 6
+    },
+    {
+     "name": "date_chargement",
+     "type": "timestamp",
+     "position": 7
+    },
+    {
+     "name": "id_traitement",
+     "type": "bigint",
+     "position": 8
+    }
+   ]
+  },
+  {
+   "id": "bv_patrimoine.evenement",
+   "database": "bv_patrimoine",
+   "name": "evenement",
+   "type": "VIEW",
+   "description": "evenement (patrimoine, fictif)",
+   "columns": [
+    {
+     "name": "num_evenement",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "ind_evenement_2",
+     "type": "decimal(9,4)",
+     "position": 3
+    },
+    {
+     "name": "devise",
+     "type": "string",
+     "position": 4
+    },
+    {
+     "name": "date_debut_evenement",
+     "type": "date",
+     "position": 5
+    },
+    {
+     "name": "mt_evenement_5",
+     "type": "string",
+     "position": 6
+    },
+    {
+     "name": "ind_qualite_evenement",
+     "type": "int",
+     "position": 7
+    }
+   ]
+  },
+  {
+   "id": "bv_patrimoine.avenant_enrichi",
+   "database": "bv_patrimoine",
+   "name": "avenant_enrichi",
+   "type": "VIEW",
+   "description": "",
+   "columns": [
+    {
+     "name": "num_avenant",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "date_effet_avenant",
+     "type": "date",
+     "position": 3
+    },
+    {
+     "name": "indice_avenant",
+     "type": "decimal(9,4)",
+     "position": 4
+    },
+    {
+     "name": "canal",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "solde",
+     "type": "decimal(18,2)",
+     "position": 6
+    },
+    {
+     "name": "qte_avenant_6",
+     "type": "string",
+     "position": 7
+    },
+    {
+     "name": "ind_qualite_avenant",
+     "type": "int",
+     "position": 8
+    },
+    {
+     "name": "categorie_client",
+     "type": "string",
+     "position": 9
+    },
+    {
+     "name": "score_patrimoine",
+     "type": "decimal(9,4)",
+     "position": 10
+    }
+   ]
+  },
+  {
+   "id": "dm_patrimoine.synthese_1",
+   "database": "dm_patrimoine",
+   "name": "synthese_1",
+   "type": "TABLE",
+   "description": "Mart patrimoine n°1 (fictif)",
+   "columns": [
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "categorie_client",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "raison_sociale",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "solde",
+     "type": "decimal(18,2)",
+     "position": 4
+    },
+    {
+     "name": "qte_avenant_6",
+     "type": "string",
+     "position": 5
+    },
+    {
+     "name": "total_avenant",
+     "type": "decimal(18,2)",
+     "position": 6
+    },
+    {
+     "name": "nb_avenant_actifs",
+     "type": "int",
+     "position": 7
+    }
+   ]
+  },
+  {
+   "id": "dm_patrimoine.synthese_2",
+   "database": "dm_patrimoine",
+   "name": "synthese_2",
+   "type": "TABLE",
+   "description": "Mart patrimoine n°2 (fictif)",
+   "columns": [
+    {
+     "name": "code_tiers_ref",
+     "type": "string",
+     "is_key": true,
+     "position": 1
+    },
+    {
+     "name": "categorie_client",
+     "type": "string",
+     "position": 2
+    },
+    {
+     "name": "raison_sociale",
+     "type": "string",
+     "position": 3
+    },
+    {
+     "name": "duree_frais",
+     "type": "int",
+     "position": 4
+    },
+    {
+     "name": "montant",
+     "type": "decimal(18,2)",
+     "position": 5
+    },
+    {
+     "name": "total_frais",
+     "type": "decimal(18,2)",
+     "position": 6
+    },
+    {
+     "name": "nb_frais_actifs",
+     "type": "int",
+     "position": 7
+    },
+    {
+     "name": "canal",
+     "type": "string",
+     "position": 8
+    },
+    {
+     "name": "date_effet_avenant",
+     "type": "date",
+     "position": 9
+    },
+    {
+     "name": "total_avenant",
+     "type": "decimal(18,2)",
+     "position": 10
+    },
+    {
+     "name": "nb_avenant_actifs",
+     "type": "int",
+     "position": 11
+    }
+   ]
+  }
+ ]
+}

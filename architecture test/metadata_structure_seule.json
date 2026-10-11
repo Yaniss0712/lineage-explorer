@@ -1,0 +1,1190 @@
+{
+  "meta": {
+    "format_version": "1.0",
+    "extracted_at": "2026-10-09T10:00:00+02:00",
+    "source": "architecture-test-fictive (structure seule)",
+    "extractor": "construire_architecture.py"
+  },
+  "objects": [
+    {
+      "id": "lac_crm.clients_raw",
+      "database": "lac_crm",
+      "name": "clients_raw",
+      "type": "TABLE",
+      "description": "Clients bruts issus du CRM",
+      "columns": [
+        {
+          "name": "code_tiers",
+          "type": "string",
+          "is_key": true,
+          "description": "Identifiant tiers CRM",
+          "position": 1
+        },
+        {
+          "name": "nom_client",
+          "type": "string",
+          "is_key": false,
+          "description": "Nom ou raison sociale",
+          "position": 2
+        },
+        {
+          "name": "segment",
+          "type": "string",
+          "is_key": false,
+          "description": "Segment CRM (PART, PRO, ENT)",
+          "position": 3
+        },
+        {
+          "name": "code_agence",
+          "type": "string",
+          "is_key": false,
+          "description": "Agence de rattachement",
+          "position": 4
+        },
+        {
+          "name": "date_creation",
+          "type": "date",
+          "is_key": false,
+          "description": "Date d'entrée en relation",
+          "position": 5
+        },
+        {
+          "name": "date_chargement",
+          "type": "timestamp",
+          "is_key": false,
+          "description": "Horodatage technique",
+          "position": 6
+        }
+      ]
+    },
+    {
+      "id": "lac_crm.adresses_raw",
+      "database": "lac_crm",
+      "name": "adresses_raw",
+      "type": "TABLE",
+      "description": "Adresses postales des tiers",
+      "columns": [
+        {
+          "name": "id_adresse",
+          "type": "string",
+          "is_key": true,
+          "description": "Identifiant adresse",
+          "position": 1
+        },
+        {
+          "name": "code_tiers",
+          "type": "string",
+          "is_key": false,
+          "description": "Tiers propriétaire de l'adresse",
+          "position": 2
+        },
+        {
+          "name": "ville",
+          "type": "string",
+          "is_key": false,
+          "description": "Ville",
+          "position": 3
+        },
+        {
+          "name": "code_postal",
+          "type": "string",
+          "is_key": false,
+          "description": "Code postal",
+          "position": 4
+        },
+        {
+          "name": "pays_iso",
+          "type": "string",
+          "is_key": false,
+          "description": "Pays (ISO 2)",
+          "position": 5
+        },
+        {
+          "name": "date_chargement",
+          "type": "timestamp",
+          "is_key": false,
+          "description": "Horodatage technique",
+          "position": 6
+        }
+      ]
+    },
+    {
+      "id": "lac_ref.agences_raw",
+      "database": "lac_ref",
+      "name": "agences_raw",
+      "type": "TABLE",
+      "description": "Référentiel des agences",
+      "columns": [
+        {
+          "name": "code_agence",
+          "type": "string",
+          "is_key": true,
+          "description": "Code agence",
+          "position": 1
+        },
+        {
+          "name": "libelle_agence",
+          "type": "string",
+          "is_key": false,
+          "description": "Nom de l'agence",
+          "position": 2
+        },
+        {
+          "name": "code_region",
+          "type": "string",
+          "is_key": false,
+          "description": "Région de l'agence",
+          "position": 3
+        },
+        {
+          "name": "date_chargement",
+          "type": "timestamp",
+          "is_key": false,
+          "description": "Horodatage technique",
+          "position": 4
+        }
+      ]
+    },
+    {
+      "id": "lac_ref.regions_raw",
+      "database": "lac_ref",
+      "name": "regions_raw",
+      "type": "TABLE",
+      "description": "Référentiel des régions",
+      "columns": [
+        {
+          "name": "code_region",
+          "type": "string",
+          "is_key": true,
+          "description": "Code région",
+          "position": 1
+        },
+        {
+          "name": "nom_region",
+          "type": "string",
+          "is_key": false,
+          "description": "Nom de la région",
+          "position": 2
+        },
+        {
+          "name": "date_chargement",
+          "type": "timestamp",
+          "is_key": false,
+          "description": "Horodatage technique",
+          "position": 3
+        }
+      ]
+    },
+    {
+      "id": "lac_ref.produits_raw",
+      "database": "lac_ref",
+      "name": "produits_raw",
+      "type": "TABLE",
+      "description": "Catalogue des produits de crédit",
+      "columns": [
+        {
+          "name": "code_produit",
+          "type": "string",
+          "is_key": true,
+          "description": "Code produit",
+          "position": 1
+        },
+        {
+          "name": "libelle_produit",
+          "type": "string",
+          "is_key": false,
+          "description": "Libellé produit",
+          "position": 2
+        },
+        {
+          "name": "famille_produit",
+          "type": "string",
+          "is_key": false,
+          "description": "Famille (IMMO, CONSO, PRO)",
+          "position": 3
+        },
+        {
+          "name": "taux_base",
+          "type": "decimal(9,4)",
+          "is_key": false,
+          "description": "Taux annuel de base",
+          "position": 4
+        },
+        {
+          "name": "date_chargement",
+          "type": "timestamp",
+          "is_key": false,
+          "description": "Horodatage technique",
+          "position": 5
+        }
+      ]
+    },
+    {
+      "id": "lac_pret.contrats_raw",
+      "database": "lac_pret",
+      "name": "contrats_raw",
+      "type": "TABLE",
+      "description": "Contrats de prêt bruts",
+      "columns": [
+        {
+          "name": "num_contrat",
+          "type": "string",
+          "is_key": true,
+          "description": "Numéro de contrat",
+          "position": 1
+        },
+        {
+          "name": "code_tiers",
+          "type": "string",
+          "is_key": false,
+          "description": "Emprunteur",
+          "position": 2
+        },
+        {
+          "name": "code_produit",
+          "type": "string",
+          "is_key": false,
+          "description": "Produit souscrit",
+          "position": 3
+        },
+        {
+          "name": "code_agence",
+          "type": "string",
+          "is_key": false,
+          "description": "Agence gestionnaire",
+          "position": 4
+        },
+        {
+          "name": "montant",
+          "type": "decimal(18,2)",
+          "is_key": false,
+          "description": "Montant emprunté",
+          "position": 5
+        },
+        {
+          "name": "date_signature",
+          "type": "date",
+          "is_key": false,
+          "description": "Date de signature",
+          "position": 6
+        },
+        {
+          "name": "duree_mois",
+          "type": "int",
+          "is_key": false,
+          "description": "Durée en mois",
+          "position": 7
+        },
+        {
+          "name": "date_chargement",
+          "type": "timestamp",
+          "is_key": false,
+          "description": "Horodatage technique",
+          "position": 8
+        }
+      ]
+    },
+    {
+      "id": "lac_pret.echeances_raw",
+      "database": "lac_pret",
+      "name": "echeances_raw",
+      "type": "TABLE",
+      "description": "Échéances de remboursement",
+      "columns": [
+        {
+          "name": "id_echeance",
+          "type": "string",
+          "is_key": true,
+          "description": "Identifiant échéance",
+          "position": 1
+        },
+        {
+          "name": "num_contrat",
+          "type": "string",
+          "is_key": false,
+          "description": "Contrat concerné",
+          "position": 2
+        },
+        {
+          "name": "date_echeance",
+          "type": "date",
+          "is_key": false,
+          "description": "Date d'échéance",
+          "position": 3
+        },
+        {
+          "name": "montant_echeance",
+          "type": "decimal(18,2)",
+          "is_key": false,
+          "description": "Montant dû",
+          "position": 4
+        },
+        {
+          "name": "statut_paiement",
+          "type": "string",
+          "is_key": false,
+          "description": "PAYE / IMPAYE",
+          "position": 5
+        },
+        {
+          "name": "date_chargement",
+          "type": "timestamp",
+          "is_key": false,
+          "description": "Horodatage technique",
+          "position": 6
+        }
+      ]
+    },
+    {
+      "id": "lac_cpt.comptes_raw",
+      "database": "lac_cpt",
+      "name": "comptes_raw",
+      "type": "TABLE",
+      "description": "Comptes bancaires",
+      "columns": [
+        {
+          "name": "num_compte",
+          "type": "string",
+          "is_key": true,
+          "description": "Numéro de compte",
+          "position": 1
+        },
+        {
+          "name": "code_tiers",
+          "type": "string",
+          "is_key": false,
+          "description": "Titulaire",
+          "position": 2
+        },
+        {
+          "name": "code_agence",
+          "type": "string",
+          "is_key": false,
+          "description": "Agence de tenue de compte",
+          "position": 3
+        },
+        {
+          "name": "type_compte",
+          "type": "string",
+          "is_key": false,
+          "description": "Type de compte",
+          "position": 4
+        },
+        {
+          "name": "date_ouverture",
+          "type": "date",
+          "is_key": false,
+          "description": "Date d'ouverture",
+          "position": 5
+        },
+        {
+          "name": "date_chargement",
+          "type": "timestamp",
+          "is_key": false,
+          "description": "Horodatage technique",
+          "position": 6
+        }
+      ]
+    },
+    {
+      "id": "lac_cpt.operations_raw",
+      "database": "lac_cpt",
+      "name": "operations_raw",
+      "type": "TABLE",
+      "description": "Opérations sur les comptes",
+      "columns": [
+        {
+          "name": "id_operation",
+          "type": "string",
+          "is_key": true,
+          "description": "Identifiant opération",
+          "position": 1
+        },
+        {
+          "name": "num_compte",
+          "type": "string",
+          "is_key": false,
+          "description": "Compte mouvementé",
+          "position": 2
+        },
+        {
+          "name": "date_operation",
+          "type": "date",
+          "is_key": false,
+          "description": "Date de l'opération",
+          "position": 3
+        },
+        {
+          "name": "montant_op",
+          "type": "decimal(18,2)",
+          "is_key": false,
+          "description": "Montant (positif)",
+          "position": 4
+        },
+        {
+          "name": "sens",
+          "type": "string",
+          "is_key": false,
+          "description": "C = crédit, D = débit",
+          "position": 5
+        },
+        {
+          "name": "code_canal",
+          "type": "string",
+          "is_key": false,
+          "description": "Canal utilisé",
+          "position": 6
+        },
+        {
+          "name": "date_chargement",
+          "type": "timestamp",
+          "is_key": false,
+          "description": "Horodatage technique",
+          "position": 7
+        }
+      ]
+    },
+    {
+      "id": "lac_ref.canaux_raw",
+      "database": "lac_ref",
+      "name": "canaux_raw",
+      "type": "TABLE",
+      "description": "Référentiel des canaux",
+      "columns": [
+        {
+          "name": "code_canal",
+          "type": "string",
+          "is_key": true,
+          "description": "Code canal",
+          "position": 1
+        },
+        {
+          "name": "libelle_canal",
+          "type": "string",
+          "is_key": false,
+          "description": "Libellé du canal",
+          "position": 2
+        },
+        {
+          "name": "date_chargement",
+          "type": "timestamp",
+          "is_key": false,
+          "description": "Horodatage technique",
+          "position": 3
+        }
+      ]
+    },
+    {
+      "id": "bv_client.tiers",
+      "database": "bv_client",
+      "name": "tiers",
+      "type": "VIEW",
+      "description": "Référentiel tiers nettoyé (identifiant normalisé, adresse)",
+      "columns": [
+        {
+          "name": "code_tiers_ref",
+          "type": "string",
+          "is_key": true,
+          "description": "Identifiant tiers normalisé (trim + upper)",
+          "position": 1
+        },
+        {
+          "name": "nom_client",
+          "type": "string",
+          "is_key": false,
+          "description": "Nom du client",
+          "position": 2
+        },
+        {
+          "name": "categorie_client",
+          "type": "string",
+          "is_key": false,
+          "description": "Catégorie client (ex-segment CRM)",
+          "position": 3
+        },
+        {
+          "name": "code_agence",
+          "type": "string",
+          "is_key": false,
+          "description": "Agence de rattachement",
+          "position": 4
+        },
+        {
+          "name": "ville",
+          "type": "string",
+          "is_key": false,
+          "description": "Ville",
+          "position": 5
+        },
+        {
+          "name": "code_postal",
+          "type": "string",
+          "is_key": false,
+          "description": "Code postal",
+          "position": 6
+        },
+        {
+          "name": "date_creation",
+          "type": "date",
+          "is_key": false,
+          "description": "Entrée en relation",
+          "position": 7
+        }
+      ]
+    },
+    {
+      "id": "bv_ref.agences",
+      "database": "bv_ref",
+      "name": "agences",
+      "type": "VIEW",
+      "description": "Agences avec leur région",
+      "columns": [
+        {
+          "name": "code_agence",
+          "type": "string",
+          "is_key": true,
+          "description": "Code agence",
+          "position": 1
+        },
+        {
+          "name": "libelle_agence",
+          "type": "string",
+          "is_key": false,
+          "description": "Nom de l'agence",
+          "position": 2
+        },
+        {
+          "name": "code_region",
+          "type": "string",
+          "is_key": false,
+          "description": "Code région",
+          "position": 3
+        },
+        {
+          "name": "nom_region",
+          "type": "string",
+          "is_key": false,
+          "description": "Nom de la région",
+          "position": 4
+        }
+      ]
+    },
+    {
+      "id": "bv_ref.produits",
+      "database": "bv_ref",
+      "name": "produits",
+      "type": "VIEW",
+      "description": "Catalogue produits",
+      "columns": [
+        {
+          "name": "code_produit",
+          "type": "string",
+          "is_key": true,
+          "description": "Code produit",
+          "position": 1
+        },
+        {
+          "name": "libelle_produit",
+          "type": "string",
+          "is_key": false,
+          "description": "Libellé produit",
+          "position": 2
+        },
+        {
+          "name": "famille_produit",
+          "type": "string",
+          "is_key": false,
+          "description": "Famille de produit",
+          "position": 3
+        },
+        {
+          "name": "taux_base",
+          "type": "decimal(9,4)",
+          "is_key": false,
+          "description": "Taux annuel de base",
+          "position": 4
+        }
+      ]
+    },
+    {
+      "id": "bv_pret.contrats",
+      "database": "bv_pret",
+      "name": "contrats",
+      "type": "VIEW",
+      "description": "Contrats de prêt nettoyés",
+      "columns": [
+        {
+          "name": "num_contrat",
+          "type": "string",
+          "is_key": true,
+          "description": "Numéro de contrat",
+          "position": 1
+        },
+        {
+          "name": "code_tiers_ref",
+          "type": "string",
+          "is_key": false,
+          "description": "Emprunteur (identifiant normalisé)",
+          "position": 2
+        },
+        {
+          "name": "code_produit",
+          "type": "string",
+          "is_key": false,
+          "description": "Produit",
+          "position": 3
+        },
+        {
+          "name": "code_agence",
+          "type": "string",
+          "is_key": false,
+          "description": "Agence gestionnaire",
+          "position": 4
+        },
+        {
+          "name": "montant_pret",
+          "type": "decimal(18,2)",
+          "is_key": false,
+          "description": "Montant emprunté",
+          "position": 5
+        },
+        {
+          "name": "date_signature",
+          "type": "date",
+          "is_key": false,
+          "description": "Date de signature",
+          "position": 6
+        },
+        {
+          "name": "duree_mois",
+          "type": "int",
+          "is_key": false,
+          "description": "Durée en mois",
+          "position": 7
+        }
+      ]
+    },
+    {
+      "id": "bv_pret.echeances",
+      "database": "bv_pret",
+      "name": "echeances",
+      "type": "VIEW",
+      "description": "Échéances de remboursement",
+      "columns": [
+        {
+          "name": "id_echeance",
+          "type": "string",
+          "is_key": true,
+          "description": "Identifiant échéance",
+          "position": 1
+        },
+        {
+          "name": "num_contrat",
+          "type": "string",
+          "is_key": false,
+          "description": "Contrat",
+          "position": 2
+        },
+        {
+          "name": "date_echeance",
+          "type": "date",
+          "is_key": false,
+          "description": "Date d'échéance",
+          "position": 3
+        },
+        {
+          "name": "montant_echeance",
+          "type": "decimal(18,2)",
+          "is_key": false,
+          "description": "Montant dû",
+          "position": 4
+        },
+        {
+          "name": "statut_paiement",
+          "type": "string",
+          "is_key": false,
+          "description": "PAYE / IMPAYE",
+          "position": 5
+        }
+      ]
+    },
+    {
+      "id": "bv_cpt.comptes",
+      "database": "bv_cpt",
+      "name": "comptes",
+      "type": "VIEW",
+      "description": "Comptes bancaires nettoyés",
+      "columns": [
+        {
+          "name": "num_compte",
+          "type": "string",
+          "is_key": true,
+          "description": "Numéro de compte",
+          "position": 1
+        },
+        {
+          "name": "code_tiers_ref",
+          "type": "string",
+          "is_key": false,
+          "description": "Titulaire (identifiant normalisé)",
+          "position": 2
+        },
+        {
+          "name": "code_agence",
+          "type": "string",
+          "is_key": false,
+          "description": "Agence",
+          "position": 3
+        },
+        {
+          "name": "type_compte",
+          "type": "string",
+          "is_key": false,
+          "description": "Type de compte",
+          "position": 4
+        },
+        {
+          "name": "date_ouverture",
+          "type": "date",
+          "is_key": false,
+          "description": "Ouverture",
+          "position": 5
+        }
+      ]
+    },
+    {
+      "id": "bv_cpt.operations",
+      "database": "bv_cpt",
+      "name": "operations",
+      "type": "VIEW",
+      "description": "Opérations avec libellé de canal",
+      "columns": [
+        {
+          "name": "id_operation",
+          "type": "string",
+          "is_key": true,
+          "description": "Identifiant opération",
+          "position": 1
+        },
+        {
+          "name": "num_compte",
+          "type": "string",
+          "is_key": false,
+          "description": "Compte",
+          "position": 2
+        },
+        {
+          "name": "date_operation",
+          "type": "date",
+          "is_key": false,
+          "description": "Date",
+          "position": 3
+        },
+        {
+          "name": "montant_operation",
+          "type": "decimal(18,2)",
+          "is_key": false,
+          "description": "Montant (positif)",
+          "position": 4
+        },
+        {
+          "name": "sens",
+          "type": "string",
+          "is_key": false,
+          "description": "C / D",
+          "position": 5
+        },
+        {
+          "name": "code_canal",
+          "type": "string",
+          "is_key": false,
+          "description": "Canal",
+          "position": 6
+        },
+        {
+          "name": "libelle_canal",
+          "type": "string",
+          "is_key": false,
+          "description": "Libellé du canal",
+          "position": 7
+        }
+      ]
+    },
+    {
+      "id": "bv_pret.contrats_enrichis",
+      "database": "bv_pret",
+      "name": "contrats_enrichis",
+      "type": "VIEW",
+      "description": "Contrats enrichis du produit (BV construite sur des BV)",
+      "columns": [
+        {
+          "name": "num_contrat",
+          "type": "string",
+          "is_key": true,
+          "description": "Numéro de contrat",
+          "position": 1
+        },
+        {
+          "name": "code_tiers_ref",
+          "type": "string",
+          "is_key": false,
+          "description": "Emprunteur",
+          "position": 2
+        },
+        {
+          "name": "code_agence",
+          "type": "string",
+          "is_key": false,
+          "description": "Agence",
+          "position": 3
+        },
+        {
+          "name": "code_produit",
+          "type": "string",
+          "is_key": false,
+          "description": "Produit",
+          "position": 4
+        },
+        {
+          "name": "libelle_produit",
+          "type": "string",
+          "is_key": false,
+          "description": "Libellé produit",
+          "position": 5
+        },
+        {
+          "name": "famille_produit",
+          "type": "string",
+          "is_key": false,
+          "description": "Famille",
+          "position": 6
+        },
+        {
+          "name": "taux_base",
+          "type": "decimal(9,4)",
+          "is_key": false,
+          "description": "Taux annuel",
+          "position": 7
+        },
+        {
+          "name": "montant_pret",
+          "type": "decimal(18,2)",
+          "is_key": false,
+          "description": "Montant emprunté",
+          "position": 8
+        },
+        {
+          "name": "duree_mois",
+          "type": "int",
+          "is_key": false,
+          "description": "Durée",
+          "position": 9
+        },
+        {
+          "name": "date_signature",
+          "type": "date",
+          "is_key": false,
+          "description": "Signature",
+          "position": 10
+        },
+        {
+          "name": "mensualite_theorique",
+          "type": "decimal(18,2)",
+          "is_key": false,
+          "description": "Mensualité calculée",
+          "position": 11
+        }
+      ]
+    },
+    {
+      "id": "dm_client.vue_360",
+      "database": "dm_client",
+      "name": "vue_360",
+      "type": "TABLE",
+      "description": "Vue 360° du client",
+      "columns": [
+        {
+          "name": "code_tiers_ref",
+          "type": "string",
+          "is_key": true,
+          "description": "Client",
+          "position": 1
+        },
+        {
+          "name": "nom_client",
+          "type": "string",
+          "is_key": false,
+          "description": "Nom",
+          "position": 2
+        },
+        {
+          "name": "categorie_client",
+          "type": "string",
+          "is_key": false,
+          "description": "Catégorie",
+          "position": 3
+        },
+        {
+          "name": "ville",
+          "type": "string",
+          "is_key": false,
+          "description": "Ville",
+          "position": 4
+        },
+        {
+          "name": "libelle_agence",
+          "type": "string",
+          "is_key": false,
+          "description": "Agence",
+          "position": 5
+        },
+        {
+          "name": "nb_comptes",
+          "type": "int",
+          "is_key": false,
+          "description": "Nombre de comptes",
+          "position": 6
+        },
+        {
+          "name": "nb_contrats",
+          "type": "int",
+          "is_key": false,
+          "description": "Nombre de prêts",
+          "position": 7
+        },
+        {
+          "name": "montant_total_pret",
+          "type": "decimal(18,2)",
+          "is_key": false,
+          "description": "Total emprunté",
+          "position": 8
+        }
+      ]
+    },
+    {
+      "id": "dm_pret.encours_client",
+      "database": "dm_pret",
+      "name": "encours_client",
+      "type": "TABLE",
+      "description": "Encours de prêt par client",
+      "columns": [
+        {
+          "name": "code_tiers_ref",
+          "type": "string",
+          "is_key": true,
+          "description": "Client",
+          "position": 1
+        },
+        {
+          "name": "nom_client",
+          "type": "string",
+          "is_key": false,
+          "description": "Nom",
+          "position": 2
+        },
+        {
+          "name": "categorie_client",
+          "type": "string",
+          "is_key": false,
+          "description": "Catégorie",
+          "position": 3
+        },
+        {
+          "name": "nb_contrats",
+          "type": "int",
+          "is_key": false,
+          "description": "Nombre de prêts",
+          "position": 4
+        },
+        {
+          "name": "montant_total_pret",
+          "type": "decimal(18,2)",
+          "is_key": false,
+          "description": "Total emprunté",
+          "position": 5
+        },
+        {
+          "name": "montant_impaye",
+          "type": "decimal(18,2)",
+          "is_key": false,
+          "description": "Total des échéances impayées",
+          "position": 6
+        }
+      ]
+    },
+    {
+      "id": "dm_pret.impayes",
+      "database": "dm_pret",
+      "name": "impayes",
+      "type": "TABLE",
+      "description": "Échéances impayées détaillées",
+      "columns": [
+        {
+          "name": "num_contrat",
+          "type": "string",
+          "is_key": true,
+          "description": "Contrat",
+          "position": 1
+        },
+        {
+          "name": "code_tiers_ref",
+          "type": "string",
+          "is_key": false,
+          "description": "Client",
+          "position": 2
+        },
+        {
+          "name": "libelle_produit",
+          "type": "string",
+          "is_key": false,
+          "description": "Produit",
+          "position": 3
+        },
+        {
+          "name": "famille_produit",
+          "type": "string",
+          "is_key": false,
+          "description": "Famille",
+          "position": 4
+        },
+        {
+          "name": "date_echeance",
+          "type": "date",
+          "is_key": false,
+          "description": "Échéance",
+          "position": 5
+        },
+        {
+          "name": "montant_impaye",
+          "type": "decimal(18,2)",
+          "is_key": false,
+          "description": "Montant impayé",
+          "position": 6
+        }
+      ]
+    },
+    {
+      "id": "dm_reseau.activite_agence",
+      "database": "dm_reseau",
+      "name": "activite_agence",
+      "type": "TABLE",
+      "description": "Activité commerciale par agence",
+      "columns": [
+        {
+          "name": "code_agence",
+          "type": "string",
+          "is_key": true,
+          "description": "Agence",
+          "position": 1
+        },
+        {
+          "name": "libelle_agence",
+          "type": "string",
+          "is_key": false,
+          "description": "Nom",
+          "position": 2
+        },
+        {
+          "name": "nom_region",
+          "type": "string",
+          "is_key": false,
+          "description": "Région",
+          "position": 3
+        },
+        {
+          "name": "nb_clients",
+          "type": "int",
+          "is_key": false,
+          "description": "Clients rattachés",
+          "position": 4
+        },
+        {
+          "name": "nb_contrats",
+          "type": "int",
+          "is_key": false,
+          "description": "Prêts gérés",
+          "position": 5
+        },
+        {
+          "name": "nb_comptes",
+          "type": "int",
+          "is_key": false,
+          "description": "Comptes tenus",
+          "position": 6
+        },
+        {
+          "name": "montant_total_pret",
+          "type": "decimal(18,2)",
+          "is_key": false,
+          "description": "Total emprunté",
+          "position": 7
+        }
+      ]
+    },
+    {
+      "id": "dm_cpt.flux_mensuels",
+      "database": "dm_cpt",
+      "name": "flux_mensuels",
+      "type": "TABLE",
+      "description": "Flux mensuels par compte (septembre 2026)",
+      "columns": [
+        {
+          "name": "num_compte",
+          "type": "string",
+          "is_key": true,
+          "description": "Compte",
+          "position": 1
+        },
+        {
+          "name": "code_tiers_ref",
+          "type": "string",
+          "is_key": false,
+          "description": "Titulaire",
+          "position": 2
+        },
+        {
+          "name": "categorie_client",
+          "type": "string",
+          "is_key": false,
+          "description": "Catégorie",
+          "position": 3
+        },
+        {
+          "name": "mois",
+          "type": "string",
+          "is_key": false,
+          "description": "Mois (AAAA-MM)",
+          "position": 4
+        },
+        {
+          "name": "total_credits",
+          "type": "decimal(18,2)",
+          "is_key": false,
+          "description": "Somme des crédits",
+          "position": 5
+        },
+        {
+          "name": "total_debits",
+          "type": "decimal(18,2)",
+          "is_key": false,
+          "description": "Somme des débits",
+          "position": 6
+        },
+        {
+          "name": "nb_operations",
+          "type": "int",
+          "is_key": false,
+          "description": "Nombre d'opérations",
+          "position": 7
+        },
+        {
+          "name": "canal_principal",
+          "type": "string",
+          "is_key": false,
+          "description": "Canal le plus utilisé",
+          "position": 8
+        }
+      ]
+    }
+  ]
+}
