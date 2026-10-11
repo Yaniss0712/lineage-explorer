@@ -75,25 +75,34 @@
     const q = $("#q").value.trim();
     const dtype = $("#dtype").value.trim();
     state.page = page || 1;
-    if (q.length < 2 && !dtype) { $("#results").innerHTML = '<p class="hint">Tapez au moins 2 caractères pour chercher.</p>'; $("#pager").innerHTML = ""; $("#results-count").textContent = ""; return; }
-    const params = new URLSearchParams({ q, page: state.page, desc: $("#in-desc").checked ? "1" : "0" });
+    // Sans recherche : on liste toutes les tables, groupées par couche (mode « parcourir »).
+    const browse = q.length < 2 && !dtype;
+    const params = new URLSearchParams({ q: browse ? "" : q, page: state.page, desc: $("#in-desc").checked ? "1" : "0" });
     const lf = layerFilter(); if (lf) params.set("layer", lf);
+    if (browse) params.set("kind", "OBJECT");
     if (dtype) { params.set("dtype", dtype); params.set("kind", "COLUMN"); }
     try {
       const t0 = performance.now();
       const data = await api("search?" + params);
       const ms = Math.round(performance.now() - t0);
-      $("#results-count").textContent = data.total;
-      selectTab("results");
-      if (!data.results.length) { $("#results").innerHTML = '<p class="hint">Aucun résultat.</p>'; $("#pager").innerHTML = ""; return; }
-      $("#results").innerHTML = data.results.map((r) => r.kind === "OBJECT"
-        ? `<div class="item" data-obj="${esc(r.object_id)}"><i class="dot ${esc(r.layer)}"></i><div class="txt"><div class="title">${esc(r.name.split(".").pop())}</div><div class="sub">${esc(r.database)} · table</div></div></div>`
-        : `<div class="item" data-obj="${esc(r.object_id)}" data-col="${esc(r.name)}"><i class="dot ${esc(r.layer)}"></i><div class="txt"><div class="title mono">${esc(r.name)}</div><div class="sub">${esc(r.object_id)}${r.data_type ? " · " + esc(r.data_type) : ""}</div></div></div>`).join("");
+      $("#results-count").textContent = data.total || "";
+      if (!browse) selectTab("results");
+      if (!data.results.length) { $("#results").innerHTML = `<p class="hint">${browse ? "Aucune table pour ces filtres." : "Aucun résultat."}</p>`; $("#pager").innerHTML = ""; return; }
+      const LAYER_NAMES = { LAC: "Lac", BV: "BV", MART: "Mart", AUTRE: "Autre" };
+      let lastLayer = null;
+      $("#results").innerHTML = data.results.map((r) => {
+        const header = browse && r.layer !== lastLayer ? `<div class="group-title"><i class="dot ${esc(r.layer)}"></i>${esc(LAYER_NAMES[r.layer] || r.layer)}</div>` : "";
+        lastLayer = r.layer;
+        return header + (r.kind === "OBJECT"
+          ? `<div class="item" data-obj="${esc(r.object_id)}"><i class="dot ${esc(r.layer)}"></i><div class="txt"><div class="title">${esc(r.name.split(".").pop())}</div><div class="sub">${esc(r.database)}</div></div></div>`
+          : `<div class="item" data-obj="${esc(r.object_id)}" data-col="${esc(r.name)}"><i class="dot ${esc(r.layer)}"></i><div class="txt"><div class="title mono">${esc(r.name)}</div><div class="sub">${esc(r.object_id)}${r.data_type ? " · " + esc(r.data_type) : ""}</div></div></div>`);
+      }).join("");
+      $$(".item", $("#results")).forEach((it) => it.classList.toggle("active", it.dataset.obj === state.center && !it.dataset.col));
       const pages = Math.ceil(data.total / data.page_size);
-      $("#pager").innerHTML = `<span>${data.total} résultat(s) · ${ms} ms</span><span>
+      $("#pager").innerHTML = `<span>${data.total} ${browse ? "table(s)" : "résultat(s)"} · ${ms} ms</span><span>
         ${state.page > 1 ? '<button class="btn sm ghost" data-page="prev">‹</button>' : ""} ${state.page}/${pages}
         ${state.page < pages ? '<button class="btn sm ghost" data-page="next">›</button>' : ""}</span>`;
-    } catch (e) { fail(e); }
+    } catch (e) { if (e.status !== 503) fail(e); }
   }
 
   $("#results").addEventListener("click", (ev) => {
@@ -666,6 +675,7 @@
     const ok = await loadStats();
     if (!$("#user").value && state.stats) $("#user").placeholder = state.stats.user;
     if (!ok) return;
+    runSearch(1);
     refreshReviewCount();
     const m = location.hash.match(/obj=([^&]+)/);
     if (m) openObject(decodeURIComponent(m[1]));
