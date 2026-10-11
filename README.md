@@ -93,6 +93,7 @@ Le rappel limité de l'inférence pure vient des marts construits à partir d'ag
 
 ## L'interface
 
+- **Liste des tables** affichée dès l'ouverture, groupée par couche (Lac, BV, Mart) et filtrable.
 - **Recherche** partielle, insensible à la casse et aux accents, filtrable par couche et par type de colonne.
 - **Graphe** : sources à gauche, cibles à droite ; Amont / Tout / Aval, profondeur, seuil de confiance, jointures et liens rejetés à la demande. Double-clic pour étendre, clic droit pour masquer.
 - **Détail d'une table** : colonnes (clic = lineage de la colonne), liens avec origine, score et « pourquoi ? », documentation (URL de spec, notes).
