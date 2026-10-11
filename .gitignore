@@ -26,3 +26,6 @@ tools/sensitive_patterns.txt
 # Documents internes (non publiés)
 docs/06_workflow_perso_pro.md
 docs/08_decisions_questions.md
+
+# Fichiers de verrou Office
+~$*
