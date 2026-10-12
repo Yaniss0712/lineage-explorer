@@ -65,12 +65,17 @@ def resolve_path(path: str, base: str = APP_DIR) -> str:
     return path if os.path.isabs(path) else os.path.join(base, path)
 
 
+PORTABLE_WORKSPACE = os.environ.get("LINEAGE_WORKSPACE")    # défini par LineageExplorer.cmd (version portable)
+
+
 def default_workspace() -> str:
+    if PORTABLE_WORKSPACE:
+        return os.path.abspath(PORTABLE_WORKSPACE)
     return APP_DIR if FROZEN else os.path.join(PROJECT_ROOT, "data", "espace")
 
 
 def default_cache_dir() -> str:
-    if FROZEN:
+    if FROZEN or PORTABLE_WORKSPACE:
         base = os.environ.get("LOCALAPPDATA") or os.path.expanduser("~")
         return os.path.join(base, "LineageExplorer", "cache")
     return os.path.join(PROJECT_ROOT, "data", "cache")
@@ -82,7 +87,8 @@ def current_user() -> str:
 
 
 def find_config_file() -> Optional[str]:
-    for folder in (APP_DIR, PROJECT_ROOT):
+    folders = ([os.path.abspath(PORTABLE_WORKSPACE)] if PORTABLE_WORKSPACE else []) + [APP_DIR, PROJECT_ROOT]
+    for folder in folders:
         candidate = os.path.join(folder, "config.json")
         if os.path.exists(candidate):
             return candidate

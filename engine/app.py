@@ -25,7 +25,7 @@ def _log_path() -> str:
 
 
 def main() -> None:
-    if getattr(sys, "frozen", False) and sys.stdout is None:          # exe sans console
+    if sys.stdout is None or os.environ.get("LINEAGE_WORKSPACE"):   # sans console (pythonw, exe)
         sys.stdout = sys.stderr = open(_log_path(), "a", encoding="utf-8", buffering=1)
     from engine.config import load_config
     from engine.server import create_server

@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lineage Explorer</title>
+  <link rel="stylesheet" href="style.css">
+  <script>try { document.documentElement.dataset.theme = localStorage.getItem("lineage.theme") || "light"; } catch (e) { document.documentElement.dataset.theme = "light"; }</script>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><span class="logo"></span><span class="brand-text">Lineage</span></div>
+  <div class="search">
+    <svg class="search-icon" viewBox="0 0 24 24" width="16" height="16"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    <input id="q" type="search" placeholder="Rechercher : table, colonne, tag, base…" title="Préfixes possibles : tag:  base:  table:  col:" autocomplete="off">
+  </div>
+  <div class="actions">
+    <button id="btn-refresh" class="btn ghost refresh" title="Actualiser : relire l'espace partagé et recharger les données">
+      <svg viewBox="0 0 24 24" width="15" height="15"><path d="M20 12a8 8 0 1 1-2.34-5.66M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span id="sync" class="sync">Actualiser</span>
+    </button>
+    <button id="btn-tags" class="btn ghost">Tags</button>
+    <button id="btn-history" class="btn ghost">Historique</button>
+    <button id="btn-save-version" class="btn" title="Enregistrer la version actuelle (tags, liens, documentation)">Enregistrer</button>
+    <button id="btn-import" class="btn primary">Importer</button>
+    <div class="popover-wrap">
+      <button id="btn-more" class="icon-btn" title="Plus" aria-label="Plus">
+        <svg viewBox="0 0 24 24" width="16" height="16"><circle cx="5" cy="12" r="1.8" fill="currentColor"/><circle cx="12" cy="12" r="1.8" fill="currentColor"/><circle cx="19" cy="12" r="1.8" fill="currentColor"/></svg>
+      </button>
+      <div id="more-menu" class="popover menu hidden">
+        <button data-menu="report">Rapport et indicateurs</button>
+        <button data-menu="export">Exporter la documentation (Excel)</button>
+        <button data-menu="settings">Réglages (colonnes ignorées, objets masqués)</button>
+        <label class="menu-field">Votre nom (auteur des modifications)<input id="user" class="input" maxlength="40"></label>
+      </div>
+    </div>
+    <button id="btn-theme" class="icon-btn" title="Mode clair / sombre" aria-label="Mode clair / sombre">
+      <svg class="ic-moon" viewBox="0 0 24 24" width="16" height="16"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+      <svg class="ic-sun" viewBox="0 0 24 24" width="16" height="16"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</header>
+
+<main class="layout">
+  <aside class="side left">
+    <nav class="tabs">
+      <button class="tab active" data-tab="catalog">Catalogue</button>
+      <button class="tab" data-tab="review">À valider <span id="review-count" class="count"></span></button>
+      <button class="tab" data-tab="sugg" title="Suggestions">Suggestions <span id="sugg-count" class="count"></span></button>
+      <button class="tab" data-tab="cols">Colonnes</button>
+    </nav>
+    <div id="tab-catalog" class="tab-body">
+      <div class="list-tools">
+        <span id="catalog-info" class="muted"></span>
+        <label class="check small"><input type="checkbox" id="select-mode"> Sélection multiple</label>
+      </div>
+      <div id="selection-bar" class="selection-bar hidden">
+        <span id="selection-count"></span>
+        <select id="selection-tag"></select>
+        <button class="btn sm primary" id="selection-apply">Taguer</button>
+        <button class="btn sm ghost" id="selection-clear">×</button>
+      </div>
+      <div id="tree" class="tree"><p class="hint">Chargement…</p></div>
+    </div>
+    <div id="tab-review" class="tab-body hidden"><div id="review" class="list"></div></div>
+    <div id="tab-sugg" class="tab-body hidden">
+      <p class="hint">Tables qui semblent liées (colonnes communes, requêtes SQL importées). Créez le lien dans le bon sens, ou écartez la suggestion.</p>
+      <div id="sugg" class="list"></div>
+    </div>
+    <div id="tab-cols" class="tab-body hidden">
+      <div class="list-tools col-tools">
+        <input id="col-filter" class="input" placeholder="Filtrer les colonnes…">
+        <label class="check small"><input type="checkbox" id="col-conflicts"> types différents</label>
+      </div>
+      <div id="cols" class="list"></div>
+    </div>
+  </aside>
+  <div class="splitter" data-split="left" title="Glisser pour élargir"></div>
+
+  <section class="canvas">
+    <div id="offline" class="offline hidden">Connexion perdue avec Lineage Explorer. La petite fenêtre « Lineage Explorer est ouvert » a peut-être été fermée : relancez <b>LineageExplorer.exe</b>. <button class="btn sm" id="offline-retry">Réessayer</button></div>
+    <div class="floatbar" id="floatbar">
+      <div class="seg" id="dir-seg">
+        <button class="btn-seg" data-dir="up" title="D'où viennent les données">Amont</button>
+        <button class="btn-seg active" data-dir="both">Tout</button>
+        <button class="btn-seg" data-dir="down" title="Ce qui est impacté">Aval</button>
+      </div>
+      <div class="stepper" title="Profondeur">
+        <button data-step="-1" aria-label="Moins profond">−</button>
+        <input id="depth" type="number" min="1" max="20" value="2">
+        <button data-step="1" aria-label="Plus profond">+</button>
+      </div>
+      <div class="popover-wrap">
+        <button id="btn-options" class="icon-btn" title="Options d'affichage">
+          <svg viewBox="0 0 24 24" width="16" height="16"><path d="M4 7h10M18 7h2M4 17h4M12 17h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="16" cy="7" r="2" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="10" cy="17" r="2" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+        </button>
+        <div id="options" class="popover hidden">
+          <label class="check"><input id="opt-sugg" type="checkbox" checked> Suggestions (pointillés)</label>
+          <label class="check"><input id="opt-pending" type="checkbox" checked> Liens à valider (tirets)</label>
+          <label class="check"><input id="opt-join" type="checkbox" checked> Jointures</label>
+        </div>
+      </div>
+      <span class="sep"></span>
+      <button id="btn-recenter" class="icon-btn" title="Centrer sur la sélection"><svg viewBox="0 0 24 24" width="16" height="16"><circle cx="12" cy="12" r="3" fill="currentColor"/><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/></svg></button>
+      <button id="btn-fit" class="icon-btn" title="Ajuster à l'écran"><svg viewBox="0 0 24 24" width="16" height="16"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    </div>
+    <div id="colbar" class="floatbar colbar hidden">
+      <span>Vue colonne : <b id="colbar-name" class="mono"></b></span>
+      <label class="check small"><input type="checkbox" id="col-similar"> noms proches</label>
+      <button class="btn sm ghost" id="colbar-close">Fermer</button>
+    </div>
+
+    <svg id="graph" xmlns="http://www.w3.org/2000/svg"></svg>
+
+    <div id="graph-empty" class="empty">
+      <div class="empty-dot"></div>
+      <h2>Explorez vos données</h2>
+      <p>Choisissez une table dans le catalogue à gauche, ou une colonne dans l'onglet « Colonnes ».</p>
+    </div>
+
+    <div class="legend">
+      <span class="ln"><svg width="22" height="8"><line x1="0" y1="4" x2="22" y2="4" class="lg-flow"/></svg>lien validé</span>
+      <span class="ln"><svg width="22" height="8"><line x1="0" y1="4" x2="22" y2="4" class="lg-pending"/></svg>à valider</span>
+      <span class="ln"><svg width="22" height="8"><line x1="0" y1="4" x2="22" y2="4" class="lg-sugg"/></svg>suggestion</span>
+      <span class="ln"><svg width="22" height="8"><line x1="0" y1="4" x2="22" y2="4" class="lg-join"/></svg>jointure</span>
+    </div>
+    <div id="graph-info" class="graph-info"></div>
+    <div id="tooltip" class="tooltip hidden"></div>
+  </section>
+  <div class="splitter" data-split="right" title="Glisser pour élargir"></div>
+
+  <aside class="side right" id="detail">
+    <div class="empty-detail"><p class="hint">Sélectionnez une table pour voir son détail.</p></div>
+  </aside>
+</main>
+
+<div id="modal" class="modal hidden" role="dialog" aria-modal="true">
+  <div class="modal-box">
+    <button class="modal-close" aria-label="Fermer">×</button>
+    <div id="modal-body"></div>
+  </div>
+</div>
+<div id="toast" class="toast hidden"></div>
+
+<script src="graph.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

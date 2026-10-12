@@ -1,2 +1,6 @@
 * text=auto eol=lf
 *.xlsx binary
+# Fichiers Windows de la version portable : conservés tels quels (fins de ligne CRLF)
+*.cmd -text
+deploiement/**/*.txt -text
+deploiement/**/*._pth -text

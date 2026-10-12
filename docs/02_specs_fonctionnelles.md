@@ -29,7 +29,7 @@
 | US-09 | documenter (description, propriétaire, URL de spec, notes) | Onglet Doc du détail |
 | US-10 | que toute l'équipe voie les modifications | Journal partagé, relu toutes les 15 s, message « N modifications de … » |
 | US-11 | enregistrer la version actuelle | Bouton dédié ; historique, comparaison, restauration |
-| US-12 | ouvrir l'outil d'un double-clic | `LineageExplorer.exe` dans le dossier Teams |
+| US-12 | ouvrir l'outil d'un double-clic | `LineageExplorer.cmd` dans le dossier Teams (Python portable officiel inclus) |
 | US-13 | voir amont / aval, l'impact, le chemin entre deux tables | Graphe, export CSV d'impact, recherche de chemin |
 | US-14 | exporter la documentation | Export Excel (objets, liens, colonnes liées, tags, règles) |
 | US-15 | réimporter une nouvelle extraction sans rien perdre | Tags et liens conservés ; objets / colonnes apparus et disparus signalés ; liens « à revoir » |

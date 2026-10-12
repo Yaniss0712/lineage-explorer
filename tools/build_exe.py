@@ -1,4 +1,7 @@
-"""Construit `dist/LineageExplorer.exe` (Windows) avec PyInstaller.
+"""Construit `dist/LineageExplorer.exe` (Windows) avec PyInstaller — DÉCONSEILLÉ.
+
+Microsoft Defender classe les exe PyInstaller non signés comme menace (faux positif
+« Trojan:Win32/Bearfoos.A!ml ») et les supprime. Utiliser plutôt `tools/build_portable.py`.
 
 À lancer sur un poste de développement (PyInstaller n'est nécessaire que pour construire,
 pas pour utiliser l'exe) :

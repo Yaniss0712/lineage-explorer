@@ -5,7 +5,7 @@
 ```
  Extraction (metastore, scripts)          Espace partagé (Teams)                 Chaque poste
  ─────────────────────────────           ────────────────────────               ─────────────────────────────
- JSON de structure ou fichiers .sql ──▶   metadonnees/  (imports)        ──▶   LineageExplorer.exe
+ JSON de structure ou fichiers .sql ──▶   metadonnees/  (imports)        ──▶   LineageExplorer.cmd
                                           journal/      (1 fichier /            ├─ serveur local 127.0.0.1
                                                          modification)  ◀──▶    ├─ cache SQLite local
                                           versions/     (instantanés)           │  (%LOCALAPPDATA%)
@@ -21,7 +21,7 @@
 | Composant | Choix | Justification |
 |---|---|---|
 | Moteur, serveur | Python ≥ 3.9, **bibliothèque standard uniquement** | Pas de `pip` nécessaire, exe autonome |
-| Distribution | **PyInstaller** `--onefile` (13 Mo), construit localement ou par GitHub Actions | Double-clic, aucune installation |
+| Distribution | **Dossier portable** : Python officiel signé + code + `LineageExplorer.cmd` (`tools/build_portable.py`) | Rien à installer ; pas de faux positif antivirus (un .exe PyInstaller non signé est bloqué par Defender) |
 | Partage | **Journal d'événements** (fichiers JSON uniques) | Zéro conflit de synchronisation, historique complet |
 | Index | SQLite local + FTS5 `trigram` (repli `LIKE`) | Recherche instantanée sur tout le catalogue |
 | Interface | HTML / CSS / JS vanilla, graphe SVG maison | Aucune librairie, aucun CDN |
@@ -31,7 +31,7 @@
 
 ```
 engine/
-├── app.py           # point d'entrée de l'exe : serveur + navigateur + petite fenêtre de contrôle
+├── app.py           # point d'entrée (LineageExplorer.cmd) : serveur + navigateur + petite fenêtre, instance unique
 ├── __main__.py      # CLI : check | import | serve | report | evaluate
 ├── config.py        # configuration, emplacements (espace partagé, cache local)
 ├── ingest.py        # lecture JSON / JSONL / SQL, validation
