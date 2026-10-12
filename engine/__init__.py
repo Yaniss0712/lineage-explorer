@@ -1,18 +1,19 @@
-"""Lineage Explorer — moteur de lineage de données (Python standard uniquement).
+"""Lineage Explorer — outil de lineage collaboratif (Python standard uniquement).
 
 Modules :
-- config      : lecture de la configuration et valeurs par défaut ;
-- ingest      : lecture / validation du JSON (ou JSON Lines) d'entrée ;
+- config      : configuration et emplacements (espace partagé, cache local) ;
+- ingest      : lecture / validation des métadonnées (JSON, JSON Lines, SQL) ;
+- sql_ingest  : requêtes SQL → structure + indications de flux et de jointures ;
 - normalize   : normalisation des noms de colonnes et d'objets ;
-- layers      : attribution des couches LAC / BV / MART ;
-- inference   : inférence du lineage à partir de la structure seule ;
-- lineage     : flux déclarés, parsing SQL, arbitrage, parcours amont/aval ;
-- relations   : détection des relations de clés ;
-- store       : base SQLite (schéma, écriture, requêtes) ;
-- annotations : annotations partagées (spec, liens manuels, validation) ;
-- build       : orchestration du build complet ;
-- evaluate    : précision / rappel sur une vérité terrain ;
-- server      : API HTTP locale + interface web.
+- catalog     : objets enrichis et fréquences des colonnes ;
+- suggestions : suggestions de liens (aucun lien n'est créé automatiquement) ;
+- build       : construction du cache local ;
+- store       : cache SQLite (recherche, dictionnaire des colonnes, suggestions) ;
+- workspace   : journal partagé, état de l'équipe (tags, liens, documentation), versions ;
+- lineage     : analyse SQL bas niveau, parcours amont / aval ;
+- xlsx        : export Excel ;
+- server      : API HTTP locale + interface web ;
+- app         : point d'entrée de l'exécutable Windows.
 """
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"

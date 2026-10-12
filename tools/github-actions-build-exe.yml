@@ -1,0 +1,40 @@
+# MODÈLE à ajouter sur GitHub : Add file > Create new file > nom « .github/workflows/build-exe.yml »,
+# coller ce contenu, Commit. (Le jeton Git du poste n'a pas le droit de publier un workflow.)
+# Construit LineageExplorer.exe sur Windows et le publie dans une Release GitHub
+# à chaque tag « v* » (ex. v0.2.0). Lancement manuel possible depuis l'onglet Actions.
+name: Construire l'exécutable
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Tests
+        run: python -m unittest
+      - name: Construire l'exe
+        run: |
+          python -m pip install pyinstaller
+          python tools/build_exe.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LineageExplorer
+          path: dist/LineageExplorer.exe
+      - name: Publier la release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/LineageExplorer.exe
+          body: |
+            Exécutable Windows autonome (aucune installation). Mode d'emploi pour un espace Teams :
+            voir docs/10_deploiement_teams.md.

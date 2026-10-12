@@ -1,49 +1,19 @@
 {
+  "_aide": "Copier en config.json à côté de l'exe (ou à la racine du projet). Toutes les clés sont facultatives.",
   "paths": {
-    "input": "examples/metadata.sample.json",
-    "database": "data/lineage.db",
-    "annotations_dir": "data/annotations"
+    "workspace": null,
+    "cache_dir": null
   },
-  "layers": [
-    { "code": "LAC",  "database_pattern": "^lac_" },
-    { "code": "BV",   "database_pattern": "^bv_" },
-    { "code": "MART", "database_pattern": "^(dm|mart)_" }
-  ],
-  "relations": {
-    "min_score": 0.6,
-    "max_column_frequency": 0.05,
-    "frequency_floor": 50,
-    "max_bucket_size": 300,
-    "max_relations_per_object": 30,
-    "ignore_columns": ["date_chargement", "dt_maj", "date_maj", "id_traitement", "flag_actif"],
-    "generic_names": ["id", "code", "libelle", "type", "date", "statut"],
-    "strip_prefixes": ["id_", "cd_", "code_", "hk_"],
-    "strip_suffixes": ["_ref", "_reference", "_id", "_cd", "_hk"],
-    "key_patterns": ["^id_", "^cd_", "^code_", "^hk_", "^num_", "^no_", "^ref_",
-                     "_id$", "_ref$", "_reference$", "_cd$", "_hk$", "_key$", "_code$"]
+  "suggestions": {
+    "min_score": 0.30,
+    "max_per_object": 12,
+    "ignore_columns": ["dt_chargement", "date_chargement", "date_maj", "dt_maj", "xx_date_insertion",
+                       "id_tech", "id_traitement", "annee_mois_jour"],
+    "generic_names": ["id", "code", "libelle", "type", "date", "statut", "flag", "url", "actions", "event"],
+    "strip_prefixes": ["id_", "cd_", "code_", "r_"],
+    "strip_suffixes": ["_ref", "_reference", "_id", "_cd"]
   },
-  "inference": {
-    "min_score": 0.4,
-    "store_min_score": 0.2,
-    "min_shared_columns": 2,
-    "max_candidates": 50,
-    "max_sources": 5,
-    "min_marginal_gain": 0.10,
-    "bv_to_bv_min_score": 0.6,
-    "weights": {
-      "coverage": 0.7,
-      "key_found": 0.10,
-      "object_name_similar": 0.10,
-      "same_domain": 0.05,
-      "layer_skip_penalty": -0.15
-    },
-    "object_name_noise": ["_raw", "_hist", "_tmp", "_v"]
-  },
-  "ui": {
-    "default_depth": 2,
-    "max_nodes": 150,
-    "page_size": 50
-  },
+  "ui": { "default_depth": 2, "max_nodes": 150, "max_suggestions_in_graph": 8, "refresh_seconds": 15 },
   "server": { "host": "127.0.0.1", "port": 8765 },
-  "user": { "name": "a_renseigner" }
+  "user": { "name": null }
 }

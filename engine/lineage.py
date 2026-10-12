@@ -1,48 +1,14 @@
-"""Flux de lineage certains (déclarés, SQL), arbitrage et parcours amont/aval.
+"""Analyse SQL de bas niveau (utilisée par `sql_ingest`) et parcours amont / aval du graphe des liens.
 
-- `declared_flows(md, catalog)`   : flux `flows[]` du JSON (origine DECLARED, score 1.0) ;
-- `sql_flows(catalog)`            : flux déduits du champ `sql` (origine SQL_PARSED, 0.9) ;
-- `parse_sql(sql, own_id, known)` : parsing regex (cible, sources, colonnes simples) ;
-- `arbitrate(edges)`              : garde l'origine la plus fiable par couple (S, C) ;
-- `traverse(start, direction, neighbours, ...)` : BFS borné avec détection de cycles.
-
-Si `sqlglot` est installé, il n'est pas encore utilisé : le parser regex couvre
-les SELECT simples (colonne, alias, fonction sur une colonne).
+- `parse_sql(sql, own_id, known)`      : cible, sources et correspondances de colonnes simples ;
+- `_parse_select_item(...)`            : une expression du SELECT → colonnes sources / cible ;
+- `traverse(start, direction, neighbours, ...)` : BFS borné, détection de cycles, score de chemin.
 """
 
 from __future__ import annotations
 
 import re
 from typing import Callable, Iterable
-
-from .catalog import Catalog
-
-ORIGIN_RANK = {"MANUAL": 4, "DECLARED": 3, "SQL_PARSED": 2, "INFERRED": 1}
-ORIGIN_SCORE = {"MANUAL": 1.0, "DECLARED": 1.0, "SQL_PARSED": 0.9}
-
-# --------------------------------------------------------------------------- flux déclarés
-
-
-def declared_flows(md: dict, catalog: Catalog) -> list[dict]:
-    """Transforme `flows[]` en arêtes DECLARED (SQL_PARSED pour les flux issus de requêtes SQL)."""
-    edges = []
-    for flow in md["flows"]:
-        if flow["source"] not in catalog.objects or flow["target"] not in catalog.objects:
-            continue
-        origin = flow.get("origin", "DECLARED")
-        score = ORIGIN_SCORE.get(origin, 1.0)
-        explanation = ("Flux lu dans une requête SQL" if origin == "SQL_PARSED" else "Flux déclaré par l'extraction") \
-            + (f" (`{flow['job']}`)." if flow["job"] else ".")
-        edges.append({
-            "kind": "FLOW", "source_object": flow["source"], "target_object": flow["target"],
-            "origin": origin, "score": score, "job": flow["job"], "transformation": None,
-            "explanation": explanation, "details": {},
-            "columns": [{"source": m["source"], "target": m["target"],
-                         "transformation": m["transformation"], "score": score}
-                        for m in flow["column_mapping"] if m["source"] and m["target"]],
-        })
-    return edges
-
 
 # --------------------------------------------------------------------------- parsing SQL
 
@@ -150,63 +116,6 @@ def _parse_select_item(item: str, aliases: dict[str, str], sources: list[str]) -
              "transformation": transformation} for src, col in refs]
 
 
-def sql_flows(catalog: Catalog) -> list[dict]:
-    """Arêtes SQL_PARSED pour tous les objets ayant un champ `sql`."""
-    edges = []
-    known = catalog.objects.keys()
-    for obj in catalog.objects.values():
-        if not obj.sql:
-            continue
-        parsed = parse_sql(obj.sql, obj.id, known)
-        target = catalog.objects.get(parsed["target"])
-        if target is None:
-            continue
-        target_cols = {c.name for c in target.columns}
-        for source_id in parsed["sources"]:
-            source_cols = {c.name for c in catalog.objects[source_id].columns}
-            cols = [{"source": c["source"], "target": c["target"],
-                     "transformation": c["transformation"], "score": 0.9}
-                    for c in parsed["columns"]
-                    if c["source_object"] == source_id and c["source"] in source_cols
-                    and c["target"] in target_cols]
-            edges.append({
-                "kind": "FLOW", "source_object": source_id, "target_object": target.id,
-                "origin": "SQL_PARSED", "score": 0.9, "job": None, "transformation": None,
-                "explanation": f"Flux déduit du SQL de `{obj.id}`.", "details": {}, "columns": cols,
-            })
-    return edges
-
-
-# --------------------------------------------------------------------------- arbitrage
-
-
-def arbitrate(edges: list[dict]) -> list[dict]:
-    """Garde, pour chaque couple (S, C), l'origine la plus fiable.
-
-    Les correspondances colonne sont reprises de l'origine la plus fiable qui en possède ;
-    un flux inféré confirmé par une source fiable est signalé dans l'explication.
-    """
-    by_pair: dict[tuple[str, str], list[dict]] = {}
-    for edge in edges:
-        by_pair.setdefault((edge["source_object"], edge["target_object"]), []).append(edge)
-    result = []
-    for group in by_pair.values():
-        group.sort(key=lambda e: (-ORIGIN_RANK[e["origin"]], -e["score"]))
-        best = dict(group[0])
-        if not best["columns"]:
-            for other in group[1:]:
-                if other["columns"]:
-                    best["columns"] = other["columns"]
-                    break
-        inferred = [e for e in group if e["origin"] == "INFERRED"]
-        if best["origin"] != "INFERRED" and inferred:
-            best["explanation"] += f" Confirme le flux inféré (score {inferred[0]['score']:.2f})."
-            best["details"] = {**best.get("details", {}), "inferred_score": inferred[0]["score"],
-                               "unexplained": inferred[0]["details"].get("unexplained", [])}
-        result.append(best)
-    return result
-
-
 # --------------------------------------------------------------------------- parcours
 
 
@@ -214,7 +123,7 @@ def traverse(start: str, direction: str, neighbours: Callable[[str, str], list[d
              max_depth: int, min_score: float = 0.0, max_nodes: int = 10_000) -> tuple[list[dict], int]:
     """BFS amont (`up`) ou aval (`down`) borné, avec score de chemin (produit des scores).
 
-    `neighbours(node, direction)` renvoie les arêtes FLOW déjà fusionnées avec les annotations
+    `neighbours(node, direction)` renvoie les liens de type flux (validés et / ou à valider)
     (les arêtes rejetées sont exclues en amont). Renvoie (résultats, nb_non_affichés).
     """
     seen = {start: 1.0}

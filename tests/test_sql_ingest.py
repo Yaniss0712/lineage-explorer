@@ -6,7 +6,7 @@ import json
 import os
 import unittest
 
-from engine import build, ingest, store
+from engine import ingest
 from engine.config import PROJECT_ROOT
 from engine.sql_ingest import parse_sql_script, split_statements
 
@@ -79,20 +79,22 @@ class SqlIngestTest(unittest.TestCase):
         self.assertEqual({(f["source"], f["target"]) for f in md["flows"]}, truth)
         self.assertEqual(len(md["objects"]), 23)
         tiers = {c["name"]: c for o in md["objects"] if o["id"] == "bv_client.tiers" for c in o["columns"]}
-        self.assertTrue(tiers["code_tiers_ref"]["is_key"])                       # clé propagée depuis le DDL
+        self.assertEqual(tiers["code_tiers_ref"]["type"], "string")              # type déduit du DDL source
 
-    def test_build_from_sql(self):
+    def test_sql_becomes_directed_suggestions(self):
+        from engine.server import LineageApi
         config, tmp = temp_config()
         self.addCleanup(tmp.cleanup)
-        md = ingest.load_metadata(os.path.join(ARCHI, "requetes_architecture.sql"))
-        report = build.run_build(md, config, config["paths"]["database"], "sql")
-        self.assertEqual(report["flows_by_origin"].get("SQL_PARSED"), 28)
-        self.assertEqual(report["mart_columns_explained"]["rate"], 1.0)
-        con = store.connect(config["paths"]["database"])
-        self.addCleanup(con.close)
-        edge = store.object_edges(con, "bv_client.tiers", "FLOW", "up")[0]
-        self.assertEqual(edge["origin"], "SQL_PARSED")
-
+        api = LineageApi(config)
+        with open(os.path.join(ARCHI, "requetes_architecture.sql"), "rb") as handle:
+            result = api.import_metadata(handle.read(), {"format": "sql", "name": "archi"}, "testeur")
+        self.assertTrue(result["ok"])
+        sql = [s for s in api.suggestions({"limit": 1000})["items"] if s["origin"] == "SQL"]
+        self.assertEqual(len(sql), 28)                          # aucun lien créé : 28 suggestions orientées
+        tiers = next(s for s in sql if s["key"] == "bv_client.tiers|lac_crm.clients_raw")
+        self.assertEqual(tiers["proposed_source"], "lac_crm.clients_raw")
+        self.assertIn({"source": "segment", "target": "categorie_client", "transformation": "renommage"}, tiers["mapping"])
+        self.assertEqual(api.state["links"], {})
 
 if __name__ == "__main__":
     unittest.main()

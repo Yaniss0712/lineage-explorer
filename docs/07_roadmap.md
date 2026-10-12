@@ -13,9 +13,11 @@ Les sprints sont exprimés en **lots** ; leur durée sera calée sur le calendri
 | **S4 — Annotations partagées** | URL de spec, validation/rejet, liens manuels | Deux postes voient la même annotation |
 | **S5 — Démo** | Lineage colonne, chemin entre tables, polish | Démo du sprint d'inno sur données réelles |
 
-## État d'avancement (2026-10-09)
+## État d'avancement (2026-10-13) — version 0.2
 
-Implémenté sur données fictives : S1 (ingestion JSON / JSONL, couches, SQLite + FTS5 trigram, CLI), S2 (inférence, flux déclarés, parsing SQL regex, relations N1/N2/N3 + Data Vault, `evaluate`, `build_report.json`), S3 (serveur, recherche, graphe en bulles, détail), S4 (annotations par fichier, valider / rejeter / lien manuel / notes / spec, file de revue), S5 partiel (lineage colonne, chemin entre tables, export CSV). Reste : test sur le poste pro et le volume réel, test à deux postes sur un dossier partagé, `sqlglot` optionnel, export PNG.
+Réalisé : tags définis par l'équipe (règles de nommage, tag en masse) à la place des couches ; suppression de la notion de clé ; liens 100 % manuels (flux / jointure, deux sens, colonne → colonne en option) avec file « À valider » et suppression ; suggestions en pointillés ; recherche globale (tag, base, table, colonne) et catalogue Tag → Base → Objets ; vue colonne et dictionnaire des colonnes ; journal partagé (dossier Teams), rafraîchissement automatique, versions enregistrées / comparées / restaurées, activité ; export Excel ; exécutable Windows et construction automatique par GitHub Actions ; ingestion SQL.
+
+Reste : test à plusieurs postes sur le vrai dossier Teams ; signature de l'exe (si le support informatique l'exige) ; lineage multi-niveaux sur les vraies données.
 
 ## Détail
 

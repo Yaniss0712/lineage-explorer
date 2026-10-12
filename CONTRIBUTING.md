@@ -14,7 +14,7 @@ Merci de votre intérêt ! Quelques règles simples gardent l'outil utilisable p
 
 ```bash
 python -m unittest                                   # tests (stdlib)
-python -m engine build --input "architecture test/requetes_architecture.sql"
+python -m engine import --input "architecture test/requetes_architecture.sql" --workspace data/espace
 python -m engine serve                               # http://localhost:8765
 python tools/generate_sample.py --domains 50         # jeu fictif plus gros + vérité terrain
 ```

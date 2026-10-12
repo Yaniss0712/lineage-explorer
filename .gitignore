@@ -29,3 +29,8 @@ docs/08_decisions_questions.md
 
 # Fichiers de verrou Office
 ~$*
+
+# Construction de l'exécutable
+dist/
+build/
+*.spec

@@ -1,0 +1,640 @@
+{
+ "meta": {
+  "source": "demo-fictive",
+  "comment": "Jeu FICTIF au format d'un export de metastore (une seule base, sans cle)"
+ },
+ "objects": [
+  {
+   "id": "db_demo_dw.client_fiche_identite",
+   "database": "db_demo_dw",
+   "name": "client_fiche_identite",
+   "type": "TABLE",
+   "columns": [
+    {
+     "name": "code_client",
+     "type": "string"
+    },
+    {
+     "name": "raison_sociale",
+     "type": "string"
+    },
+    {
+     "name": "siret",
+     "type": "string"
+    },
+    {
+     "name": "siren",
+     "type": "string"
+    },
+    {
+     "name": "categorie_client",
+     "type": "string"
+    },
+    {
+     "name": "forme_juridique",
+     "type": "string"
+    },
+    {
+     "name": "ville",
+     "type": "string"
+    },
+    {
+     "name": "code_postal",
+     "type": "string"
+    },
+    {
+     "name": "region",
+     "type": "string"
+    },
+    {
+     "name": "date_creation",
+     "type": "date"
+    }
+   ]
+  },
+  {
+   "id": "db_demo_dw.client_fiche_encours",
+   "database": "db_demo_dw",
+   "name": "client_fiche_encours",
+   "type": "TABLE",
+   "columns": [
+    {
+     "name": "code_client",
+     "type": "string"
+    },
+    {
+     "name": "raison_sociale",
+     "type": "string"
+    },
+    {
+     "name": "mois_solde",
+     "type": "string"
+    },
+    {
+     "name": "encours_moyen",
+     "type": "decimal(18,2)"
+    },
+    {
+     "name": "solde_comptable",
+     "type": "decimal(18,2)"
+    }
+   ]
+  },
+  {
+   "id": "db_demo_dw.client_fiche_prets",
+   "database": "db_demo_dw",
+   "name": "client_fiche_prets",
+   "type": "TABLE",
+   "columns": [
+    {
+     "name": "code_client",
+     "type": "string"
+    },
+    {
+     "name": "raison_sociale",
+     "type": "string"
+    },
+    {
+     "name": "id_pret",
+     "type": "string"
+    },
+    {
+     "name": "statut_pret",
+     "type": "string"
+    },
+    {
+     "name": "montant_initial_pret",
+     "type": "decimal(18,2)"
+    },
+    {
+     "name": "montant_crd",
+     "type": "decimal(18,2)"
+    },
+    {
+     "name": "date_effet_pret",
+     "type": "timestamp"
+    },
+    {
+     "name": "flag_impaye",
+     "type": "int"
+    }
+   ]
+  },
+  {
+   "id": "db_demo_dw.client_fiche_contacts",
+   "database": "db_demo_dw",
+   "name": "client_fiche_contacts",
+   "type": "TABLE",
+   "columns": [
+    {
+     "name": "code_client",
+     "type": "string"
+    },
+    {
+     "name": "raison_sociale",
+     "type": "string"
+    },
+    {
+     "name": "nom_contact",
+     "type": "string"
+    },
+    {
+     "name": "prenom_contact",
+     "type": "string"
+    },
+    {
+     "name": "email_contact",
+     "type": "string"
+    }
+   ]
+  },
+  {
+   "id": "db_demo_dw.client_segmentation",
+   "database": "db_demo_dw",
+   "name": "client_segmentation",
+   "type": "TABLE",
+   "columns": [
+    {
+     "name": "code_client",
+     "type": "int"
+    },
+    {
+     "name": "siret",
+     "type": "bigint"
+    },
+    {
+     "name": "segment",
+     "type": "string"
+    }
+   ]
+  },
+  {
+   "id": "db_demo_dw.client_vision_360",
+   "database": "db_demo_dw",
+   "name": "client_vision_360",
+   "type": "TABLE",
+   "columns": [
+    {
+     "name": "code_client",
+     "type": "string"
+    },
+    {
+     "name": "categorie_client",
+     "type": "string"
+    },
+    {
+     "name": "montant_total_crd",
+     "type": "decimal(18,2)"
+    },
+    {
+     "name": "nb_prets",
+     "type": "bigint"
+    }
+   ]
+  },
+  {
+   "id": "db_demo_dw.pret_demandes_web",
+   "database": "db_demo_dw",
+   "name": "pret_demandes_web",
+   "type": "TABLE",
+   "columns": [
+    {
+     "name": "id_dossier",
+     "type": "string"
+    },
+    {
+     "name": "code_client",
+     "type": "string"
+    },
+    {
+     "name": "id_pret",
+     "type": "string"
+    },
+    {
+     "name": "type_operation",
+     "type": "string"
+    },
+    {
+     "name": "date_creation_dossier",
+     "type": "timestamp"
+    },
+    {
+     "name": "montant_total_offre",
+     "type": "int"
+    },
+    {
+     "name": "libelle_produit",
+     "type": "string"
+    },
+    {
+     "name": "dt_chargement",
+     "type": "timestamp"
+    }
+   ]
+  },
+  {
+   "id": "db_demo_dw.pret_demandes_agence",
+   "database": "db_demo_dw",
+   "name": "pret_demandes_agence",
+   "type": "TABLE",
+   "columns": [
+    {
+     "name": "id_dossier",
+     "type": "string"
+    },
+    {
+     "name": "code_client",
+     "type": "string"
+    },
+    {
+     "name": "id_pret",
+     "type": "string"
+    },
+    {
+     "name": "type_operation",
+     "type": "string"
+    },
+    {
+     "name": "date_creation_dossier",
+     "type": "timestamp"
+    },
+    {
+     "name": "montant_total_offre",
+     "type": "int"
+    },
+    {
+     "name": "libelle_produit",
+     "type": "string"
+    },
+    {
+     "name": "dt_chargement",
+     "type": "timestamp"
+    }
+   ]
+  },
+  {
+   "id": "db_demo_dw.flux1_base_emprunteurs",
+   "database": "db_demo_dw",
+   "name": "flux1_base_emprunteurs",
+   "type": "TABLE",
+   "columns": [
+    {
+     "name": "siren",
+     "type": "string"
+    },
+    {
+     "name": "siret",
+     "type": "string"
+    },
+    {
+     "name": "code_client",
+     "type": "string"
+    },
+    {
+     "name": "denomination",
+     "type": "string"
+    },
+    {
+     "name": "sous_categorie",
+     "type": "string"
+    },
+    {
+     "name": "montant_initial",
+     "type": "decimal(18,2)"
+    },
+    {
+     "name": "statut_actif",
+     "type": "int"
+    }
+   ]
+  },
+  {
+   "id": "db_demo_dw.flux2_montants_signes",
+   "database": "db_demo_dw",
+   "name": "flux2_montants_signes",
+   "type": "TABLE",
+   "columns": [
+    {
+     "name": "id_emprunteur",
+     "type": "string"
+    },
+    {
+     "name": "code_segment",
+     "type": "string"
+    },
+    {
+     "name": "annee_signature",
+     "type": "int"
+    },
+    {
+     "name": "sum_montant_signe",
+     "type": "bigint"
+    }
+   ]
+  },
+  {
+   "id": "db_demo_dw.flux3_repartition_prets",
+   "database": "db_demo_dw",
+   "name": "flux3_repartition_prets",
+   "type": "TABLE",
+   "columns": [
+    {
+     "name": "id_emprunteur",
+     "type": "string"
+    },
+    {
+     "name": "code_segment",
+     "type": "string"
+    },
+    {
+     "name": "cat_enveloppe",
+     "type": "string"
+    },
+    {
+     "name": "sum_montant_signe",
+     "type": "bigint"
+    }
+   ]
+  },
+  {
+   "id": "db_demo_dw.flux4_encours_marge",
+   "database": "db_demo_dw",
+   "name": "flux4_encours_marge",
+   "type": "TABLE",
+   "columns": [
+    {
+     "name": "annee_mois",
+     "type": "string"
+    },
+    {
+     "name": "code_client",
+     "type": "string"
+    },
+    {
+     "name": "encours",
+     "type": "decimal(18,2)"
+    },
+    {
+     "name": "marge",
+     "type": "decimal(18,2)"
+    }
+   ]
+  },
+  {
+   "id": "db_demo_dw.web_visites",
+   "database": "db_demo_dw",
+   "name": "web_visites",
+   "type": "TABLE",
+   "columns": [
+    {
+     "name": "id_visite",
+     "type": "string"
+    },
+    {
+     "name": "id_visiteur",
+     "type": "string"
+    },
+    {
+     "name": "jour_visite",
+     "type": "string"
+    },
+    {
+     "name": "url",
+     "type": "string"
+    },
+    {
+     "name": "titre_page",
+     "type": "string"
+    },
+    {
+     "name": "duree_visite",
+     "type": "string"
+    },
+    {
+     "name": "type_device",
+     "type": "string"
+    },
+    {
+     "name": "id_campagne",
+     "type": "string"
+    }
+   ]
+  },
+  {
+   "id": "db_demo_dw.web_visites_pret",
+   "database": "db_demo_dw",
+   "name": "web_visites_pret",
+   "type": "TABLE",
+   "columns": [
+    {
+     "name": "id_visite",
+     "type": "string"
+    },
+    {
+     "name": "id_visiteur",
+     "type": "string"
+    },
+    {
+     "name": "jour_visite",
+     "type": "string"
+    },
+    {
+     "name": "titre_page",
+     "type": "string"
+    },
+    {
+     "name": "flag_erreur",
+     "type": "int"
+    },
+    {
+     "name": "url",
+     "type": "string"
+    }
+   ]
+  },
+  {
+   "id": "db_demo_dw.web_pages_synthese",
+   "database": "db_demo_dw",
+   "name": "web_pages_synthese",
+   "type": "TABLE",
+   "columns": [
+    {
+     "name": "jour_visite",
+     "type": "string"
+    },
+    {
+     "name": "url",
+     "type": "string"
+    },
+    {
+     "name": "nb_visites",
+     "type": "bigint"
+    },
+    {
+     "name": "nb_visiteurs",
+     "type": "bigint"
+    },
+    {
+     "name": "total_pages_vues",
+     "type": "bigint"
+    }
+   ]
+  },
+  {
+   "id": "db_demo_dw.appli_connexions",
+   "database": "db_demo_dw",
+   "name": "appli_connexions",
+   "type": "TABLE",
+   "columns": [
+    {
+     "name": "id_utilisateur",
+     "type": "string"
+    },
+    {
+     "name": "derniere_connexion",
+     "type": "timestamp"
+    },
+    {
+     "name": "siret",
+     "type": "string"
+    },
+    {
+     "name": "code_client",
+     "type": "string"
+    },
+    {
+     "name": "categorie_client",
+     "type": "string"
+    },
+    {
+     "name": "flag_connexion",
+     "type": "int"
+    }
+   ]
+  },
+  {
+   "id": "db_demo_dw.appli_enrolements",
+   "database": "db_demo_dw",
+   "name": "appli_enrolements",
+   "type": "TABLE",
+   "columns": [
+    {
+     "name": "id_utilisateur",
+     "type": "string"
+    },
+    {
+     "name": "date_enrolement",
+     "type": "timestamp"
+    },
+    {
+     "name": "device",
+     "type": "string"
+    },
+    {
+     "name": "code_client",
+     "type": "string"
+    },
+    {
+     "name": "categorie_client",
+     "type": "string"
+    }
+   ]
+  },
+  {
+   "id": "db_demo_dw.campagne_emailing",
+   "database": "db_demo_dw",
+   "name": "campagne_emailing",
+   "type": "TABLE",
+   "columns": [
+    {
+     "name": "id_diffusion",
+     "type": "int"
+    },
+    {
+     "name": "code_diffusion",
+     "type": "string"
+    },
+    {
+     "name": "id_campagne",
+     "type": "string"
+    },
+    {
+     "name": "date_diffusion",
+     "type": "date"
+    },
+    {
+     "name": "segment_destinataire",
+     "type": "string"
+    },
+    {
+     "name": "volume_ouverture",
+     "type": "bigint"
+    },
+    {
+     "name": "volume_click",
+     "type": "bigint"
+    },
+    {
+     "name": "xx_date_insertion",
+     "type": "string"
+    }
+   ]
+  },
+  {
+   "id": "db_demo_dw.campagne_emailing_courante",
+   "database": "db_demo_dw",
+   "name": "campagne_emailing_courante",
+   "type": "VIEW",
+   "columns": [
+    {
+     "name": "id_diffusion",
+     "type": "int"
+    },
+    {
+     "name": "code_diffusion",
+     "type": "string"
+    },
+    {
+     "name": "id_campagne",
+     "type": "string"
+    },
+    {
+     "name": "date_diffusion",
+     "type": "date"
+    },
+    {
+     "name": "segment_destinataire",
+     "type": "string"
+    },
+    {
+     "name": "volume_ouverture",
+     "type": "bigint"
+    },
+    {
+     "name": "volume_click",
+     "type": "bigint"
+    },
+    {
+     "name": "annee",
+     "type": "int"
+    },
+    {
+     "name": "mois",
+     "type": "int"
+    }
+   ]
+  },
+  {
+   "id": "db_demo_dw.table_technique",
+   "database": "db_demo_dw",
+   "name": "table_technique",
+   "type": "TABLE",
+   "columns": [
+    {
+     "name": "dummy",
+     "type": "boolean"
+    }
+   ]
+  }
+ ]
+}

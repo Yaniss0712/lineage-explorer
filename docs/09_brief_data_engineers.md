@@ -15,7 +15,6 @@ Le niveau 1 suffit pour démarrer. Chaque niveau supplémentaire rend le lineage
 | Niveau | Ce qu'il faut fournir | Effort estimé | Gain |
 |---|---|---|---|
 | **1 — Structure** ✅ | Bases, tables/vues, colonnes, types | Faible (lecture du metastore) | L'outil fonctionne |
-| 2 — Clés | Indiquer les colonnes qui sont des clés (`is_key`) | Faible si l'info existe | Moins de faux liens |
 | 3 — Flux ETL | Pour chaque job de l'outil ETL Python : source(s) et cible | Moyen (export des configs de jobs) | Lineage **certain** sur ces jobs |
 | 4 — SQL des vues | Définition SQL des vues, quand elle est récupérable | Variable | Lineage certain + niveau colonne |
 | ⭐ Vérité terrain | 20 à 50 flux que vous **savez** vrais | 1 h | Permet de mesurer la précision de l'outil |
@@ -83,7 +82,7 @@ Pour les **flux ETL** (niveau 3), le format attendu est simplement :
 
 ## Questions pour vous
 
-1. Quelles sont les **conventions de nommage** des bases par couche (Lac / BV / Mart) ?
+1. Quelles sont les **conventions de nommage** des tables (familles, préfixes) ? Elles servent à créer les règles de tags.
 2. L'outil ETL Python stocke-t-il quelque part la **liste source → cible** de chaque job ?
 3. Est-il possible de récupérer la définition SQL d'une partie des vues depuis le **metastore** ?
 4. Les **clés** sont-elles documentées (convention de nommage, Data Vault `hk_`, fichier de référence) ?

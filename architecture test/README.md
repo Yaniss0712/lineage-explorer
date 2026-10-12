@@ -1,6 +1,6 @@
 # Architecture de test (fictive)
 
-Banque de détail **fictive** : 23 tables (au plus 5 lignes chacune), organisées en 3 couches.
+Banque de détail **fictive** : 23 tables (au plus 5 lignes chacune), organisées en 3 niveaux (données brutes, tables de base, marts) — idéal pour créer des tags et tester l'outil.
 
 ```
 LAC (10 tables brutes)          BV (8 tables de base)              MART (5 tables métier)
@@ -59,8 +59,8 @@ Les valeurs des BV et des marts sont calculées à partir des tables sources : e
 Dans l'interface : **Importer** → `architecture test/metadata_architecture.json` (ou `…structure_seule.json`).
 
 ```bash
-python -m engine build --input "architecture test/metadata_structure_seule.json"
-python -m engine evaluate --truth "architecture test/verite_terrain.json"
+python -m engine import --input "architecture test/metadata_structure_seule.json" --workspace data/espace_test
+python -m engine evaluate --truth "architecture test/verite_terrain.json" --workspace data/espace_test
 ```
 
 Structure seule, résultat mesuré : précision 92 %, rappel 43 %. L'algorithme retrouve les copies Lac → BV, mais pas les marts faits d'agrégats. Il faut alors les valider à la main, ou utiliser le JSON complet.

@@ -4,7 +4,7 @@ Ce fichier donne à un assistant de code (Claude Code) le contexte nécessaire p
 
 ## Le projet
 
-Outil de lineage de données pour une architecture **Lac → BV → Mart** à très grand volume. Il ingère un JSON de structure ou des requêtes SQL, calcule flux (lineage) et relations (clés), et propose une interface en bulles avec annotations partagées. Détails : `docs/`.
+Outil de lineage de données pour une architecture **Lac → BV → Mart** à très grand volume. Il ingère un JSON de structure ou des requêtes SQL, propose des suggestions de liens, et l'équipe crée / valide les liens, tague les objets et documente, via un journal partagé (dossier Teams). Détails : `docs/`.
 
 ## Contraintes impératives
 
@@ -25,13 +25,11 @@ Outil de lineage de données pour une architecture **Lac → BV → Mart** à tr
 ## Commandes
 
 ```bash
-python -m engine check --input examples/metadata.sample.json
-python -m engine build --input "architecture test/requetes_architecture.sql"
-python -m engine build --input examples/metadata.sample.json --config config.example.json
-python -m engine serve --port 8765
-python -m engine evaluate --truth examples/ground_truth.generated.json
-python tools/generate_sample.py --domains 50     # jeu fictif plus gros + vérité terrain
 python -m unittest
+python -m engine check --input examples/metadata.demo_une_base.json
+python -m engine import --input examples/metadata.demo_une_base.json --workspace data/espace
+python -m engine serve --workspace data/espace
+python tools/build_exe.py            # nécessite pyinstaller (poste de développement)
 ```
 
 ## Avant chaque commit

@@ -17,7 +17,7 @@ Aujourd'hui, la réponse dépend de la mémoire de quelques personnes et de la l
 Un **outil de lineage léger, local et partagé** :
 
 1. Un **script d'extraction** (Python, VS Code) produit un JSON décrivant la structure : objets, colonnes, types, flux d'alimentation.
-2. Un **moteur Python** ingère ce JSON, **détecte les liens** (clés communes) et **infère le lineage** par algorithmes (colonnes communes, rareté, ordre des couches), jusqu'à la colonne. Chaque flux inféré porte un **score** et une **explication** ; l'équipe le valide ou le rejette.
+2. Un **moteur Python** ingère ce JSON (ou des requêtes SQL) et **suggère** les liens probables (colonnes communes, rareté, SQL), avec score et explication. L'équipe **crée, valide ou supprime** les liens, et range les objets avec ses propres **tags**.
 3. Une **interface en bulles** permet de **chercher**, d'**explorer** le voisinage d'une table et d'**annoter** (URL de spec Confluence, liens manuels, validation des liens suggérés).
 
 ## 3. Objectifs
@@ -43,7 +43,7 @@ Un **outil de lineage léger, local et partagé** :
 
 ### Inclus (MVP)
 
-- Ingestion d'un JSON de structure (Lac / BV / Mart, tables, colonnes, types).
+- Ingestion d'un JSON de structure (tables, colonnes, types) ou de requêtes SQL.
 - Lineage **niveau table** (quel objet alimente quel objet).
 - Détection automatique des **liens de clés** (nom identique, nom partiel, lien déclaré).
 - Recherche globale (tables, colonnes, descriptions).
