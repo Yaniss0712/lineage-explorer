@@ -15,11 +15,11 @@
 
 ## Démarrer
 
-### Avec l'exécutable (recommandé)
+### Avec l'exécutable (recommandé) — rien à installer, rien sur un PC personnel
 
-1. Récupérez `LineageExplorer.exe` : onglet **Actions** du dépôt → « Construire l'exécutable » → artefact, ou [Releases](https://github.com/Yaniss0712/lineage-explorer/releases). Vous pouvez aussi le construire avec `python tools/build_exe.py`.
-2. Déposez-le dans le dossier Teams de l'équipe (synchronisé), puis double-cliquez dessus.
-3. **Importer**, puis votre JSON ou vos `.sql`.
+1. Sur GitHub, ouvrez le dossier [`deploiement/LineageExplorer`](deploiement/LineageExplorer) : il contient `LineageExplorer.exe` et `LISEZMOI.txt`. Téléchargez l'exe (bouton **Download raw file**) ou tout le dépôt (**Code → Download ZIP**).
+2. Déposez le dossier `LineageExplorer` (l'exe suffit) dans les fichiers du canal Teams de l'équipe, puis **Synchroniser**.
+3. Double-cliquez sur l'exe dans le dossier synchronisé, puis **Importer** votre JSON ou vos `.sql`. Le stockage (`journal\`, `versions\`, `metadonnees\`) se crée tout seul dans ce dossier Teams.
 
 Mode d'emploi complet : [docs/10_deploiement_teams.md](docs/10_deploiement_teams.md).
 

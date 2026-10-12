@@ -8,10 +8,12 @@ dossier de l'exe (par exemple le dossier Teams synchronisé de l'équipe), sauf 
 
 from __future__ import annotations
 
+import json
 import os
 import sys
 import threading
 import traceback
+import urllib.request
 import webbrowser
 
 
@@ -30,6 +32,10 @@ def main() -> None:
 
     try:
         config = load_config()
+        running = _running_instance(config["paths"]["workspace"])
+        if running:                                   # déjà ouvert : on rouvre simplement le navigateur
+            webbrowser.open(running)
+            return
         httpd, api = create_server(config)
     except Exception as exc:  # noqa: BLE001
         traceback.print_exc()
@@ -37,11 +43,43 @@ def main() -> None:
         return
     url = f"http://localhost:{httpd.server_address[1]}"
     threading.Thread(target=httpd.serve_forever, daemon=True).start()
+    _write_instance(url, api.workspace.root)
     print(f"Lineage Explorer : {url} — espace : {api.workspace.root}")
     webbrowser.open(url)
-    _window(url, api.workspace.root)
-    httpd.shutdown()
-    httpd.server_close()
+    try:
+        _window(url, api.workspace.root)
+    finally:
+        _write_instance(None, None)
+        httpd.shutdown()
+        httpd.server_close()
+
+
+def _instance_file() -> str:
+    return os.path.join(os.path.dirname(_log_path()), "instance.json")
+
+
+def _write_instance(url, workspace) -> None:
+    try:
+        if url is None:
+            os.remove(_instance_file())
+        else:
+            with open(_instance_file(), "w", encoding="utf-8") as handle:
+                json.dump({"url": url, "workspace": workspace, "pid": os.getpid()}, handle)
+    except OSError:
+        pass
+
+
+def _running_instance(workspace: str):
+    """URL d'une instance déjà lancée sur ce poste pour le même espace, sinon None."""
+    try:
+        with open(_instance_file(), encoding="utf-8") as handle:
+            info = json.load(handle)
+        if os.path.normcase(os.path.abspath(info["workspace"])) != os.path.normcase(os.path.abspath(workspace)):
+            return None
+        with urllib.request.urlopen(info["url"] + "/api/revision", timeout=2) as res:
+            return info["url"] if res.status == 200 else None
+    except (OSError, ValueError, KeyError):
+        return None
 
 
 def _message(title: str, text: str) -> None:

@@ -627,6 +627,11 @@ class LineageApi:
 
     def write(self, action: str, body: dict, user: str) -> dict:
         """Toutes les écritures passent par le journal partagé."""
+        if action == "refresh":                       # bouton « Actualiser »
+            self.workspace.refresh(force=True)
+            self._cache_key = None
+            self.sync(force=True)
+            return {"ok": True, "revision": self.workspace.revision, "objects": len(self._objects)}
         self.sync()
         ws = self.workspace
         if action == "tags/save":

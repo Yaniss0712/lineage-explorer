@@ -75,6 +75,7 @@
     state.info = await api("state");
     state.revision = state.info.revision;
     $("#user").placeholder = state.info.user;
+    $("#user").title = "Par défaut : " + state.info.user;
     $("#review-count").textContent = state.info.counts.links_pending || "";
     fillTagSelect($("#selection-tag"), true);
     return state.info;
@@ -82,9 +83,23 @@
 
   function setSync(text, cls) { const s = $("#sync"); s.textContent = text; s.className = "sync" + (cls ? " " + cls : ""); }
 
+  // Connexion au serveur local : seules les erreurs réseau comptent comme « déconnecté »
+  // (une erreur d'affichage ne doit pas faire croire que l'outil est fermé).
+  let failures = 0;
+  function setOnline(ok) {
+    failures = ok ? 0 : failures + 1;
+    $("#offline").classList.toggle("hidden", failures < 2);
+    if (!ok && failures >= 2) setSync("hors ligne", "off");
+  }
+  function stamp() { return new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }); }
+
   async function poll() {
+    let r;
+    try { r = await api("revision?since=" + enc(state.revision || "")); }
+    catch (e) { if (!e.status) return setOnline(false); r = null; }
+    setOnline(true);
+    if (!r) return;
     try {
-      const r = await api("revision?since=" + enc(state.revision || ""));
       if (r.revision !== state.revision) {
         const me = (userName() || state.info.user || "").toLowerCase();
         const others = r.changes.filter((c) => (c.user || "").toLowerCase() !== me);
@@ -93,12 +108,29 @@
         await refreshAll();
         if (others.length) toast(`${others.length} modification(s) de ${users}`);
       }
-      setSync("à jour " + new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }));
-    } catch (e) { setSync("hors ligne", "off"); }
+      setSync("à jour " + stamp());
+    } catch (e) { console.error(e); setSync("à jour " + stamp()); }
   }
 
+  async function manualRefresh() {
+    const btn = $("#btn-refresh");
+    btn.classList.add("spinning"); setSync("actualisation…", "busy");
+    try {
+      await post("refresh", {});
+      setOnline(true);
+      await refreshAll();
+      setSync("à jour " + stamp());
+      toast("Données actualisées");
+    } catch (e) {
+      if (!e.status) { setOnline(false); setOnline(false); } else fail(e);
+    } finally { btn.classList.remove("spinning"); }
+  }
+  $("#btn-refresh").addEventListener("click", manualRefresh);
+  $("#offline-retry").addEventListener("click", manualRefresh);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) poll(); });
+
   async function refreshAll() {
-    await loadState();
+    try { await loadState(); } catch (e) { if (!e.status) throw e; return fail(e); }
     await Promise.all([refreshCatalog(), refreshCounts()]);
     const active = $(".tab.active").dataset.tab;
     if (active === "review") loadReview();
@@ -129,9 +161,9 @@
     $("#catalog-info").textContent = `${state.info.counts.objects} objet(s) · ${tags().length} tag(s)`;
     if (!state.openGroups.size && groups.length === 1) state.openGroups.add("g:" + groups[0].tag_id);
     $("#tree").innerHTML = groups.map((g) => `<div class="tree-group ${state.openGroups.has("g:" + g.tag_id) ? "open" : ""}" data-key="g:${esc(g.tag_id)}">
-        <div class="tree-head" data-toggle="g:${esc(g.tag_id)}"><span class="caret">▶</span><i class="swatch" style="background:${esc(g.color || "")}"></i>${esc(g.name)}<span class="n">${g.count}</span></div>
+        <div class="tree-head" data-toggle="g:${esc(g.tag_id)}"><span class="caret">▶</span><i class="swatch" style="background:${esc(g.color || "")}"></i><span class="lbl" title="${esc(g.name)}">${esc(g.name)}</span><span class="n">${g.count}</span></div>
         <div class="tree-children">${g.databases.map((d) => { const k = `d:${g.tag_id}:${d.database}`; return `<div class="tree-db ${state.openGroups.has(k) ? "open" : ""}" data-key="${esc(k)}" data-tag="${esc(g.tag_id)}" data-db="${esc(d.database)}">
-            <div class="tree-head" data-toggle="${esc(k)}"><span class="caret">▶</span>${esc(d.database)}<span class="n">${d.count}</span></div>
+            <div class="tree-head" data-toggle="${esc(k)}"><span class="caret">▶</span><span class="lbl" title="${esc(d.database)}">${esc(d.database)}</span><span class="n">${d.count}</span></div>
             <div class="tree-children" data-objects></div></div>`; }).join("")}</div></div>`).join("") || '<p class="hint">Aucun objet.</p>';
     for (const db of $$(".tree-db.open", $("#tree"))) await loadDbObjects(db);
   }
@@ -146,7 +178,7 @@
     const checked = state.selection.has(o.id) ? "checked" : "";
     return `<div class="item ${o.id === state.center ? "active" : ""}" data-obj="${esc(o.id)}">
       ${state.selectMode ? `<input type="checkbox" data-pick="${esc(o.id)}" ${checked}>` : ""}
-      <div class="txt"><div class="title">${esc(o.name)}</div>
+      <div class="txt"><div class="title" title="${esc(o.id)}">${esc(o.name)}</div>
       <div class="sub">${o.type === "VIEW" ? "vue · " : ""}${o.nb_columns} col.${o.matched_columns && o.matched_columns.length ? "" : ""}</div>
       ${o.matched_columns && o.matched_columns.length ? `<div class="cols-hit">${o.matched_columns.slice(0, 4).map((c) => esc(c.name)).join(", ")}${o.matched_columns.length > 4 ? "…" : ""}</div>` : ""}</div></div>`;
   }
@@ -824,8 +856,32 @@
   $("#user").value = storageGet("lineage.user") || "";
   $("#user").addEventListener("change", () => { storageSet("lineage.user", $("#user").value.trim()); });
 
+  // ---- séparateurs déplaçables entre les panneaux (largeurs mémorisées)
+  (function splitters() {
+    const layout = $(".layout");
+    for (const side of ["left", "right"]) {
+      const saved = Number(storageGet("lineage.w." + side));
+      if (saved) layout.style.setProperty(side === "left" ? "--lw" : "--rw", saved + "px");
+    }
+    $$(".splitter").forEach((sp) => sp.addEventListener("mousedown", (e) => {
+      e.preventDefault();
+      const side = sp.dataset.split, rect = layout.getBoundingClientRect();
+      sp.classList.add("dragging");
+      const move = (ev) => {
+        const w = side === "left" ? ev.clientX - rect.left : rect.right - ev.clientX;
+        const width = Math.max(220, Math.min(rect.width * 0.45, w));
+        layout.style.setProperty(side === "left" ? "--lw" : "--rw", width + "px");
+        storageSet("lineage.w." + side, Math.round(width));
+      };
+      const up = () => { sp.classList.remove("dragging"); window.removeEventListener("mousemove", move); window.removeEventListener("mouseup", up); graph.fit(); };
+      window.addEventListener("mousemove", move); window.addEventListener("mouseup", up);
+    }));
+  })();
+
+  let polling = null;
   (async function init() {
-    try { await loadState(); } catch (e) { setSync("serveur arrêté", "off"); return fail(e); }
+    try { await loadState(); } catch (e) { setOnline(false); setOnline(false); setTimeout(init, 4000); return; }
+    setOnline(true);
     if (!state.info.has_data) {
       $("#graph-empty").innerHTML = `<div class="empty-dot"></div><h2>Aucune donnée pour l'instant</h2><p>Importez un fichier JSON ou des requêtes SQL décrivant vos tables.</p>
         <button class="btn primary" id="empty-import" style="margin-top:14px;pointer-events:auto">Importer</button>`;
@@ -835,6 +891,6 @@
     setSync("à jour");
     const m = location.hash.match(/(obj|col)=([^&]+)/);
     if (m && state.info.has_data) (m[1] === "obj" ? openObject : openColumn)(decodeURIComponent(m[2]));
-    setInterval(poll, Math.max(5, state.info.ui.refresh_seconds || 15) * 1000);
+    if (!polling) polling = setInterval(poll, Math.max(5, state.info.ui.refresh_seconds || 15) * 1000);
   })();
 })();

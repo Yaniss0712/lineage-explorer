@@ -24,7 +24,7 @@ Sur chaque poste (jamais dans Teams) :
 
 ## 2. Mise en place (une seule fois, par la personne qui administre l'outil)
 
-1. **Récupérer l'exe** : sur la page GitHub du projet, onglet **Actions** → « Construire l'exécutable » → **Run workflow**. Au bout d'environ 3 minutes, télécharge l'artefact `LineageExplorer` (un zip qui contient l'exe). Une fois un tag `v*` publié, l'exe est aussi dans **Releases**. Autre possibilité : le construire toi-même (voir § 6).
+1. **Récupérer l'exe depuis GitHub** (depuis n'importe quel poste, aucune installation) : dépôt `Yaniss0712/lineage-explorer` → dossier `deploiement/LineageExplorer` → `LineageExplorer.exe` → **Download raw file**. On peut aussi télécharger tout le dépôt (**Code → Download ZIP**) et prendre ce dossier.
 2. Dans le canal Teams de l'équipe : **Fichiers** → **Nouveau dossier** → `LineageExplorer`.
 3. Dépose `LineageExplorer.exe` dans ce dossier.
 4. Clique sur **Synchroniser** (ou **Ajouter un raccourci à Mon OneDrive**) pour que le dossier apparaisse dans l'Explorateur Windows.
@@ -73,7 +73,7 @@ Le chemin exact est celui affiché par l'Explorateur quand tu ouvres le dossier 
 
 ## 6. Mettre à jour l'outil
 
-1. Récupère la nouvelle version de `LineageExplorer.exe` (Releases GitHub, ou `python tools/build_exe.py` sur un poste de développement).
+1. Récupère la nouvelle version de `LineageExplorer.exe` sur GitHub (`deploiement/LineageExplorer/`).
 2. Demande à l'équipe de fermer l'outil : un exe en cours d'utilisation ne peut pas être remplacé.
 3. Remplace l'exe dans le dossier Teams. `journal\`, `versions\` et `metadonnees\` ne bougent pas : rien n'est perdu.
 
@@ -88,7 +88,8 @@ Le chemin exact est celui affiché par l'Explorateur quand tu ouvres le dossier 
 | Symptôme | Piste |
 |---|---|
 | L'outil ne démarre pas | Lire `%LOCALAPPDATA%\LineageExplorer\lineage_explorer.log` |
-| « hors ligne » en haut à droite | La petite fenêtre « Lineage Explorer est ouvert » a été fermée : relancer l'exe |
+| « hors ligne » / bandeau « Connexion perdue » | La petite fenêtre « Lineage Explorer est ouvert » a été fermée (ou le PC s'est mis en veille) : relancer l'exe, puis « Réessayer ». Relancer l'exe alors qu'il tourne déjà rouvre simplement l'onglet |
+| Données pas à jour | Bouton **Actualiser** en haut (relit le dossier partagé et recharge tout) |
 | Les modifications d'un collègue n'arrivent pas | Vérifier la synchronisation Teams / OneDrive (icône dans la barre des tâches) et « Toujours conserver sur cet appareil » |
 | Recherche ou suggestions incohérentes | Fermer l'outil, supprimer `%LOCALAPPDATA%\LineageExplorer\cache\`, relancer (l'index est reconstruit) |
 | Antivirus / SmartScreen | Demander l'autorisation de `LineageExplorer.exe` au support informatique |

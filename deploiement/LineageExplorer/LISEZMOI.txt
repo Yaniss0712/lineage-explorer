@@ -1,0 +1,30 @@
+LINEAGE EXPLORER — DOSSIER À DÉPOSER DANS TEAMS
+=================================================
+
+Ce dossier est prêt à l'emploi : copiez-le TEL QUEL dans les fichiers du canal Teams
+(ou dans tout dossier partagé de l'équipe). Rien n'est à installer sur les postes.
+
+1. Dans Teams : canal de l'équipe > Fichiers > Charger > Dossier > choisir ce dossier
+   « LineageExplorer » (il contient LineageExplorer.exe et ce fichier).
+2. Cliquer sur « Synchroniser » pour le voir dans l'Explorateur Windows.
+   Puis clic droit sur le dossier > « Toujours conserver sur cet appareil ».
+3. Double-cliquer sur LineageExplorer.exe.
+   - Si Windows affiche « Windows a protégé votre ordinateur » :
+     « Informations complémentaires » > « Exécuter quand même ».
+   - Le navigateur s'ouvre sur l'outil ; une petite fenêtre « Lineage Explorer est ouvert »
+     apparaît : la garder ouverte (la fermer arrête l'outil).
+4. Première fois : bouton « Importer » > déposer le JSON extrait du metastore (ou des .sql).
+
+Ce que l'outil crée lui-même dans ce dossier (ne pas modifier ni supprimer à la main) :
+   metadonnees\   les fichiers importés
+   journal\       une modification = un petit fichier (tags, liens, specs, notes…)
+   versions\      les « Enregistrer » (versions restaurables depuis « Historique »)
+
+Sur chaque poste, seul un index de recherche est recréé automatiquement dans
+%LOCALAPPDATA%\LineageExplorer (aucune donnée de l'équipe n'y est stockée de façon unique).
+
+Mettre à jour l'outil : tout le monde ferme l'outil, puis on remplace uniquement
+LineageExplorer.exe par la nouvelle version (journal\, versions\, metadonnees\ restent).
+
+Bouton « Actualiser » (en haut) : relit le dossier partagé et recharge les données.
+Guide complet : docs/10_deploiement_teams.md sur GitHub (Yaniss0712/lineage-explorer).

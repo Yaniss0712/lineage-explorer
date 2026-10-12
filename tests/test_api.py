@@ -131,7 +131,9 @@ class ApiTest(unittest.TestCase):
     def test_second_computer_sees_changes(self):
         other = LineageApi(dict(self.config, paths=dict(self.config["paths"])))
         self.api.write("tags/save", {"name": "Partagé"}, "alice")
-        other.sync(force=True)
+        refreshed = other.write("refresh", {}, U)                                    # bouton « Actualiser »
+        self.assertEqual(refreshed["revision"], self.api.workspace.revision)
+        self.assertEqual(refreshed["objects"], 20)
         self.assertIn("Partagé", {t["name"] for t in other.state["tags"].values()})
         self.assertTrue(other.revision("0")["nb_changes"] >= 2)
 

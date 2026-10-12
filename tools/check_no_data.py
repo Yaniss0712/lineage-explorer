@@ -20,6 +20,7 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MAX_SIZE = 1024 * 1024
+ALLOWED_BINARIES = {"deploiement/LineageExplorer/LineageExplorer.exe"}   # exécutable publié
 PATTERNS_FILE = os.path.join(ROOT, "tools", "sensitive_patterns.txt")
 
 
@@ -47,6 +48,8 @@ def check(files: list[str], patterns: list[re.Pattern]) -> list[str]:
         if norm.endswith("sensitive_patterns.txt") or norm == "config.json":
             problems.append(f"{rel} : fichier local, ne doit pas être versionné")
         if not os.path.isfile(path):
+            continue
+        if norm in ALLOWED_BINARIES:
             continue
         if os.path.getsize(path) > MAX_SIZE:
             problems.append(f"{rel} : plus de 1 Mo")
