@@ -45,6 +45,8 @@ def check(files: list[str], patterns: list[re.Pattern]) -> list[str]:
         norm = rel.replace("\\", "/")
         if norm.startswith("data/") or norm.endswith(".db") or (norm.endswith(".jsonl") and not norm.startswith("examples/")):
             problems.append(f"{rel} : fichier de données, ne doit pas être versionné")
+        if re.match(r"deploiement/[^/]+/(journal|metadonnees|versions)/", norm):
+            problems.append(f"{rel} : données d'un espace de travail, ne doit pas être versionné")
         if norm.endswith("sensitive_patterns.txt") or norm == "config.json":
             problems.append(f"{rel} : fichier local, ne doit pas être versionné")
         if not os.path.isfile(path):

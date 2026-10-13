@@ -35,3 +35,9 @@ docs/08_decisions_questions.md
 dist/
 build/
 *.spec
+
+# Données d'équipe créées en lançant l'outil depuis le dossier de déploiement (jamais sur GitHub)
+deploiement/*/journal/
+deploiement/*/metadonnees/
+deploiement/*/versions/
+deploiement/*/config.json
