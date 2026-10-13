@@ -374,7 +374,9 @@ class LineageApi:
         for col in columns:
             col["nb_links"] = col_links.get(col["name"], 0)
         sugs = [self.sug_out(s) for s in self.visible_suggestions(store.suggestions_for(con, obj_id))]
+        rules = store.rules_for(con, obj_id)
         return {
+            "rules": rules,
             "object": {**obj, **self.node(obj_id)}, "columns": columns,
             "upstream": [l for l in links if l["kind"] == "FLOW" and l["target"] == obj_id],
             "downstream": [l for l in links if l["kind"] == "FLOW" and l["source"] == obj_id],
@@ -474,6 +476,21 @@ class LineageApi:
         direction = params.get("dir", "up")
         seen, frontier, steps = {(obj_id, column)}, [(obj_id, column)], []
         flows = [l for l in self.links(True) if l["kind"] == "FLOW"]
+        if params.get("sql", "1") == "1" and self._objects:
+            con = store.connect(self.cache_path)
+            try:
+                hints = [s for s in store.suggestions_all(con) if s.get("mapping") and s.get("kind") == "FLOW"
+                         and s["key"] not in self.state["dismissed"]]
+            finally:
+                con.close()
+            linked = {(l["source"], c.get("source"), l["target"], c.get("target")) for l in flows for c in l.get("columns") or []}
+            for s in hints:
+                src = s["direction"] or s["a"]
+                tgt = s["b"] if src == s["a"] else s["a"]
+                cols = [c for c in s["mapping"] if (src, c["source"], tgt, c["target"]) not in linked]
+                if cols:
+                    flows.append({"id": "s:" + s["key"], "kind": "FLOW", "source": src, "target": tgt,
+                                  "columns": cols, "status": "SUGGESTION"})
         for level in range(1, int(params.get("depth", 15)) + 1):
             nxt = []
             for node_obj, node_col in frontier:
@@ -794,18 +811,24 @@ class LineageApi:
             except (UnicodeDecodeError, ValueError) as exc:
                 raise ApiError(HTTPStatus.BAD_REQUEST, str(exc)) from exc
             name = params.get("name") or "import"
+        previous_path = self.workspace.metadata_path()
+        previous = ingest.load_metadata(previous_path) if previous_path else None
+        mode = params.get("mode") or ("merge" if previous and params.get("format") == "sql" else "replace")
+        recognition = None
+        if mode == "merge" and previous:
+            md, recognition = ingest.merge_metadata(previous, md, name)
         check = ingest.check_metadata(md)
         if not check["ok"]:
             return {"ok": False, "check": check}
-        previous_path = self.workspace.metadata_path()
-        previous = ingest.load_metadata(previous_path) if previous_path else None
         file = self.workspace.save_metadata(md, name, user)
         diff = diff_metadata(previous, md)
         stats = {"nb_objects": check["nb_objects"], "nb_columns": check["nb_columns"]}
-        self.workspace.append("metadata.import", {"file": file, "name": name, "stats": stats, "diff": diff}, user)
+        self.workspace.append("metadata.import", {"file": file, "name": name, "stats": stats, "diff": diff,
+                                                  "mode": mode, "recognition": recognition}, user)
         self._cache_key = None
         self.sync(force=True)
-        return {"ok": True, "check": check, "report": self.last_report, "diff": diff}
+        return {"ok": True, "check": check, "report": self.last_report, "diff": diff, "mode": mode,
+                "recognition": recognition}
 
 
 # ====================================================================== transport HTTP

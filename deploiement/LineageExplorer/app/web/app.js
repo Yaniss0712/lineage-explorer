@@ -13,7 +13,8 @@
   const fmtScore = (s) => (s == null ? "–" : Number(s).toFixed(2));
   const fmtDate = (s) => (s ? new Date(s).toLocaleString("fr-FR", { dateStyle: "short", timeStyle: "short" }) : "");
   const short = (id) => String(id || "").split(".").pop();
-  const STATUS_LABEL = { VALIDE: "validé", A_VALIDER: "à valider", SUGGESTION: "suggestion" };
+  const STATUS_LABEL = { VALIDE: "validé", A_VALIDER: "à valider", SUGGESTION: "lu dans le SQL" };
+  const RULE_KIND = { VIEW: "Vue", INSERT: "Alimentation (INSERT)", CTAS: "Création (CREATE TABLE AS)", SELECT: "Requête" };
   const KIND_LABEL = { FLOW: "Flux", JOIN: "Jointure" };
   const ORIGIN_LABEL = { STRUCTURE: "colonnes communes", SQL: "requête SQL", DECLARE: "fichier importé" };
 
@@ -330,6 +331,21 @@
       <div class="btns"><button class="btn sm primary" data-act="create">Créer le lien…</button><button class="btn sm ghost" data-act="dismiss">Écarter</button></div></div>`;
   }
 
+  function ruleCard(r, selfId) {
+    const tbl = (id) => id ? `<span class="obj" data-open="${esc(id)}">${esc(short(id))}</span>` : "";
+    const head = r.role === "target"
+      ? `${esc(RULE_KIND[r.kind] || r.kind)} de cette table à partir de ${r.sources.map(tbl).join(", ") || "—"}`
+      : `${esc(RULE_KIND[r.kind] || r.kind)}${r.target ? ` de ${tbl(r.target)}` : ""} qui utilise cette table`;
+    const line = (label, value) => value ? `<div class="rule-line"><span class="rule-label">${label}</span><code>${esc(value)}</code></div>` : "";
+    const mine = r.role === "target" ? r.columns : r.columns.filter((c) => c.expression.toLowerCase().includes(short(selfId).toLowerCase() + "."));
+    return `<div class="rule-card">
+      <div class="rule-head">${head}</div>
+      ${r.joins.map((j) => line(esc(j.type.toLowerCase()), `${short(j.table)}${j.condition ? "  ON  " + j.condition : ""}`)).join("")}
+      ${line("filtre", r.filters)}${line("regroupement", r.group_by)}${line("condition sur groupe", r.having)}
+      ${mine.length ? `<table class="col-table rule-cols">${mine.map((c) => `<tr><td class="mono">${esc(c.column)}</td><td><code>${esc(c.expression)}</code></td></tr>`).join("")}</table>` : ""}
+      <details class="more"><summary>Code SQL${r.source_file ? " · " + esc(r.source_file) : ""}</summary><pre class="sql">${esc(r.sql)}</pre></details></div>`;
+  }
+
   function setDetailTab(name) {
     state.detailTab = name;
     $$("[data-dtab]").forEach((b) => b.classList.toggle("active", b.dataset.dtab === name));
@@ -353,9 +369,10 @@
         ${o.id !== state.center ? '<button class="btn sm ghost" id="btn-hide">Masquer</button>' : ""}
       </div>
       <div class="d-tabs">
-        <button class="d-tab" data-dtab="cols">Colonnes · ${d.columns.length}</button>
-        <button class="d-tab" data-dtab="links">Liens · ${nbLinks}</button>
-        <button class="d-tab" data-dtab="sugg">Suggestions · ${d.suggestions.length}</button>
+        <button class="d-tab" data-dtab="cols">Colonnes ${d.columns.length}</button>
+        <button class="d-tab" data-dtab="links">Liens ${nbLinks}</button>
+        <button class="d-tab" data-dtab="sugg" title="Suggestions">Sugg. ${d.suggestions.length}</button>
+        <button class="d-tab" data-dtab="rules">Règles ${(d.rules || []).length}</button>
         <button class="d-tab" data-dtab="doc">Doc</button>
       </div>
       <div data-pane="cols">
@@ -371,6 +388,9 @@
         <div class="section-title">Alimente · ${d.downstream.length}</div>${list(d.downstream, "Aucune table alimentée documentée.")}
         <div class="section-title">Jointures · ${d.joins.length}</div>${list(d.joins, "Aucune jointure documentée.")}
       </div>
+      <div data-pane="rules">${(d.rules || []).length
+        ? `<p class="hint" style="padding-top:0">Règles de gestion lues dans le SQL importé : jointures, filtres, regroupements et calcul des colonnes.</p>${d.rules.map((r) => ruleCard(r, o.id)).join("")}`
+        : '<p class="hint">Aucune requête SQL ne concerne cette table. Importez du SQL (mode « Compléter ») pour voir ses règles de gestion.</p>'}</div>
       <div data-pane="sugg">${d.suggestions.map((s) => suggCard(s, o.id)).join("") || '<p class="hint">Aucune suggestion pour cette table.</p>'}</div>
       <div data-pane="doc">
         <div class="form">
@@ -800,12 +820,20 @@
     try { examples = await api("examples"); } catch (e) { /* aucun exemple */ }
     const body = openModal(`<h2>Importer des métadonnées</h2>
       <p class="muted" style="margin:0">Un JSON de structure (tables + colonnes) ou des requêtes SQL. Le fichier est enregistré dans l'espace partagé : toute l'équipe voit la nouvelle version. Tags, liens et documentation sont conservés ; les objets ou colonnes disparus sont signalés.</p>
+      ${state.info && state.info.has_data ? `<div class="seg-wide" id="imp-mode" style="margin-top:12px">
+        <button data-mode="" class="active" title="SQL : complète la structure actuelle ; JSON : remplace la structure">Automatique</button>
+        <button data-mode="merge" title="Ajoute les tables, règles et jointures du fichier à la structure actuelle">Compléter la structure</button>
+        <button data-mode="replace" title="Le fichier devient la nouvelle structure (tags et liens conservés)">Remplacer la structure</button></div>
+        <p class="hint" style="padding:4px 2px 0">Automatique : un fichier <b>.sql</b> complète la structure actuelle (tables reconnues, règles de gestion et jointures ajoutées) ; un <b>.json</b> la remplace.</p>` : ""}
       <label class="dropzone" id="drop"><input type="file" id="file" accept=".json,.jsonl,.sql,application/json" multiple hidden>
         <b>Déposez un fichier ici</b><br><span class="muted">.json, .jsonl ou un ou plusieurs .sql — ou cliquez pour choisir</span></label>
       <details class="more" style="margin-top:12px"><summary>Ou coller des requêtes SQL</summary>
         <div class="form" style="margin-top:6px"><textarea id="sql-text" rows="6" class="mono"></textarea><button class="btn sm primary" id="sql-go" style="justify-self:start">Analyser le SQL</button></div></details>
       ${examples.length ? `<details class="more" style="margin-top:8px"><summary>Exemples fictifs</summary><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">${examples.map((x) => `<button class="btn sm" data-example="${esc(x)}">${esc(x)}</button>`).join("")}</div></details>` : ""}
       <div id="import-result" style="margin-top:14px"></div>`);
+    const modeBox = $("#imp-mode", body);
+    if (modeBox) modeBox.onclick = (e) => { const b = e.target.closest("[data-mode]"); if (b) { $$("button", modeBox).forEach((x) => x.classList.toggle("active", x === b)); state.importMode = b.dataset.mode; } };
+    state.importMode = "";
     const drop = $("#drop", body);
     drop.addEventListener("dragover", (e) => { e.preventDefault(); drop.classList.add("over"); });
     drop.addEventListener("dragleave", () => drop.classList.remove("over"));
@@ -826,12 +854,20 @@
   }
   async function doImport(path, text, label) {
     const out = $("#import-result");
+    if (state.importMode) path += (path.includes("?") ? "&" : "?") + "mode=" + state.importMode;
     out.innerHTML = `<p class="hint">⏳ Import de <b>${esc(label)}</b>…</p>`;
     try {
       const d = await api(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: text || "" });
       if (!d.ok) { out.innerHTML = `<p><b>Fichier refusé</b> :</p><div class="errors">${d.check.errors.slice(0, 50).map((x) => `<div>• ${esc(x)}</div>`).join("")}</div>`; return; }
       const r = d.report || {}, diff = d.diff || {};
-      out.innerHTML = `<p>✅ <b>${esc(label)}</b> importé : ${r.nb_objects} objets, ${r.nb_columns} colonnes, ${r.nb_suggestions} suggestions.</p>
+      const rec = d.recognition;
+      out.innerHTML = `<p>✅ <b>${esc(label)}</b> ${d.mode === "merge" ? "ajouté à la structure" : "importé"} : ${r.nb_objects} objets, ${r.nb_columns} colonnes, ${r.nb_suggestions} suggestions, ${r.nb_rules || 0} règle(s) de gestion.</p>
+        ${rec ? `<div class="stats-grid"><div class="stat"><b>${rec.matched.length}</b><span>tables du SQL reconnues dans la structure</span></div>
+          <div class="stat"><b>${rec.added.length}</b><span>tables ajoutées (absentes de la structure)</span></div>
+          <div class="stat"><b>${rec.nb_rules}</b><span>règles de gestion</span></div><div class="stat"><b>${rec.nb_joins}</b><span>jointures</span></div></div>
+          ${rec.added.length ? `<details><summary>Tables ajoutées (${rec.added.length})</summary><div class="mono" style="font-size:12px">${rec.added.map(esc).join("<br>")}</div></details>` : ""}
+          ${rec.nb_unknown_columns ? `<details><summary class="type-warn">${rec.nb_unknown_columns} colonne(s) utilisée(s) dans le SQL mais absentes de la structure</summary><div class="mono" style="font-size:12px">${rec.unknown_columns.map(esc).join("<br>")}</div></details>` : ""}
+          ${rec.ambiguous.length ? `<details><summary>${rec.ambiguous.length} nom(s) ambigu(s)</summary><div class="mono" style="font-size:12px">${rec.ambiguous.map(esc).join("<br>")}</div></details>` : ""}` : ""}
         ${diff.first_import ? "" : `<p class="muted" style="font-size:13px">Par rapport à l'import précédent : +${(diff.objects_added || []).length} / −${(diff.objects_removed || []).length} objet(s), +${diff.nb_columns_added || 0} / −${diff.nb_columns_removed || 0} colonne(s).</p>`}
         ${d.check.warnings.length ? `<details><summary>${d.check.warnings.length} avertissement(s)</summary><div class="errors" style="color:var(--warn)">${d.check.warnings.slice(0, 100).map((x) => `<div>• ${esc(x)}</div>`).join("")}</div></details>` : ""}
         <button class="btn primary" id="imp-close" style="margin-top:10px">Explorer</button>`;

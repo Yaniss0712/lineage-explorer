@@ -46,7 +46,7 @@ Uniquement la structure (aucune clé, aucune couche) :
 ] }
 ```
 
-Des requêtes SQL (`CREATE TABLE`, `CREATE VIEW … AS SELECT`, `INSERT … SELECT`, `SELECT … JOIN`) fonctionnent aussi : elles apportent des suggestions **orientées**, avec la correspondance des colonnes. Détails : [docs/04_format_json.md](docs/04_format_json.md).
+**JSON et SQL se complètent** : importez d'abord la structure en JSON, puis votre code SQL. L'outil reconnaît les tables existantes (même sans le nom de base), leur ajoute les **règles de gestion** (jointures et conditions, filtres, regroupements, formules des colonnes) et signale les colonnes inconnues. Des requêtes SQL seules (`CREATE TABLE`, `CREATE VIEW … AS SELECT`, `INSERT … SELECT`, `SELECT … JOIN`) fonctionnent aussi : elles apportent des suggestions **orientées**, avec la correspondance des colonnes. Détails : [docs/04_format_json.md](docs/04_format_json.md).
 
 ## L'interface
 
@@ -58,7 +58,7 @@ Des requêtes SQL (`CREATE TABLE`, `CREATE VIEW … AS SELECT`, `INSERT … SELE
 | **Suggestions** | Tables probablement liées, avec le « pourquoi » ; créer le lien ou écarter |
 | **Colonnes** | Dictionnaire de toutes les colonnes, filtre « types différents », vue colonne |
 | **Graphe** | Amont / Tout / Aval, profondeur ; liens validés (plein), à valider (tirets), suggestions (pointillés), jointures |
-| **Détail** | Tag, colonnes et lineage d'une colonne, liens, suggestions, documentation (description, propriétaire, URL de spec, notes) |
+| **Détail** | Tag, colonnes et lineage d'une colonne, liens, suggestions, **règles de gestion lues dans le SQL**, documentation (description, propriétaire, URL de spec, notes) |
 | **En-tête** | Tags et règles, Historique (versions, activité), Enregistrer la version, Importer, export Excel, rapport, réglages, mode clair / sombre |
 
 ## Exemples fictifs
@@ -72,7 +72,7 @@ Des requêtes SQL (`CREATE TABLE`, `CREATE VIEW … AS SELECT`, `INSERT … SELE
 ## Pour les développeurs
 
 ```bash
-python -m unittest                     # 34 tests (stdlib)
+python -m unittest                     # 38 tests (stdlib)
 python -m engine import --input fichier.json --workspace data/espace
 python tools/build_portable.py        # → deploiement/LineageExplorer (version portable)
 ```

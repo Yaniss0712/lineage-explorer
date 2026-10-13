@@ -26,6 +26,8 @@ CREATE TABLE columns (id TEXT PRIMARY KEY, object_id TEXT, name TEXT, name_norm 
                       description TEXT, position INTEGER);
 CREATE TABLE suggestions (key TEXT PRIMARY KEY, a TEXT, b TEXT, score REAL, origin TEXT, kind TEXT,
                           direction TEXT, data TEXT);
+CREATE TABLE rules (rowid INTEGER PRIMARY KEY, target TEXT, data TEXT);
+CREATE TABLE rule_objects (rule_id INTEGER, object_id TEXT, role TEXT);
 CREATE TABLE column_stats (name TEXT PRIMARY KEY, name_norm TEXT, nb_objects INTEGER, types TEXT, conflict INTEGER);
 CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT);
 CREATE TABLE search (rowid INTEGER PRIMARY KEY, kind TEXT, object_id TEXT, column_name TEXT, database TEXT,
@@ -38,6 +40,7 @@ CREATE INDEX idx_columns_norm ON columns(name_norm);
 CREATE INDEX idx_sugg_a ON suggestions(a);
 CREATE INDEX idx_sugg_b ON suggestions(b);
 CREATE INDEX idx_search_name ON search(name_norm);
+CREATE INDEX idx_rule_objects ON rule_objects(object_id);
 """
 
 
@@ -58,7 +61,7 @@ def has_trigram() -> bool:
 # --------------------------------------------------------------------------- écriture
 
 
-def write_cache(path: str, catalog: Catalog, suggestions: list[dict], meta: dict) -> None:
+def write_cache(path: str, catalog: Catalog, suggestions: list[dict], meta: dict, rules: list[dict] | None = None) -> None:
     """Écrit le cache complet dans un fichier temporaire puis remplace l'ancien."""
     os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
     tmp = f"{path}.{os.getpid()}.tmp"
@@ -92,6 +95,17 @@ def write_cache(path: str, catalog: Catalog, suggestions: list[dict], meta: dict
         con.executemany("INSERT INTO suggestions VALUES (?,?,?,?,?,?,?,?)",
                         [(s["key"], s["a"], s["b"], s["score"], s["origin"], s["kind"], s["direction"],
                           json.dumps(s, ensure_ascii=False)) for s in suggestions])
+        for rule in rules or []:
+            cur = con.execute("INSERT INTO rules(target, data) VALUES (?, ?)",
+                              (rule.get("target"), json.dumps(rule, ensure_ascii=False)))
+            roles = {}
+            for src in rule.get("sources") or []:
+                roles.setdefault(src, "source")
+            for join in rule.get("joins") or []:
+                roles.setdefault(join["table"], "source")
+            if rule.get("target"):
+                roles[rule["target"]] = "target"
+            con.executemany("INSERT INTO rule_objects VALUES (?,?,?)", [(cur.lastrowid, o, r) for o, r in roles.items() if o])
         fts = has_trigram()
         if fts:
             con.execute("CREATE VIRTUAL TABLE search_fts USING fts5(name_norm, desc_norm, content='search', "
@@ -204,6 +218,13 @@ def search_hits(con, query: str, in_desc: bool = True, kinds: tuple = ("OBJECT",
     kind_clause = " AND s.kind IN (" + ",".join(f"'{k}'" for k in kinds) + ")"
     return _rows(con.execute(f"SELECT s.kind, s.object_id, s.column_name, s.data_type FROM search s WHERE {cond}"
                              f"{kind_clause} LIMIT :limit", params))
+
+
+def rules_for(con, obj_id: str) -> list[dict]:
+    """Règles de gestion (SQL) où l'objet est la cible ou une source, avec son rôle."""
+    rows = con.execute("SELECT r.data, o.role FROM rule_objects o JOIN rules r ON r.rowid = o.rule_id "
+                       "WHERE o.object_id = ? ORDER BY o.role DESC, r.rowid", (obj_id,))
+    return [{**json.loads(r["data"]), "role": r["role"]} for r in rows]
 
 
 def suggestions_all(con) -> list[dict]:

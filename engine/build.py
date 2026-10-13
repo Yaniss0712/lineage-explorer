@@ -39,11 +39,13 @@ def build_cache(md: dict, settings: dict, cache_path: str, extra_meta: dict | No
         "objects_by_type": dict(Counter(o.type for o in catalog.objects.values())),
         "nb_suggestions": len(suggestions),
         "suggestions_by_origin": dict(Counter(s["origin"] for s in suggestions)),
+        "nb_rules": len(md.get("rules") or []),
+        "sources": md["meta"].get("sources") or [],
         "most_shared_columns": [{"name": n, "nb_objects": c} for n, c in shared.most_common(15) if c > 1],
         "duration_s": round(time.perf_counter() - start, 2),
     }
     meta = {**(extra_meta or {}), "built_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
             "extracted_at": md["meta"].get("extracted_at"), "source": md["meta"].get("source"), "report": report}
-    store.write_cache(cache_path, catalog, suggestions, meta)
+    store.write_cache(cache_path, catalog, suggestions, meta, md.get("rules") or [])
     report["duration_s"] = round(time.perf_counter() - start, 2)
     return report

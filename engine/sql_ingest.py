@@ -12,7 +12,11 @@ Instructions reconnues (dialectes Hive / Spark / ANSI courants, parsing par expr
 
 Une table seulement lue (FROM / JOIN) mais jamais déclarée est créée avec les colonnes que les
 requêtes y référencent (`alias.colonne`) : la structure est reconstituée à partir de l'usage.
-Les conditions `a.x = b.y` (ON / WHERE) deviennent des relations de clés.
+Les conditions `a.x = b.y` (ON / WHERE) deviennent des relations de jointure.
+
+Chaque requête produit aussi des **règles de gestion** (`rules[]`) : tables lues, jointures avec
+leur condition, filtres (WHERE / HAVING), regroupement (GROUP BY) et formule de chaque colonne
+calculée, alias remplacés par les noms de tables, plus le texte SQL d'origine.
 
 Point d'entrée : `parse_sql_script(text, default_database)` → dict au format du contrat JSON
 (docs/04_format_json.md), à passer ensuite à `ingest.parse_metadata`.
@@ -126,6 +130,7 @@ class _Model:
         self.declared: set[str] = set()          # objets décrits par un DDL ou une vue
         self.flows: list[dict] = []
         self.relations: dict[tuple, dict] = {}
+        self.rules: list[dict] = []
         self.warnings: list[str] = []
 
     def obj(self, obj_id: str, otype: str = "TABLE", description: str = "") -> dict:
@@ -164,7 +169,8 @@ class _Model:
             objects.append({**obj, "columns": [{**c, "position": i} for i, c in enumerate(obj["columns"].values(), 1)]})
         return {"meta": {"format_version": "1.0", "source": source, "extractor": "engine.sql_ingest",
                          "warnings": self.warnings[:200]},
-                "objects": objects, "flows": self.flows, "relations": list(self.relations.values())}
+                "objects": objects, "flows": self.flows, "relations": list(self.relations.values()),
+                "rules": self.rules}
 
 
 # --------------------------------------------------------------------------- DDL
@@ -266,6 +272,70 @@ def _learn_usage(model: _Model, query: str, sources: list[str], aliases: dict[st
             model.add_relation(a, ca.lower(), b, cb.lower(), "Jointure lue dans une requête SQL")
 
 
+_STOP = r"(?=\b(?:LEFT|RIGHT|FULL|INNER|CROSS|JOIN|WHERE|GROUP\s+BY|HAVING|ORDER\s+BY|LIMIT|UNION|QUALIFY|WINDOW|LATERAL)\b|$)"
+_JOIN_CLAUSE_RE = re.compile(
+    rf"\b((?:(?:LEFT|RIGHT|FULL)(?:\s+OUTER)?|LEFT\s+SEMI|LEFT\s+ANTI|INNER|CROSS)?\s*JOIN)\s+({_IDENT})"
+    rf"(?:\s+(?:AS\s+)?(?!ON\b)(\w+))?(?:\s+ON\s+(.*?){_STOP})?", re.IGNORECASE | re.DOTALL)
+_WHERE_RE = re.compile(r"\bWHERE\s+(.*?)(?=\b(?:GROUP\s+BY|HAVING|ORDER\s+BY|LIMIT|UNION|QUALIFY)\b|$)", re.I | re.S)
+_GROUP_RE = re.compile(r"\bGROUP\s+BY\s+(.*?)(?=\b(?:HAVING|ORDER\s+BY|LIMIT|UNION|QUALIFY)\b|$)", re.I | re.S)
+_HAVING_RE = re.compile(r"\bHAVING\s+(.*?)(?=\b(?:ORDER\s+BY|LIMIT|UNION|QUALIFY)\b|$)", re.I | re.S)
+
+
+def _readable(text: str, aliases: dict[str, str]) -> str:
+    """Remplace les alias (`t.col`) par le nom court de la table (`tiers.col`)."""
+    def sub(match):
+        target = aliases.get(match.group(1).lower())
+        return f"{target.split('.')[-1]}." if target else match.group(0)
+    return " ".join(re.sub(r"\b(\w+)\.(?=\w)", sub, text or "").split())
+
+
+def _top_level(text: str) -> str:
+    """Texte sans le contenu des parenthèses (pour chercher WHERE / GROUP BY du niveau principal)."""
+    out, depth = [], 0
+    for ch in text:
+        if ch == "(":
+            depth += 1
+            out.append(ch if depth == 1 else " ")
+        elif ch == ")":
+            depth -= 1
+            out.append(ch if depth == 0 else " ")
+        else:
+            out.append(" " if depth else ch)
+    return "".join(out)
+
+
+def _clause(regex, main: str, flat: str) -> str | None:
+    """Clause trouvée au niveau principal (positions de `flat`), texte réel pris dans `main`."""
+    match = regex.search(flat)
+    return main[match.start(1):match.end(1)].strip() if match else None
+
+
+def _add_rule(model: _Model, raw_query: str, target: str | None, kind: str, sources: list[str],
+              aliases: dict[str, str], col_rules: list[dict], statement: str, job: str) -> None:
+    main = _main_select(raw_query)
+    from_part = main[re.search(r"\bFROM\b", main, re.I).start():] if re.search(r"\bFROM\b", main, re.I) else ""
+    flat = _top_level(from_part)
+    joins = []
+    for m in _JOIN_CLAUSE_RE.finditer(flat):
+        table = aliases.get(_ident(m.group(2), model.default_db)) or _ident(m.group(2), model.default_db)
+        condition = from_part[m.start(4):m.end(4)].strip() if m.group(4) else ""
+        joins.append({"type": " ".join(m.group(1).upper().split()), "table": table,
+                      "condition": _readable(condition, aliases)})
+    first = re.match(rf"\s*FROM\s+({_IDENT})", from_part, re.I)
+    rule = {
+        "id": job, "kind": kind, "target": target, "sources": sources,
+        "from": (aliases.get(_ident(first.group(1), model.default_db)) or _ident(first.group(1), model.default_db)) if first else None,
+        "joins": joins,
+        "filters": _readable(_clause(_WHERE_RE, from_part, flat), aliases) or None,
+        "group_by": _readable(_clause(_GROUP_RE, from_part, flat), aliases) or None,
+        "having": _readable(_clause(_HAVING_RE, from_part, flat), aliases) or None,
+        "columns": [{"column": c["column"], "expression": _readable(c["expression"], aliases)} for c in col_rules],
+        "sql": statement[:8000],
+    }
+    if rule["joins"] or rule["filters"] or rule["group_by"] or rule["columns"] or target:
+        model.rules.append(rule)
+
+
 def _expression_type(expression: str, refs: list[dict], model: _Model) -> str | None:
     for pattern, ctype in _FUNC_TYPES:
         match = pattern.search(expression)
@@ -277,11 +347,13 @@ def _expression_type(expression: str, refs: list[dict], model: _Model) -> str | 
 
 
 def _parse_query(model: _Model, query: str, target: str | None, target_cols: list[str] | None,
-                 otype: str, job: str) -> None:
-    """Analyse un SELECT : structure des sources, colonnes de la cible, flux colonne à colonne."""
+                 otype: str, job: str, statement: str = "", kind: str = "SELECT") -> None:
+    """Analyse un SELECT : structure des sources, colonnes de la cible, flux colonne à colonne,
+    règles de gestion."""
     sources, aliases = _sources(model, query)
     _learn_usage(model, query, sources, aliases)
     if target is None:
+        _add_rule(model, query, None, kind, sources, aliases, [], statement or query, job)
         return
     is_new = target not in model.declared
     if not is_new and not target_cols and model.objects[target]["columns"]:
@@ -292,9 +364,14 @@ def _parse_query(model: _Model, query: str, target: str | None, target_cols: lis
     main = _strip(_main_select(query))
     select = re.match(r"^SELECT\s+(?:DISTINCT\s+)?(.*?)\s+FROM\b", main, re.IGNORECASE | re.DOTALL)
     items = _split_top_level(select.group(1)) if select else []
+    raw_select = re.match(r"^SELECT\s+(?:DISTINCT\s+)?(.*?)\s+FROM\b", _main_select(query), re.IGNORECASE | re.DOTALL)
+    raw_items = _split_top_level(raw_select.group(1)) if raw_select else []
+    if len(raw_items) != len(items):
+        raw_items = items
     mappings: dict[str, list[dict]] = {}
+    col_rules: list[dict] = []
     position = 0
-    for item in items:
+    for item, raw_item in zip(items, raw_items):
         star = re.match(r"^(?:(\w+)\.)?\*$", item.strip())
         if star:
             expanded = [aliases[star.group(1).lower()]] if star.group(1) and star.group(1).lower() in aliases else sources
@@ -324,6 +401,10 @@ def _parse_query(model: _Model, query: str, target: str | None, target_cols: lis
         source_key = (len(refs) == 1 and re.fullmatch(r"\s*(?:\w+\.)?\w+\s*|\s*(upper|lower|trim)\s*\(.*\)\s*", expression, re.I)
                       and model.objects.get(refs[0]["source_object"], {}).get("columns", {}).get(refs[0]["source"], {}).get("is_key"))
         model.add_column(target, name, _expression_type(expression, refs, model), bool(source_key))
+        raw_alias = re.search(r"\s+(?:AS\s+)?([`\"]?\w+[`\"]?)\s*$", raw_item, re.IGNORECASE) if alias else None
+        raw_expression = (raw_item[:raw_alias.start()] if raw_alias else raw_item).strip()
+        if not re.fullmatch(r"(?:\w+\.)?" + re.escape(name), raw_expression, re.IGNORECASE):
+            col_rules.append({"column": name, "expression": raw_expression})
         seen = set()
         for ref in refs:
             if ref["source_object"] not in sources or (ref["source_object"], ref["source"]) in seen:
@@ -338,6 +419,8 @@ def _parse_query(model: _Model, query: str, target: str | None, target_cols: lis
             continue
         model.flows.append({"source": src, "target": target, "job": job, "origin": SQL_ORIGIN,
                             "column_mapping": mappings.get(src, [])})
+    _add_rule(model, query, target, kind, [s for s in sources if s != target], aliases, col_rules,
+              statement or query, job)
 
 
 def _target_name(target_cols: list[str] | None, position: int, default: str) -> str:
@@ -364,19 +447,19 @@ def parse_sql_script(text: str, default_database: str = "default", source: str =
         view = _CREATE_VIEW_RE.match(stmt)
         if view:
             _parse_query(model, view.group(3), _ident(view.group(1), model.default_db),
-                         _cols(view.group(2)[1:-1]) if view.group(2) else None, "VIEW", job)
+                         _cols(view.group(2)[1:-1]) if view.group(2) else None, "VIEW", job, stmt, "VIEW")
             continue
         table = _CREATE_TABLE_RE.match(stmt)
         if table:
             query, _ = _ctas_query(table.group(2))
             if query:
-                _parse_query(model, query, _ident(table.group(1), model.default_db), None, "TABLE", job)
+                _parse_query(model, query, _ident(table.group(1), model.default_db), None, "TABLE", job, stmt, "CTAS")
             continue
         insert = _INSERT_RE.match(stmt)
         if insert:
             if re.match(r"^\(?\s*(SELECT|WITH)\b", insert.group(3), re.IGNORECASE):
                 _parse_query(model, insert.group(3), _ident(insert.group(1), model.default_db),
-                             _cols(insert.group(2)[1:-1]) if insert.group(2) else None, "TABLE", job)
+                             _cols(insert.group(2)[1:-1]) if insert.group(2) else None, "TABLE", job, stmt, "INSERT")
             continue
         fk = _ALTER_FK_RE.match(stmt)
         if fk:
@@ -385,7 +468,7 @@ def parse_sql_script(text: str, default_database: str = "default", source: str =
                 model.add_relation(a, ac, b, bc, "Clé étrangère déclarée (ALTER TABLE)")
             continue
         if re.match(r"^\(?\s*(SELECT|WITH)\b", stmt, re.IGNORECASE):
-            _parse_query(model, stmt, None, None, "TABLE", job)
+            _parse_query(model, stmt, None, None, "TABLE", job, stmt, "SELECT")
             continue
         if not re.match(r"^(USE|SET|DROP|TRUNCATE|ANALYZE|MSCK|COMMENT|GRANT|REFRESH|INVALIDATE)\b", stmt, re.IGNORECASE):
             model.warnings.append(f"Instruction {n} ignorée : {stmt[:80]}…")
