@@ -11,9 +11,10 @@ LineageExplorer\                      ← à déposer dans les fichiers du canal
 ├── LineageExplorer.cmd               ← double-clic pour lancer l'outil
 ├── LISEZMOI.txt
 ├── app\                              ← l'outil (code + Python portable officiel, ne pas modifier)
-│   └── python\                       ← Python 3 signé par la Python Software Foundation
+│   ├── python\                       ← Python 3 signé par la Python Software Foundation
+│   └── vendor\sqlglot\               ← analyseur SQL (pur Python, licence MIT)
 ├── metadonnees\   (créé tout seul)   ← les JSON / SQL importés
-├── journal\       (créé tout seul)   ← 1 petit fichier par modification
+├── journal\       (créé tout seul)   ← un fichier par version et par poste (une ligne par modification)
 └── versions\      (créé tout seul)   ← les « Enregistrer »
 ```
 
@@ -45,7 +46,11 @@ Sur chaque poste, seul un **index de recherche** est recréé automatiquement da
 | Action | Où | Enregistré dans |
 |---|---|---|
 | Taguer | Détail de la table → Tag, ou « Sélection multiple » dans le catalogue | `journal\` |
-| Créer un lien | « Ajouter un lien », une suggestion, la vue colonne | `journal\` (statut « à valider ») |
+| Créer un lien | « Ajouter un lien », une suggestion, la vue colonne, ou un import SQL | `journal\` (flux « à valider », jointure validée) |
+| Créer un objet (objet métier, viz, table prévue) | **+ Objet** dans le catalogue | `journal\` (étiquette New) |
+| Fusionner une table New | **Importer → Fusionner une table New** (SQL ou JSON) | `metadonnees\` + `journal\` |
+| Annuler / revenir en arrière | **Ctrl+Z / Ctrl+Y**, ou **Historique** → annuler une ligne, revenir à un point | `journal\` (rien n'est effacé) |
+| Signaler une anomalie | Onglet **Suivi**, ou « Signaler » sur un objet / un lien | `journal\` |
 | Valider / supprimer un lien | Onglet « À valider » ou onglet Liens | `journal\` |
 | Documenter | Détail → Doc (description, propriétaire, URL de spec, notes) | `journal\` |
 | Recharger les données | Bouton **Actualiser** (en haut) | — |
@@ -60,7 +65,19 @@ Sur chaque poste, seul un **index de recherche** est recréé automatiquement da
 
 1. Télécharger la nouvelle version depuis GitHub (**Download ZIP**).
 2. Demander à l'équipe de fermer l'outil (fermer la petite fenêtre).
-3. Dans le dossier Teams, remplacer **uniquement** `app\` et `LineageExplorer.cmd`. `journal\`, `versions\` et `metadonnees\` ne bougent pas : rien n'est perdu.
+3. Dans le dossier Teams, remplacer **uniquement** `app\`, `LineageExplorer.cmd` et `FusionnerJournal.cmd`. `journal\`, `versions\` et `metadonnees\` ne bougent pas : rien n'est perdu.
+
+### Passer de la v0.3 à la v0.4 : regrouper le journal
+
+Jusqu'à la v0.3, chaque modification était un petit fichier `.json` dans `journal\`. La v0.4 les **regroupe en un seul fichier** `journal\archive__….jsonl` (une ligne par modification, même contenu, ordre chronologique), puis écrit un fichier par version et par poste.
+
+1. **Tout le monde ferme l'outil** et passe à la v0.4 en même temps : une v0.3 ne sait pas lire le nouveau fichier, elle verrait un journal vide.
+2. Vérifier que Teams a fini de synchroniser `journal\` (plus d'icône de synchronisation).
+3. Une seule personne lance la v0.4 (`LineageExplorer.cmd`) : le regroupement est **automatique**. Ou double-clic sur **`FusionnerJournal.cmd`**, qui affiche le bilan (nombre de fichiers, de modifications) avant de regrouper.
+4. Sécurités : la copie est relue avant toute suppression ; l'état de l'équipe (tags, liens, docs…) est comparé avant / après, et rien n'est supprimé s'il diffère ; les anciens fichiers sont gardés dans `journal\sauvegardes\journal_avant_regroupement_….zip`. Un fichier encore en cours de synchronisation est laissé en place et regroupé au lancement suivant.
+5. Les autres lancent ensuite la v0.4 normalement.
+
+En ligne de commande : `app\python\python.exe -m engine compact --workspace <dossier Teams> --dry-run` (bilan seul), puis sans `--dry-run`.
 
 ## 6. En cas de problème
 

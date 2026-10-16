@@ -14,7 +14,10 @@ les fichiers du canal Teams ou dans tout dossier partagé de l'équipe. Rien à 
 
 Créés automatiquement dans ce dossier (ne pas modifier ni supprimer à la main) :
    metadonnees\   les fichiers importés
-   journal\       une modification = un petit fichier (tags, liens, specs, notes…)
+   journal\       un fichier par version et par poste, une ligne par modification
+                  (tags, liens, objets, specs, notes, suivi). Les anciens journaux
+                  (un fichier par modification) sont regroupés automatiquement au
+                  premier lancement de la v0.4, ou avec FusionnerJournal.cmd.
    versions\      les « Enregistrer » (restaurables depuis « Historique »)
 
 Sur chaque poste, seul un index de recherche est recréé automatiquement dans

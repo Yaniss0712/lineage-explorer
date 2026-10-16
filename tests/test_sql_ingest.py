@@ -81,7 +81,7 @@ class SqlIngestTest(unittest.TestCase):
         tiers = {c["name"]: c for o in md["objects"] if o["id"] == "bv_client.tiers" for c in o["columns"]}
         self.assertEqual(tiers["code_tiers_ref"]["type"], "string")              # type déduit du DDL source
 
-    def test_sql_becomes_directed_suggestions(self):
+    def test_sql_creates_links_in_the_graph(self):
         from engine.server import LineageApi
         config, tmp = temp_config()
         self.addCleanup(tmp.cleanup)
@@ -89,12 +89,22 @@ class SqlIngestTest(unittest.TestCase):
         with open(os.path.join(ARCHI, "requetes_architecture.sql"), "rb") as handle:
             result = api.import_metadata(handle.read(), {"format": "sql", "name": "archi"}, "testeur")
         self.assertTrue(result["ok"])
+        flows = [l for l in api.state["links"].values() if l["kind"] == "FLOW"]
+        self.assertEqual(len(flows), 28)                                   # chaque flux lu devient un lien visible
+        self.assertEqual(result["links"]["flows"], 28)
+        self.assertTrue(all(l["origin"] == "SQL" and l["status"] == "A_VALIDER" for l in flows))
+        joins = [l for l in api.state["links"].values() if l["kind"] == "JOIN"]
+        self.assertTrue(joins and all(l["status"] == "VALIDE" for l in joins))   # jointures : sans validation
+        tiers = next(l for l in flows if (l["source"], l["target"]) == ("lac_crm.clients_raw", "bv_client.tiers"))
+        self.assertIn({"source": "segment", "target": "categorie_client", "transformation": "renommage"}, tiers["columns"])
         sql = [s for s in api.suggestions({"limit": 1000})["items"] if s["origin"] == "SQL"]
-        self.assertEqual(len(sql), 28)                          # aucun lien créé : 28 suggestions orientées
-        tiers = next(s for s in sql if s["key"] == "bv_client.tiers|lac_crm.clients_raw")
-        self.assertEqual(tiers["proposed_source"], "lac_crm.clients_raw")
-        self.assertIn({"source": "segment", "target": "categorie_client", "transformation": "renommage"}, tiers["mapping"])
-        self.assertEqual(api.state["links"], {})
+        self.assertEqual(sql, [])                                          # plus de suggestion pour un lien existant
+        with open(os.path.join(ARCHI, "requetes_architecture.sql"), "rb") as handle:
+            sql_bytes = handle.read()
+        again = api.import_metadata(sql_bytes,
+                                    {"format": "sql", "name": "archi bis"}, "testeur")
+        self.assertEqual(again["links"]["flows"], 0)                      # réimporter ne crée pas de doublon
+
 
 if __name__ == "__main__":
     unittest.main()

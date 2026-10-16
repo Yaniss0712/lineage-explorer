@@ -41,3 +41,9 @@ deploiement/*/journal/
 deploiement/*/metadonnees/
 deploiement/*/versions/
 deploiement/*/config.json
+
+# Configuration locale du script d extraction (DSN, bases réelles) et ses sorties
+extraction.local.json
+tools/metadata_databases.json
+tools/vues_databases.sql
+tools/metadata_errors.json

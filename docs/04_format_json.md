@@ -69,7 +69,32 @@ Scénario type : on importe d'abord le **JSON de structure** (toutes les tables,
 4. **Suggestions orientées** avec correspondance des colonnes et **lineage de colonne** « lu dans le SQL », toujours sans créer de lien automatiquement.
 5. **Rapport de reconnaissance** à l'import : tables reconnues, tables ajoutées, noms ambigus, et **colonnes utilisées dans le SQL mais absentes de la structure** (faute de frappe, colonne supprimée, JSON pas à jour).
 
-Le résultat (structure + SQL) est enregistré comme une nouvelle version des métadonnées dans `metadonnees/`. On peut importer plusieurs fichiers SQL successivement : ils s'additionnent. Le mode **Remplacer** repart d'un fichier unique ; tags, liens et documentation sont conservés dans les deux cas.
+Le résultat (structure + SQL) est enregistré comme une nouvelle version des métadonnées dans `metadonnees/`. On peut importer plusieurs fichiers SQL successivement : ils s'additionnent.
+
+Modes d'import :
+
+| Mode | Défaut pour | Effet |
+|---|---|---|
+| **Compléter** (`merge`) | un `.sql` | Le fichier s'ajoute à la structure actuelle |
+| **Mettre à jour** (`refresh`) | un `.json` | Le JSON devient la structure ; règles de gestion, flux et jointures lus dans le SQL sont reportés dessus. Une table que le SQL avait créée en `default.x` et que le JSON décrit en `base.x` est renommée, et ses liens suivent (`objects.rename`) |
+| **Remplacer** (`replace`) | — | Repartir de ce seul fichier |
+
+Dans tous les cas, **tags, liens, objets créés à la main, documentation et suivi ne sont jamais touchés**. Un lien dont une table disparaît n'est pas supprimé : il devient **orphelin** (signalé en orange, et dans les anomalies du Suivi).
+
+### 2.2 Liens lus dans le SQL
+
+Analyse par **sqlglot** (fourni dans `vendor/`, pur Python, licence MIT), avec repli sur des expressions régulières si une requête n'est pas comprise. Sont compris : CTE (`WITH`), sous-requêtes, `UNION ALL`, `CASE`, fonctions de fenêtre, `INSERT OVERWRITE … PARTITION`, `JOIN … USING`, `IN (SELECT …)`. Le lineage de colonne traverse les CTE (`retard_max ← max(echeances.jours_retard)`).
+
+- chaque flux (`INSERT`, `CREATE TABLE AS`, vue) devient un **lien FLOW** `origin: "SQL"`, statut « à valider », avec la correspondance des colonnes ;
+- chaque jointure (`ON`, `USING`, clé étrangère) devient un **lien JOIN** déjà validé ;
+- réimporter le même SQL ne crée pas de doublon ; un lien supprimé par l'équipe n'est pas recréé ;
+- le détail d'un lien affiche les règles de gestion de la requête qui l'a produit.
+
+### 2.3 Objets créés à la main et fusion
+
+Bouton **+ Objet** : `objet métier`, `source`, `table`, `vue`, `viz`, `autre`, avec colonnes facultatives. Identifiant `base.nom` (base `manuel` par défaut). Ils portent l'étiquette **New** jusqu'à :
+- leur **validation** (`object.confirm`, après confirmation) : ils restent tels quels ;
+- leur **fusion** avec la vraie définition : **Importer → Fusionner une table New**, coller le `CREATE TABLE … AS SELECT` (ou un bout de JSON) ; l'outil propose la table New correspondante (même nom, sinon colonnes proches), un menu permet d'en choisir une autre. Le code est importé en mode Compléter, puis `object.merge` transfère liens, tag, documentation, notes et suivi vers la vraie table : aucun doublon. Un import classique qui contient une table de même nom qu'une table New propose aussi la fusion.
 
 Format d'une règle dans le JSON (`rules[]`, produit automatiquement, mais accepté en entrée) :
 
@@ -87,7 +112,7 @@ Format d'une règle dans le JSON (`rules[]`, produit automatiquement, mais accep
 Voir [10 — Déploiement Teams](10_deploiement_teams.md). Trois dossiers, créés automatiquement :
 
 - `metadonnees/` : chaque import, normalisé (JSON) ; le plus récent est celui utilisé ;
-- `journal/` : un fichier JSON par modification ;
+- `journal/` : `<version>__<utilisateur>__<poste>.jsonl`, une ligne JSON par modification. Chaque poste n'écrit que dans son propre fichier ; « Enregistrer la version » en ouvre un nouveau. Les anciens journaux (un `.json` par modification) sont regroupés automatiquement dans `archive__….jsonl` ;
 - `versions/` : les instantanés « Enregistrer la version ».
 
 ### Événement du journal
@@ -105,16 +130,23 @@ Voir [10 — Déploiement Teams](10_deploiement_teams.md). Trois dossiers, cré�
 | `tag.save` / `tag.delete` | `id`, `name`, `color`, `description`, `order` |
 | `object.tag` | `object_ids[]`, `tag_id` (null = retirer le tag choisi à la main) |
 | `rule.save` / `rule.delete` | `id`, `pattern` (ex. `fiche_client_*`), `tag_id` |
-| `link.create` / `link.update` | `id`, `kind` (`FLOW` = flux orienté, `JOIN` = jointure), `source`, `target`, `columns[]`, `comment` |
+| `link.create` / `link.update` | `id`, `kind` (`FLOW` = flux orienté, `JOIN` = jointure), `source`, `target`, `columns[]`, `comment`, `status` (`VALIDE` pour une jointure ou « créer et valider »), `origin` |
+| `links.import` | `links[]` lus dans le SQL, `source_file` (doublons et liens supprimés ignorés) |
 | `link.validate` / `link.delete` | `id` (+ `reason` facultatif) |
 | `suggestion.dismiss` / `suggestion.restore` | `key` (`objetA|objetB`, ordre alphabétique) |
 | `object.update` | `id`, `description`, `owner`, `spec_url` |
+| `object.create` / `object.edit` | `id`, `database`, `name`, `type`, `description`, `columns[]` (objet créé à la main, New) |
+| `object.confirm` / `object.delete` | `id` |
+| `object.merge` | `id` (table New), `into` (vraie table) : liens, tag, doc, notes et suivi suivent |
+| `objects.rename` | `map` {ancien identifiant : nouveau} (table du SQL retrouvée dans le JSON) |
+| `ticket.save` / `ticket.comment` / `ticket.delete` | `id`, `kind` (`ANOMALIE`, `MODIFICATION`, `AMELIORATION`), `title`, `status` (`OUVERT`, `EN_COURS`, `RESOLU`, `REJETE`), `priority`, `object_id`, `column`, `link_id`, `assignee` |
+| `event.revert` / `event.restore` | `ids[]`, `mode` (`undo`, `redo`, `history`, `point`) : annuler / rétablir sans rien effacer |
 | `note.add` / `note.delete` | `object_id`, `id`, `text` |
 | `settings.update` | `ignore_columns[]`, `hidden_objects[]` |
 | `metadata.import` | `file`, `name`, `stats`, `diff` |
 | `version.save` / `version.restore` | `file`, `label`, `comment` |
 
-L'état de l'équipe = rejeu de tous les événements, triés par date (`ts`, puis `id`). Un lien créé a le statut `A_VALIDER`. `link.validate` le passe à `VALIDE` (son auteur peut le valider lui-même). `link.delete` le retire, en gardant la trace de qui et quand.
+L'état de l'équipe = rejeu de tous les événements, triés par date (`ts`, puis `id`), en sautant ceux qu'un `event.revert` a annulés. Un flux créé a le statut `A_VALIDER` ; une jointure est `VALIDE` dès sa création. `link.validate` le passe à `VALIDE` (son auteur peut le valider lui-même). `link.delete` le retire, en gardant la trace de qui et quand.
 
 ## 4. `config.json` (facultatif)
 

@@ -1,0 +1,10 @@
+{
+  "_lisez_moi": "Copiez ce fichier en extraction.local.json (ignoré par git) et remplacez les valeurs fictives.",
+  "dsn": "MON-DSN-HIVE",
+  "databases": ["db_exemple_lac", "db_exemple_bv", "db_exemple_mart"],
+  "output": "metadata_databases.json",
+  "sql_output": "vues_databases.sql",
+  "errors": "metadata_errors.json",
+  "show_create_views": true,
+  "timeout": 30
+}

@@ -19,6 +19,21 @@ Réalisé : tags définis par l'équipe (règles de nommage, tag en masse) à la
 
 Reste : test à plusieurs postes sur le vrai dossier Teams ; signature de l'exe (si le support informatique l'exige) ; lineage multi-niveaux sur les vraies données.
 
+## État d'avancement (2026-10-16) — version 0.4
+
+Réalisé (plan : [11 — Plan v0.4](11_plan_v0.4.md)) :
+- **Journal v2** : un fichier par version et par poste, regroupement automatique des anciens fichiers, Ctrl+Z / Ctrl+Y, annulation d'une ligne, retour à un point, vue de l'état passé ;
+- **imports sans casse** : mode « Mettre à jour » qui garde les apports du SQL, liens orphelins signalés et jamais supprimés, tables `default.x` du SQL renommées quand le JSON les décrit ;
+- **ordre des tags** = sens d'alimentation et colonnes du graphe de gauche à droite, couleurs, orientation automatique des flux ;
+- **objets créés à la main** (New) : validation directe (confirmation) ou fusion avec leur définition SQL / JSON ;
+- **analyseur SQL sqlglot** (CTE, sous-requêtes, UNION, CASE, Hive), liens SQL dans le graphe, jointures sans validation, règles de gestion sur les liens et étapes (CTE) ;
+- **confort du graphe** : fenêtres qui ne se ferment pas en cliquant à côté, branches qui restent ouvertes, bouton retour et fil d'Ariane, zoom, mini-carte, recherche dans le graphe, navigation au clavier, panneaux repliables, raccourcis (Entrée, Suppr / E, F, G…) ;
+- **vues** : vue d'ensemble par tag ou par base, vue 360, chaîne d'existence d'une colonne ;
+- **suivi** des anomalies, modifications et améliorations, anomalies détectées automatiquement ;
+- **script d'extraction Hive** (structure + SQL des vues), configuration réelle hors du dépôt.
+
+Suite (phases 2 à 4) : données sensibles et leur empreinte en aval, glossaire métier, rôles légers, alertes de changement après import, tableau de bord qualité, vues enregistrées et liens partageables, export PNG / PDF du graphe, recherche dans les règles de gestion, guide de démarrage, workflow GitHub Actions, tests d'interface automatisés, hébergement interne.
+
 ## Détail
 
 ### S0 — Cadrage

@@ -1,0 +1,38 @@
+{
+  "description": "Résultat attendu de l'analyse de requetes_complexes.sql (données fictives).",
+  "flows": [
+    ["bv_client.tiers", "dm_risque.score_client"],
+    ["bv_pret.contrats", "dm_risque.score_client"],
+    ["bv_pret.echeances", "dm_risque.score_client"],
+    ["lac_web.demandes_web", "bv_canal.demandes_toutes"],
+    ["lac_agence.demandes_agence", "bv_canal.demandes_toutes"],
+    ["lac_crm.contacts", "dm_client.dernier_contact"],
+    ["bv_ref.agences", "dm_reseau.agences_region"],
+    ["bv_ref.regions", "dm_reseau.agences_region"]
+  ],
+  "column_mappings": [
+    ["bv_client.tiers", "code_tiers", "dm_risque.score_client", "code_tiers"],
+    ["bv_client.tiers", "nom_client", "dm_risque.score_client", "nom_client"],
+    ["bv_pret.contrats", "montant_initial", "dm_risque.score_client", "encours_total"],
+    ["bv_pret.echeances", "jours_retard", "dm_risque.score_client", "retard_max"],
+    ["bv_pret.echeances", "jours_retard", "dm_risque.score_client", "classe_risque"],
+    ["lac_web.demandes_web", "montant", "bv_canal.demandes_toutes", "montant"],
+    ["lac_agence.demandes_agence", "montant_demande", "bv_canal.demandes_toutes", "montant"],
+    ["lac_agence.demandes_agence", "code_tiers", "bv_canal.demandes_toutes", "code_tiers"],
+    ["lac_crm.contacts", "code_tiers", "dm_client.dernier_contact", "code_tiers"],
+    ["lac_crm.contacts", "date_contact", "dm_client.dernier_contact", "date_contact"],
+    ["bv_ref.agences", "libelle_agence", "dm_reseau.agences_region", "libelle_agence"],
+    ["bv_ref.regions", "nom_region", "dm_reseau.agences_region", "nom_region"]
+  ],
+  "joins": [
+    ["bv_client.tiers", "code_tiers", "bv_pret.contrats", "code_tiers"],
+    ["bv_pret.contrats", "num_contrat", "bv_pret.echeances", "num_contrat"],
+    ["bv_ref.agences", "code_region", "bv_ref.regions", "code_region"]
+  ],
+  "rules": {
+    "dm_risque.score_client": {"kind": "INSERT", "having": "sum(prets_actifs.montant_initial) > 0",
+                               "step_filters": ["contrats.statut = 'ACTIF'", "echeances.jours_retard > 0"]},
+    "dm_client.dernier_contact": {"kind": "CTAS", "filters": "x.rang = 1"},
+    "bv_canal.demandes_toutes": {"kind": "VIEW"}
+  }
+}

@@ -4,7 +4,7 @@ Ce fichier donne à un assistant de code (Claude Code) le contexte nécessaire p
 
 ## Le projet
 
-Outil de lineage de données pour une architecture **Lac → BV → Mart** à très grand volume. Il ingère un JSON de structure ou des requêtes SQL, propose des suggestions de liens, et l'équipe crée / valide les liens, tague les objets et documente, via un journal partagé (dossier Teams). Détails : `docs/`.
+Outil de lineage de données à très grand volume. Il ingère un JSON de structure et des requêtes SQL (sqlglot dans `vendor/`, repli regex), crée les liens lus dans le SQL, propose des suggestions, et l'équipe crée / valide les liens, tague les objets (l'ordre des tags = sens d'alimentation et colonnes du graphe), crée ses propres objets (New), documente et suit les anomalies, via un journal partagé (dossier Teams, fichiers `.jsonl` par version et par poste, annulation par `event.revert`). Détails : `docs/`.
 
 ## Contraintes impératives
 

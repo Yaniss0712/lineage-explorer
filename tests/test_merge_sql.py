@@ -52,15 +52,18 @@ class MergeSqlTest(unittest.TestCase):
         used = self.api.object_detail(f"{DB}.client_fiche_prets")["rules"]
         self.assertEqual(used[0]["role"], "source")
 
-    def test_suggestions_and_column_lineage_from_sql(self):
-        sugs = {s["key"]: s for s in self.api.suggestions({"limit": 500})["items"]}
-        s = sugs[f"{DB}.client_fiche_prets|{DB}.client_vision_360"]
-        self.assertEqual(s["origin"], "SQL")
-        self.assertEqual(s["proposed_source"], f"{DB}.client_fiche_prets")
+    def test_sql_links_and_column_lineage(self):
+        links = {(l["source"], l["target"]): l for l in self.api.state["links"].values() if l["kind"] == "FLOW"}
+        link = links[(f"{DB}.client_fiche_prets", f"{DB}.client_vision_360")]
+        self.assertEqual((link["origin"], link["status"]), ("SQL", "A_VALIDER"))
         lineage = self.api.column_lineage({"object": f"{DB}.client_vision_360", "column": "montant_total_crd", "dir": "up"})
         self.assertEqual((lineage["steps"][0]["object"], lineage["steps"][0]["column"]), (f"{DB}.client_fiche_prets", "montant_crd"))
-        self.assertEqual(lineage["steps"][0]["status"], "SUGGESTION")
-        self.assertEqual(self.api.state["links"], {})                      # toujours aucun lien automatique
+        self.assertEqual(lineage["steps"][0]["transformation"], "sum(client_fiche_prets.montant_crd)")
+        detail = self.api.link_detail(link["id"])
+        self.assertEqual(detail["rules"][0]["filters"], "client_fiche_identite.date_creation >= '2020-01-01'")
+        joins = [l for l in self.api.state["links"].values() if l["kind"] == "JOIN"]
+        self.assertTrue(any({l["source"], l["target"]} == {f"{DB}.client_fiche_prets", f"{DB}.client_fiche_identite"}
+                            for l in joins))
 
     def test_replace_mode_still_available(self):
         r = self.api.import_metadata(SQL.encode(), {"format": "sql", "name": "seul.sql", "mode": "replace"}, "testeur")

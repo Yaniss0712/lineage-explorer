@@ -31,11 +31,12 @@ from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, unquote, urlparse
 
-from . import build, ingest, lineage, store
+from . import build, ingest, lineage, sql_glot, store
 from .config import PROJECT_ROOT, RESOURCE_DIR
 from .normalize import strip_accents
 from .suggestions import pair_key
-from .workspace import LINK_KINDS, Workspace, diff_metadata, diff_states, effective_tag, link_signature, new_id
+from .workspace import (LINK_KINDS, OBJECT_TYPES, TICKET_KINDS, TICKET_STATUSES, Workspace, diff_metadata,
+                        diff_states, effective_tag, link_ends, link_signature, new_id, safe_name)
 from .xlsx import write_xlsx
 
 WEB_DIR = os.path.join(RESOURCE_DIR, "web")
@@ -66,6 +67,10 @@ def norm(text: str) -> str:
     return strip_accents(text or "").lower().strip()
 
 
+def short_id(obj_id: str) -> str:
+    return str(obj_id or "").split(".")[-1]
+
+
 EVENT_LABELS = {
     "tag.save": "a enregistré un tag", "tag.delete": "a supprimé un tag", "object.tag": "a tagué des objets",
     "rule.save": "a créé une règle de tag", "rule.delete": "a supprimé une règle de tag",
@@ -74,8 +79,60 @@ EVENT_LABELS = {
     "suggestion.restore": "a rétabli une suggestion", "object.update": "a documenté un objet",
     "note.add": "a ajouté une note", "note.delete": "a supprimé une note", "settings.update": "a modifié les réglages",
     "metadata.import": "a importé des métadonnées", "version.save": "a enregistré une version",
-    "version.restore": "a restauré une version",
+    "version.restore": "a restauré une version", "links.import": "a importé des liens lus dans le SQL",
+    "object.create": "a créé un objet", "object.edit": "a modifié un objet créé à la main",
+    "object.confirm": "a validé un objet New", "object.delete": "a supprimé un objet créé à la main",
+    "object.merge": "a fusionné une table New avec sa définition", "objects.rename": "a renommé des objets",
+    "ticket.save": "a mis à jour le suivi", "ticket.comment": "a commenté un sujet du suivi",
+    "ticket.delete": "a supprimé un sujet du suivi", "event.revert": "a annulé", "event.restore": "a rétabli",
 }
+OBJECT_TYPE_LABELS = {"OBJET_METIER": "Objet métier", "SOURCE": "Source", "TABLE": "Table", "VIEW": "Vue",
+                      "VIZ": "Viz", "AUTRE": "Autre"}
+
+
+def empty_metadata() -> dict:
+    return {"meta": {"source": "objets créés à la main"}, "objects": [], "flows": [], "relations": [], "rules": []}
+
+
+def sql_layer(md: dict) -> dict:
+    """Ce que les imports SQL ont apporté (règles, flux, jointures et tables citées) : reporté sur
+    une nouvelle structure JSON pour ne rien perdre lors de sa mise à jour."""
+    flows = [f for f in md.get("flows") or [] if f.get("origin") == "SQL"]
+    rules = list(md.get("rules") or [])
+    relations = list(md.get("relations") or [])
+    used = {x for f in flows for x in (f["source"], f["target"])} | {x for r in relations for x in (r["a"], r["b"])}
+    for rule in rules:
+        used |= {rule.get("target"), rule.get("from"), *(rule.get("sources") or []),
+                 *(j.get("table") for j in rule.get("joins") or [])}
+    return {"meta": {}, "objects": [o for o in md["objects"] if o["id"] in used], "flows": flows,
+            "relations": relations, "rules": rules}
+
+
+def sql_links(md: dict, remap, source_file: str) -> list[dict]:
+    """Liens lus dans le SQL : flux (INSERT, CTAS, vues) et jointures (ON, USING, clés étrangères)."""
+    out, joins = [], {}
+    for flow in md.get("flows") or []:
+        if flow.get("origin") != "SQL":
+            continue
+        src, tgt = remap(flow["source"]), remap(flow["target"])
+        if not src or not tgt or src == tgt:
+            continue
+        out.append({"id": new_id(), "kind": "FLOW", "source": src, "target": tgt, "origin": "SQL",
+                    "columns": [{"source": m["source"], "target": m["target"], "transformation": m.get("transformation")}
+                                for m in flow.get("column_mapping") or []],
+                    "comment": f"Lu dans le SQL ({flow.get('job') or 'requête'})"})
+    for rel in md.get("relations") or []:
+        a, b = remap(rel["a"]), remap(rel["b"])
+        if not a or not b or a == b:
+            continue
+        key = tuple(sorted((a, b)))
+        link = joins.setdefault(key, {"id": new_id(), "kind": "JOIN", "source": a, "target": b, "origin": "SQL",
+                                      "status": "VALIDE", "columns": [], "comment": rel.get("comment") or ""})
+        col = {"source": rel["a_column"], "target": rel["b_column"]} if link["source"] == a else \
+            {"source": rel["b_column"], "target": rel["a_column"]}
+        if col not in link["columns"]:
+            link["columns"].append(col)
+    return out + list(joins.values())
 
 
 class LineageApi:
@@ -114,9 +171,26 @@ class LineageApi:
     def _settings(self) -> dict:
         return build.effective_settings(self.config["suggestions"], self.state["settings"])
 
+    def _custom_key(self) -> str:
+        custom = [(o["id"], o["type"], o.get("description"), [(c.get("name"), c.get("type")) for c in o["columns"]])
+                  for o in sorted(self.state["custom"].values(), key=lambda o: o["id"])]
+        return hashlib.sha1(json.dumps(custom, ensure_ascii=False).encode()).hexdigest()[:16] if custom else ""
+
     def _wanted_key(self):
         meta = self.state.get("metadata")
-        return (meta["file"], tuple(self._settings()["ignore_columns"])) if meta else None
+        custom = self._custom_key()
+        if not meta and not custom:
+            return None
+        return (meta["file"] if meta else "", tuple(self._settings()["ignore_columns"]), custom)
+
+    def _compose(self, md: dict) -> dict:
+        """Métadonnées importées + objets créés à la main (ceux dont l'identifiant n'existe pas déjà)."""
+        known = {o["id"] for o in md["objects"]}
+        extra = [ingest.parse_metadata({"objects": [{
+            "id": o["id"], "database": o["database"], "name": o["name"], "type": o["type"],
+            "description": o.get("description") or "", "columns": o.get("columns") or []}]})["objects"][0]
+            for o in self.state["custom"].values() if o["id"] not in known]
+        return {**md, "objects": md["objects"] + extra}
 
     def sync(self, force: bool = False) -> None:
         """Relit le journal partagé et reconstruit le cache local si nécessaire."""
@@ -134,16 +208,17 @@ class LineageApi:
                     con = store.connect(self.cache_path)
                     meta = store.get_meta(con)
                     con.close()
-                    current = (meta.get("metadata_file"), tuple(meta.get("ignore_columns", [])))
+                    current = (meta.get("metadata_file"), tuple(meta.get("ignore_columns", [])), meta.get("custom_key", ""))
                 except Exception:  # noqa: BLE001 — cache illisible : reconstruit
                     current = None
             if current != wanted:
                 path = self.workspace.metadata_path()
-                if path is None:
+                if path is None and wanted[0]:
                     return                                   # fichier pas encore synchronisé
-                md = ingest.load_metadata(path)
-                self.last_report = build.build_cache(md, self._settings(), self.cache_path,
-                                                     {"metadata_file": wanted[0], "ignore_columns": list(wanted[1])})
+                md = ingest.load_metadata(path) if path else empty_metadata()
+                self.last_report = build.build_cache(self._compose(md), self._settings(), self.cache_path,
+                                                     {"metadata_file": wanted[0], "ignore_columns": list(wanted[1]),
+                                                      "custom_key": wanted[2]})
             con = store.connect(self.cache_path)
             try:
                 self._objects = {o["id"]: o for o in store.all_objects(con)}
@@ -159,15 +234,44 @@ class LineageApi:
     def hidden(self) -> set[str]:
         return set(self.state["settings"].get("hidden_objects", []))
 
+    def _open_tickets(self) -> Counter:
+        key = self.workspace.revision
+        if getattr(self, "_tickets_key", None) != key:
+            self._tickets_cache = Counter(t.get("object_id") for t in self.state["tickets"].values()
+                                          if t.get("object_id") and t.get("status") in ("OUVERT", "EN_COURS"))
+            self._tickets_key = key
+        return self._tickets_cache
+
     def node(self, obj_id: str, depth: int = 0) -> dict:
         obj = self._objects.get(obj_id) or {"id": obj_id, "database": obj_id.split(".")[0],
                                               "name": obj_id.split(".")[-1], "type": "?", "nb_columns": 0}
         tag = self.tag_of(obj_id)
         doc = self.state["objects"].get(obj_id, {})
+        custom = self.state["custom"].get(obj_id)
+        order = (tag or {}).get("order")
         return {"id": obj_id, "database": obj["database"], "name": obj["name"], "type": obj["type"],
                 "nb_columns": obj["nb_columns"], "tag_id": tag["id"] if tag else None,
                 "tag": tag["name"] if tag else None, "color": tag["color"] if tag else None,
+                "tag_order": order if isinstance(order, (int, float)) else None,
+                "custom": bool(custom), "is_new": bool(custom and custom["status"] == "NEW"),
+                "tickets": self._open_tickets().get(obj_id, 0),
                 "has_spec": bool(doc.get("spec_url")), "depth": depth, "missing": obj_id not in self._objects}
+
+    def tag_rank(self, obj_id: str):
+        """Ordre du tag (sens d'alimentation) ; None si pas de tag ou tag sans ordre."""
+        order = (self.tag_of(obj_id) or {}).get("order")
+        return order if isinstance(order, (int, float)) else None
+
+    def lanes(self, ids) -> list[dict]:
+        """Tags présents, rangés par ordre : une colonne du graphe par tag, de gauche à droite."""
+        tags = {}
+        for obj_id in ids:
+            tag = self.tag_of(obj_id)
+            if tag:
+                tags[tag["id"]] = tag
+        return [{"id": t["id"], "name": t["name"], "color": t["color"], "order": t.get("order")}
+                for t in sorted(tags.values(), key=lambda t: (t.get("order") if isinstance(t.get("order"), (int, float))
+                                                                else 9999, norm(t["name"])))]
 
     def links(self, include_pending: bool = True) -> list[dict]:
         return [l for l in self.state["links"].values() if include_pending or l["status"] == "VALIDE"]
@@ -181,8 +285,12 @@ class LineageApi:
                     problems.append(f"colonne absente : {link['source']}.{col['source']}")
                 if col.get("target") and col["target"] not in types.get(link["target"], {}):
                     problems.append(f"colonne absente : {link['target']}.{col['target']}")
+        ra, rb = self.tag_rank(link["source"]), self.tag_rank(link["target"])
+        against = link["kind"] == "FLOW" and ra is not None and rb is not None and ra > rb
         return {**link, "source_object": link["source"], "target_object": link["target"],
-                "problems": problems, "edge_id": "l:" + link["id"]}
+                "problems": problems, "edge_id": "l:" + link["id"],
+                "orphan": any(end not in self._objects for end in (link["source"], link["target"])),
+                "against_order": against}
 
     def _types_for(self, con, ids) -> dict:
         return {i: store.column_types(con, i) for i in set(ids)}
@@ -226,9 +334,20 @@ class LineageApi:
             "settings": st["settings"], "metadata": st.get("metadata"),
             "counts": {"objects": len(self._objects), "untagged": counts.get(UNTAGGED, 0),
                        "links_pending": sum(1 for l in links if l["status"] == "A_VALIDER"),
-                       "links_validated": sum(1 for l in links if l["status"] == "VALIDE")},
+                       "links_validated": sum(1 for l in links if l["status"] == "VALIDE"),
+                       "new_objects": sum(1 for o in st["custom"].values() if o["status"] == "NEW"),
+                       "tickets_open": sum(1 for t in st["tickets"].values() if t.get("status") in ("OUVERT", "EN_COURS"))},
+            "new_objects": sorted(({"id": o["id"], "name": o["name"], "type": o["type"]} for o in st["custom"].values()
+                                   if o["status"] == "NEW"), key=lambda o: o["name"]),
+            "undo": self._undo_info(user), "object_types": OBJECT_TYPE_LABELS,
+            "sqlglot": sql_glot.AVAILABLE,
             "ui": self.config["ui"], "palette": PALETTE,
         }
+
+    def _undo_info(self, user: str) -> dict:
+        undo = self.workspace.undo_candidate(user)
+        redo = self.workspace.redo_candidate(user)
+        return {"undo": self.describe(undo) if undo else None, "redo": len(redo) if redo else 0}
 
     def describe(self, event: dict) -> dict:
         data, label = event.get("data") or {}, EVENT_LABELS.get(event["type"], event["type"])
@@ -248,8 +367,23 @@ class LineageApi:
             detail = data.get("label", "")
         elif event["type"] == "metadata.import":
             detail = data.get("name", "")
+        elif event["type"] == "links.import":
+            detail = f"{len(data.get('links') or [])} lien(s) — {data.get('source_file') or ''}"
+        elif event["type"] in ("object.create", "object.edit", "object.confirm", "object.delete"):
+            detail = data.get("id", "")
+        elif event["type"] == "object.merge":
+            detail = f"{data.get('id')} → {data.get('into')}"
+        elif event["type"].startswith("ticket."):
+            ticket = self.state["tickets"].get(data.get("id") or "", {})
+            detail = data.get("title") or ticket.get("title", "")
+        elif event["type"] in ("event.revert", "event.restore"):
+            n = len(data.get("ids") or [])
+            label = {"undo": "a annulé (Ctrl+Z)", "redo": "a rétabli (Ctrl+Y)", "point": "est revenu à un point du journal"}.get(
+                data.get("mode"), label)
+            detail = f"{n} modification(s)"
         return {"id": event["id"], "at": event["ts"], "user": event.get("user"), "type": event["type"],
-                "label": label, "detail": detail}
+                "label": label, "detail": detail, "reverted": event["id"] in self.workspace.reverted,
+                "control": event["type"] in ("event.revert", "event.restore")}
 
     def revision(self, since: str) -> dict:
         self.sync()
@@ -259,7 +393,25 @@ class LineageApi:
     def activity(self, params: dict) -> list[dict]:
         self.sync()
         limit = int(params.get("limit", 200))
-        return [self.describe(e) for e in reversed(self.workspace.events[-limit:])]
+        events = self.workspace.events
+        if params.get("object"):
+            oid = params["object"].lower()
+            events = [e for e in events if oid in json.dumps(e.get("data") or {}, ensure_ascii=False)]
+        return [self.describe(e) for e in reversed(events[-limit:])]
+
+    def history_at(self, params: dict) -> dict:
+        """Retour dans le temps : état de l'équipe juste après une modification, comparé à aujourd'hui."""
+        self.sync()
+        try:
+            past = self.workspace.state_at(params.get("event", ""))
+        except ValueError as exc:
+            raise ApiError(HTTPStatus.NOT_FOUND, str(exc)) from exc
+        event = next(e for e in self.workspace.events if e["id"] == params["event"])
+        later = [e for e in self.workspace.events if (e["ts"], e["id"]) > (event["ts"], event["id"])
+                 and e["type"] not in ("event.revert", "event.restore") and e["id"] not in self.workspace.reverted]
+        return {"event": self.describe(event), "diff": diff_states(past, self.state), "nb_later": len(later),
+                "counts": {"links": len(past["links"]), "tags": len(past["tags"]), "custom": len(past["custom"]),
+                           "tickets": len(past["tickets"])}}
 
     # ================================================================== catalogue / recherche
 
@@ -330,9 +482,10 @@ class LineageApi:
             tags_found = [t for t in self.state["tags"].values() if free in norm(t["name"])]
             tag_ids = {t["id"] for t in tags_found}
             dbs_found = sorted({o["database"] for o in objects.values() if free in norm(o["database"])})
+            variants = {free, free.replace(" ", "_")}                 # « tableau de bord » = tableau_de_bord
             for oid in candidates:
                 obj = objects[oid]
-                if free in norm(obj["name"]) or obj["database"] in dbs_found \
+                if any(v in norm(obj["name"]) for v in variants) or obj["database"] in dbs_found \
                         or effective_tag(self.state, oid, obj["name"]) in tag_ids:
                     selected.add(oid)
             for h in store.search_hits(con, free, in_desc=params.get("desc", "1") == "1"):
@@ -375,8 +528,10 @@ class LineageApi:
             col["nb_links"] = col_links.get(col["name"], 0)
         sugs = [self.sug_out(s) for s in self.visible_suggestions(store.suggestions_for(con, obj_id))]
         rules = store.rules_for(con, obj_id)
+        tickets = sorted((t for t in self.state["tickets"].values() if t.get("object_id") == obj_id),
+                         key=lambda t: t.get("updated_at") or "", reverse=True)
         return {
-            "rules": rules,
+            "rules": rules, "custom": self.state["custom"].get(obj_id), "tickets": tickets,
             "object": {**obj, **self.node(obj_id)}, "columns": columns,
             "upstream": [l for l in links if l["kind"] == "FLOW" and l["target"] == obj_id],
             "downstream": [l for l in links if l["kind"] == "FLOW" and l["source"] == obj_id],
@@ -385,6 +540,25 @@ class LineageApi:
             "doc": self.state["objects"].get(obj_id, {}), "notes": self.state["notes"].get(obj_id, []),
             "hidden": obj_id in self.hidden(),
         }
+
+    @_closing
+    def link_detail(self, link_id: str) -> dict:
+        """Lien + règles de gestion des requêtes SQL qui le justifient (jointure, filtres, formules)."""
+        self.sync()
+        link = self.state["links"].get(link_id)
+        if link is None:
+            raise ApiError(HTTPStatus.NOT_FOUND, "Lien introuvable (supprimé ?)")
+        con = self.con()
+        rules = []
+        if link["target"] in self._objects or link["source"] in self._objects:
+            for rule in store.rules_for(con, link["target"]) + store.rules_for(con, link["source"]):
+                tables = {rule.get("target"), rule.get("from"), *(rule.get("sources") or []),
+                          *(j.get("table") for j in rule.get("joins") or [])}
+                if link["source"] in tables and link["target"] in tables and rule not in rules:
+                    rules.append(rule)
+        types = self._types_for(con, [x for x in (link["source"], link["target"]) if x in self._objects])
+        return {"link": self.link_out(link, types), "rules": rules,
+                "source": self.node(link["source"]), "target": self.node(link["target"])}
 
     def _flow_neighbours(self, include_pending: bool):
         up, down = defaultdict(list), defaultdict(list)
@@ -441,7 +615,8 @@ class LineageApi:
                     depths[other] = 0
                 edges["s:" + sug["key"]] = self.sug_out(sug)
         nodes = [self.node(n, d) for n, d in depths.items()]
-        return {"center": obj_id, "nodes": nodes, "edges": list(edges.values()), "truncated": truncated}
+        return {"center": obj_id, "nodes": nodes, "edges": list(edges.values()), "truncated": truncated,
+                "lanes": self.lanes(depths)}
 
     @_closing
     def column_view(self, params: dict) -> dict:
@@ -466,8 +641,35 @@ class LineageApi:
                            "type_differs": len(types) > 1 and main_type is not None
                            and (main_type or "?").split("(")[0] != types.most_common(1)[0][0]})
         similar_names = sorted({c["name"] for cols in by_obj.values() for c in cols if c["name"] != name})
-        return {"name": name, "tables": tables, "links": links, "types": dict(types),
-                "type_conflict": len(types) > 1, "similar_names": similar_names}
+        # Chaîne d'existence : en partant des tables les plus en aval, on remonte les liens (colonne,
+        # puis même nom, puis niveau table) jusqu'à l'origine (objet métier, source…).
+        chains, extra, chain_edges = [], {}, {}
+        if len(ids) <= 60:
+            flows_out = {l["source"] for l in self.state["links"].values() if l["kind"] == "FLOW" and l["target"] in ids}
+            terminal = [t for t in ids if t not in flows_out] or sorted(ids)
+            for oid in sorted(terminal, key=lambda o: -(self.tag_rank(o) or 0))[:6]:
+                lin = self.column_lineage({"object": oid, "column": name, "dir": "up", "tables": "1"})
+                if lin["steps"]:
+                    chains.append({"object": oid, "steps": lin["steps"]})
+                for step in lin["steps"]:
+                    if step["object"] not in ids and step["object"] not in extra:
+                        extra[step["object"]] = {**self.node(step["object"]), "columns": [], "column_type": None,
+                                                 "type_differs": False, "without_column": True}
+                    if step["link_id"] in self.state["links"] and "l:" + step["link_id"] not in chain_edges:
+                        chain_edges["l:" + step["link_id"]] = self.link_out(self.state["links"][step["link_id"]])
+                    elif str(step["link_id"]).startswith("s:"):
+                        src = step["object"]
+                        tgt = step["from"].rsplit(".", 1)[0]
+                        chain_edges.setdefault(step["link_id"], {
+                            "id": step["link_id"], "edge_id": step["link_id"], "kind": "FLOW", "status": "SUGGESTION",
+                            "source": src, "target": tgt, "source_object": src, "target_object": tgt,
+                            "proposed_source": src, "columns": [{"source": step["column"], "target": name}],
+                            "explanation": "lu dans le SQL", "score": 0.95})
+        all_links = {l["edge_id"]: l for l in links}
+        all_links.update({k: v for k, v in chain_edges.items() if k not in all_links})
+        return {"name": name, "tables": tables + list(extra.values()), "links": list(all_links.values()),
+                "types": dict(types), "type_conflict": len(types) > 1, "similar_names": similar_names,
+                "chains": chains, "lanes": self.lanes(list(ids) + list(extra))}
 
     def column_lineage(self, params: dict) -> dict:
         """Lineage d'une colonne à travers les correspondances colonne → colonne des liens."""
@@ -491,28 +693,70 @@ class LineageApi:
                 if cols:
                     flows.append({"id": "s:" + s["key"], "kind": "FLOW", "source": src, "target": tgt,
                                   "columns": cols, "status": "SUGGESTION"})
+        table_level = params.get("tables") == "1"
+        cols_of = {}
+
+        def has_col(obj, col):
+            if obj not in cols_of:
+                cols_of[obj] = {c["name"] for c in self._columns_of(obj)}
+            return col in cols_of[obj]
+
         for level in range(1, int(params.get("depth", 15)) + 1):
             nxt = []
             for node_obj, node_col in frontier:
+                found = False
                 for link in flows:
                     for col in link.get("columns") or []:
+                        if node_col is None:
+                            continue
                         if direction == "up" and link["target"] == node_obj and col.get("target") == node_col:
                             other = (link["source"], col.get("source"))
                         elif direction == "down" and link["source"] == node_obj and col.get("source") == node_col:
                             other = (link["target"], col.get("target"))
                         else:
                             continue
+                        found = True
                         steps.append({"depth": level, "from": f"{node_obj}.{node_col}", "object": other[0],
                                       "column": other[1], "transformation": col.get("transformation"),
-                                      "status": link["status"], "link_id": link["id"]})
+                                      "status": link["status"], "link_id": link["id"], "level": "column"})
                         if other not in seen:
                             seen.add(other)
                             nxt.append(other)
+                if found or not table_level:
+                    continue
+                # Pas de correspondance de colonne : on suit les liens au niveau table.
+                for link in flows:
+                    if str(link["id"]).startswith("s:"):
+                        continue
+                    if direction == "up" and link["target"] == node_obj:
+                        other_obj = link["source"]
+                    elif direction == "down" and link["source"] == node_obj:
+                        other_obj = link["target"]
+                    else:
+                        continue
+                    same = node_col is not None and has_col(other_obj, node_col)
+                    other = (other_obj, node_col if same else None)
+                    steps.append({"depth": level, "from": f"{node_obj}.{node_col or '*'}", "object": other_obj,
+                                  "column": other[1], "transformation": None, "status": link["status"],
+                                  "link_id": link["id"], "level": "name" if same else "table"})
+                    if other not in seen:
+                        seen.add(other)
+                        nxt.append(other)
             frontier = nxt
             if not frontier:
                 break
+        for step in steps:
+            node = self.node(step["object"])
+            step.update(tag=node["tag"], color=node["color"], tag_order=node["tag_order"], name=node["name"])
         return {"object": obj_id, "column": column, "dir": direction, "steps": steps,
                 "objects": sorted({s["object"] for s in steps} | {obj_id})}
+
+    def _columns_of(self, obj_id: str) -> list[dict]:
+        con = store.connect(self.cache_path)
+        try:
+            return store.get_columns(con, obj_id)
+        finally:
+            con.close()
 
     def path(self, params: dict) -> dict:
         self.sync()
@@ -606,6 +850,15 @@ class LineageApi:
                                 "transformation"], mapping),
             ("Tags", ["tag", "couleur", "description", "ordre", "nb objets"], tags),
             ("Règles de tag", ["motif", "tag"], rules),
+            ("Objets créés", ["id", "type", "statut", "description", "colonnes", "créé par", "créé le"],
+             [[o["id"], OBJECT_TYPE_LABELS.get(o["type"], o["type"]), "New" if o["status"] == "NEW" else "validé",
+               o.get("description", ""), ", ".join(c["name"] for c in o["columns"]), o["created_by"], o["created_at"]]
+              for o in st["custom"].values()]),
+            ("Suivi", ["id", "type", "titre", "statut", "priorité", "objet", "colonne", "responsable", "créé par",
+                       "créé le", "commentaires"],
+             [[t["id"], t.get("kind"), t.get("title"), t.get("status"), t.get("priority"), t.get("object_id") or "",
+               t.get("column") or "", t.get("assignee") or "", t.get("created_by"), t.get("created_at"),
+               len(t.get("comments") or [])] for t in st["tickets"].values()]),
         ])
 
     @_closing
@@ -742,7 +995,173 @@ class LineageApi:
             except ValueError as exc:
                 raise ApiError(HTTPStatus.NOT_FOUND, str(exc)) from exc
             return {"ok": True}
+        if action.startswith("objects/"):
+            return self._write_object(action, body, user)
+        if action.startswith("tickets/"):
+            return self._write_ticket(action, body, user)
+        if action.startswith("history/"):
+            return self._write_history(action, body, user)
         raise ApiError(HTTPStatus.NOT_FOUND, f"Action inconnue : {action}")
+
+    # ---- objets créés à la main (objet métier, source, viz, table prévue…)
+
+    @staticmethod
+    def _clean_columns(raw) -> list[dict]:
+        if isinstance(raw, str):
+            raw = [line for line in re.split(r"[\n,;]+", raw) if line.strip()]
+        out, seen = [], set()
+        for item in raw or []:
+            if isinstance(item, str):
+                parts = item.strip().split()
+                item = {"name": parts[0] if parts else "", "type": " ".join(parts[1:]) or None}
+            name = re.sub(r"[^\w$]", "", str(item.get("name") or "")).lower()
+            if name and name not in seen:
+                seen.add(name)
+                out.append({"name": name, "type": (str(item.get("type") or "").strip().lower() or None)})
+        return out
+
+    def _write_object(self, action: str, body: dict, user: str) -> dict:
+        ws, custom = self.workspace, self.state["custom"]
+        if action == "objects/create":
+            name = re.sub(r"[^\w$]", "_", (body.get("name") or "").strip().lower()).strip("_")
+            database = re.sub(r"[^\w$]", "_", (body.get("database") or "manuel").strip().lower()).strip("_") or "manuel"
+            if not name:
+                raise ApiError(HTTPStatus.BAD_REQUEST, "Nom obligatoire")
+            obj_id = f"{database}.{name}"
+            if obj_id in self._objects:
+                raise ApiError(HTTPStatus.CONFLICT, f"L'objet {obj_id} existe déjà")
+            otype = str(body.get("type") or "TABLE").upper()
+            if otype not in OBJECT_TYPES:
+                raise ApiError(HTTPStatus.BAD_REQUEST, f"Type inconnu : {otype}")
+            data = {"id": obj_id, "database": database, "name": name, "type": otype,
+                    "description": (body.get("description") or "")[:2000], "columns": self._clean_columns(body.get("columns"))}
+            ws.append("object.create", data, user)
+            if body.get("tag_id") in self.state["tags"]:
+                ws.append("object.tag", {"object_ids": [obj_id], "tag_id": body["tag_id"]}, user)
+            self.sync()
+            return {"ok": True, "id": obj_id}
+        obj_id = str(body.get("id") or "").lower()
+        if obj_id not in custom:
+            raise ApiError(HTTPStatus.NOT_FOUND, "Objet créé à la main introuvable")
+        if action == "objects/edit":
+            data = {"id": obj_id}
+            if "type" in body:
+                data["type"] = str(body["type"]).upper() if str(body["type"]).upper() in OBJECT_TYPES else "TABLE"
+            if "description" in body:
+                data["description"] = (body.get("description") or "")[:2000]
+            if "columns" in body:
+                data["columns"] = self._clean_columns(body["columns"])
+            ws.append("object.edit", data, user)
+        elif action == "objects/confirm":
+            ws.append("object.confirm", {"id": obj_id}, user)
+        elif action == "objects/delete":
+            ws.append("object.delete", {"id": obj_id}, user)
+        elif action == "objects/merge":
+            into = str(body.get("into") or "").lower()
+            if into not in self._objects or (into in custom and into != obj_id):
+                raise ApiError(HTTPStatus.BAD_REQUEST, "Choisissez une table importée (JSON ou SQL) existante")
+            ws.append("object.merge", {"id": obj_id, "into": into}, user)
+        else:
+            raise ApiError(HTTPStatus.NOT_FOUND, f"Action inconnue : {action}")
+        self.sync()
+        return {"ok": True, "id": obj_id}
+
+    # ---- suivi des anomalies, modifications, améliorations
+
+    def _write_ticket(self, action: str, body: dict, user: str) -> dict:
+        ws, tickets = self.workspace, self.state["tickets"]
+        if action == "tickets/save":
+            ticket_id = body.get("id") or new_id()
+            data = {"id": ticket_id}
+            if body.get("id") is None or "title" in body:
+                title = (body.get("title") or "").strip()
+                if not title:
+                    raise ApiError(HTTPStatus.BAD_REQUEST, "Titre obligatoire")
+                data["title"] = title[:200]
+            if body.get("id") is None:
+                data.update(kind="ANOMALIE", status="OUVERT", priority="NORMALE")
+            for key in ("description", "assignee", "column", "link_id"):
+                if key in body:
+                    data[key] = (body.get(key) or "")[:4000] or None
+            if "object_id" in body:
+                data["object_id"] = (body.get("object_id") or "").lower() or None
+            if "kind" in body:
+                kind = str(body["kind"]).upper()
+                data["kind"] = kind if kind in TICKET_KINDS else "ANOMALIE"
+            if "status" in body:
+                status = str(body["status"]).upper()
+                if status not in TICKET_STATUSES:
+                    raise ApiError(HTTPStatus.BAD_REQUEST, f"Statut inconnu : {status}")
+                data["status"] = status
+            if "priority" in body:
+                data["priority"] = str(body["priority"]).upper() if str(body["priority"]).upper() in ("BASSE", "NORMALE", "HAUTE") else "NORMALE"
+            if body.get("id") and body["id"] not in tickets:
+                raise ApiError(HTTPStatus.NOT_FOUND, "Sujet introuvable")
+            ws.append("ticket.save", data, user)
+            return {"ok": True, "id": ticket_id}
+        ticket_id = body.get("id")
+        if ticket_id not in tickets:
+            raise ApiError(HTTPStatus.NOT_FOUND, "Sujet introuvable")
+        if action == "tickets/comment":
+            text = (body.get("text") or "").strip()
+            if not text:
+                raise ApiError(HTTPStatus.BAD_REQUEST, "Commentaire vide")
+            ws.append("ticket.comment", {"id": ticket_id, "comment_id": new_id(), "text": text[:4000]}, user)
+        elif action == "tickets/delete":
+            ws.append("ticket.delete", {"id": ticket_id}, user)
+        else:
+            raise ApiError(HTTPStatus.NOT_FOUND, f"Action inconnue : {action}")
+        return {"ok": True, "id": ticket_id}
+
+    def tickets(self, params: dict) -> dict:
+        self.sync()
+        items = list(self.state["tickets"].values())
+        for key in ("status", "kind", "object_id"):
+            if params.get(key):
+                wanted = set(params[key].upper().split(",")) if key != "object_id" else {params[key].lower()}
+                items = [t for t in items if (t.get(key) or "").upper() in wanted or (key == "object_id" and t.get(key) in wanted)]
+        order = {"OUVERT": 0, "EN_COURS": 1, "RESOLU": 2, "REJETE": 3}
+        items.sort(key=lambda t: (order.get(t.get("status"), 9), {"HAUTE": 0, "NORMALE": 1, "BASSE": 2}.get(t.get("priority"), 1),
+                                  t.get("updated_at") or ""))
+        return {"items": [{**t, "object": self.node(t["object_id"]) if t.get("object_id") else None} for t in items],
+                "counts": dict(Counter(t.get("status") for t in self.state["tickets"].values()))}
+
+    # ---- annuler / rétablir / revenir à un point
+
+    def _write_history(self, action: str, body: dict, user: str) -> dict:
+        ws = self.workspace
+        if action == "history/undo":
+            event = ws.undo(user)
+            if event is None:
+                raise ApiError(HTTPStatus.CONFLICT, "Rien à annuler")
+            done = self.describe(event)
+        elif action == "history/redo":
+            ids = ws.redo(user)
+            if not ids:
+                raise ApiError(HTTPStatus.CONFLICT, "Rien à rétablir")
+            done = {"label": "rétabli", "detail": f"{len(ids)} modification(s)"}
+        elif action == "history/revert":
+            ids = ws.revert(list(body.get("ids") or [body.get("id")]), user)
+            if not ids:
+                raise ApiError(HTTPStatus.CONFLICT, "Modification déjà annulée ou introuvable")
+            done = {"label": "annulé", "detail": f"{len(ids)} modification(s)"}
+        elif action == "history/restore":
+            ids = [i for i in body.get("ids") or [body.get("id")] if i in ws.reverted]
+            if not ids:
+                raise ApiError(HTTPStatus.CONFLICT, "Cette modification n'est pas annulée")
+            ws.append("event.restore", {"ids": ids, "mode": "history"}, user)
+            done = {"label": "rétabli", "detail": f"{len(ids)} modification(s)"}
+        elif action == "history/revert_to":
+            try:
+                ids = ws.revert_to(body.get("event", ""), user)
+            except ValueError as exc:
+                raise ApiError(HTTPStatus.NOT_FOUND, str(exc)) from exc
+            done = {"label": "retour au point choisi", "detail": f"{len(ids)} modification(s) annulée(s)"}
+        else:
+            raise ApiError(HTTPStatus.NOT_FOUND, f"Action inconnue : {action}")
+        self._cache_key = None
+        self.sync(force=True)
+        return {"ok": True, "done": done, "undo": self._undo_info(user)}
 
     def _save_link(self, action: str, body: dict, user: str) -> dict:
         kind = str(body.get("kind", "FLOW")).upper()
@@ -766,6 +1185,11 @@ class LineageApi:
             if (s and s not in src_cols) or (t and t not in tgt_cols):
                 raise ApiError(HTTPStatus.BAD_REQUEST, f"Colonne inconnue : {s or '?'} → {t or '?'}")
             columns.append({"source": s or None, "target": t or None, "transformation": (col.get("transformation") or "")[:500] or None})
+        swapped = False
+        ra, rb = self.tag_rank(source), self.tag_rank(target)
+        if kind == "FLOW" and not body.get("keep_direction") and ra is not None and rb is not None and ra > rb:
+            source, target, swapped = target, source, True        # le tag le plus à gauche alimente l'autre
+            columns = [{"source": c["target"], "target": c["source"], "transformation": c["transformation"]} for c in columns]
         data = {"kind": kind, "source": source, "target": target, "columns": columns,
                 "comment": (body.get("comment") or "")[:1000]}
         signature = link_signature(data)
@@ -776,13 +1200,15 @@ class LineageApi:
             if body.get("id") not in self.state["links"]:
                 raise ApiError(HTTPStatus.NOT_FOUND, "Lien introuvable")
             self.workspace.append("link.update", {"id": body["id"], **data}, user)
-            return {"ok": True, "id": body["id"]}
+            if body.get("validate") or kind == "JOIN":
+                self.workspace.append("link.validate", {"id": body["id"]}, user)
+            return {"ok": True, "id": body["id"], "swapped": swapped}
         data["id"] = new_id()
         data["suggestion_key"] = body.get("suggestion_key")
+        if body.get("validate") or kind == "JOIN":                # une jointure n'a pas besoin d'être validée
+            data["status"] = "VALIDE"
         self.workspace.append("link.create", data, user)
-        if body.get("validate"):
-            self.workspace.append("link.validate", {"id": data["id"]}, user)
-        return {"ok": True, "id": data["id"]}
+        return {"ok": True, "id": data["id"], "swapped": swapped, "status": data.get("status", "A_VALIDER")}
 
     # ================================================================== import
 
@@ -811,24 +1237,232 @@ class LineageApi:
             except (UnicodeDecodeError, ValueError) as exc:
                 raise ApiError(HTTPStatus.BAD_REQUEST, str(exc)) from exc
             name = params.get("name") or "import"
+        return self._import(md, name, params, user)
+
+    def _import(self, incoming: dict, name: str, params: dict, user: str) -> dict:
+        """Modes : merge (le fichier complète la structure : défaut pour le SQL), refresh (le JSON
+        remplace la structure, ce que le SQL avait apporté est conservé : défaut pour un JSON),
+        replace (repartir de ce seul fichier). Tags, liens, objets créés à la main, documentation
+        et suivi ne sont jamais touchés par un import."""
         previous_path = self.workspace.metadata_path()
         previous = ingest.load_metadata(previous_path) if previous_path else None
-        mode = params.get("mode") or ("merge" if previous and params.get("format") == "sql" else "replace")
-        recognition = None
-        if mode == "merge" and previous:
-            md, recognition = ingest.merge_metadata(previous, md, name)
+        is_sql = params.get("format") == "sql" or bool(incoming.get("rules"))
+        mode = params.get("mode") or ("merge" if is_sql else "refresh")
+        if not previous:
+            mode = "replace"
+        md, recognition, renames = incoming, None, {}
+        identity = {o["id"]: o["id"] for o in incoming["objects"]}
+        mapping = identity
+        if mode == "merge":
+            md, recognition = ingest.merge_metadata(previous, incoming, name)
+            mapping = recognition["mapping"]
+        elif mode == "refresh":
+            layer = sql_layer(previous)
+            if layer["rules"] or layer["flows"] or layer["relations"]:
+                md, rec = ingest.merge_metadata(incoming, layer, "SQL déjà importé")
+                new_ids = {o["id"] for o in incoming["objects"]}
+                renames = {old: new for old, new in rec["mapping"].items() if old != new and new in new_ids}
+                md["meta"]["sources"] = [{"name": name, "kind": "json"}] + [
+                    x for x in (previous.get("meta") or {}).get("sources") or [] if x.get("kind") == "sql"]
+                recognition = {**rec, "kept_from_sql": True}
         check = ingest.check_metadata(md)
         if not check["ok"]:
             return {"ok": False, "check": check}
         file = self.workspace.save_metadata(md, name, user)
         diff = diff_metadata(previous, md)
         stats = {"nb_objects": check["nb_objects"], "nb_columns": check["nb_columns"]}
+        rec_small = {k: v for k, v in (recognition or {}).items() if k != "mapping"} or None
         self.workspace.append("metadata.import", {"file": file, "name": name, "stats": stats, "diff": diff,
-                                                  "mode": mode, "recognition": recognition}, user)
+                                                  "mode": mode, "recognition": rec_small}, user)
+        if renames:                                # tables passées de « default.x » (SQL) à « base.x » (JSON)
+            self.workspace.append("objects.rename", {"map": renames}, user)
+        links, skipped = [], 0
+        if is_sql and params.get("links", "1") == "1":
+            links = sql_links(incoming, lambda i: mapping.get(i, i) if i else i, name)
+            taken = {link_ends(l) for l in self.state["links"].values()} |                 {link_ends(l) for l in self.state["deleted_links"].values()}
+            fresh, seen = [], set()
+            for link in links:                       # déjà présent, ou supprimé par l'équipe : pas recréé
+                if link_ends(link) not in taken and link_ends(link) not in seen:
+                    seen.add(link_ends(link))
+                    fresh.append(link)
+            skipped = len(links) - len(fresh)
+            links = fresh
+            if links:
+                self.workspace.append("links.import", {"links": links, "source_file": name}, user)
         self._cache_key = None
         self.sync(force=True)
+        created = [l for l in links if l["id"] in self.state["links"]]
+        new_names = {o["name"]: o["id"] for o in self.state["custom"].values() if o["status"] == "NEW"}
+        new_matches = sorted({(new_names[o["name"]], mapping.get(o["id"], o["id"])) for o in incoming["objects"]
+                              if o["name"] in new_names and mapping.get(o["id"], o["id"]) != new_names[o["name"]]})
         return {"ok": True, "check": check, "report": self.last_report, "diff": diff, "mode": mode,
-                "recognition": recognition}
+                "recognition": rec_small, "parsers": (incoming.get("meta") or {}).get("parsers"),
+                "links": {"flows": sum(1 for l in created if l["kind"] == "FLOW"),
+                          "joins": sum(1 for l in created if l["kind"] == "JOIN"),
+                          "skipped": skipped + len(links) - len(created)},
+                "renamed": renames,
+                "new_matches": [{"new": a, "object": b} for a, b in new_matches]}
+
+    # ---- fusionner une table New avec sa vraie définition (SQL ou JSON)
+
+    def _parse_fragment(self, raw: bytes, params: dict) -> dict:
+        try:
+            return ingest.parse_text(raw.decode("utf-8-sig"), params.get("format", "sql"), params.get("name") or "fusion")
+        except (UnicodeDecodeError, ValueError) as exc:
+            raise ApiError(HTTPStatus.BAD_REQUEST, str(exc)) from exc
+
+    def merge_preview(self, raw: bytes, params: dict) -> dict:
+        """Tables décrites par le fragment et table New proposée pour chacune (même nom, sinon colonnes)."""
+        self.sync()
+        md = self._parse_fragment(raw, params)
+        targets = {r.get("target") for r in md.get("rules") or [] if r.get("target")}
+        objects = [o for o in md["objects"] if o["id"] in targets] or md["objects"]
+        news = [o for o in self.state["custom"].values() if o["status"] == "NEW"]
+        proposals = []
+        for obj in objects:
+            cols = {c["name"] for c in obj["columns"]}
+            best, score = None, 0.0
+            for new in news:
+                ncols = {c["name"] for c in new["columns"]}
+                value = 1.0 if new["name"] == obj["name"] else (
+                    len(cols & ncols) / len(cols | ncols) if cols and ncols else 0.0)
+                if value > score:
+                    best, score = new["id"], value
+            proposals.append({"object": obj["id"], "name": obj["name"], "type": obj["type"], "nb_columns": len(cols),
+                              "proposed": best if score >= 0.3 else None, "score": round(score, 2)})
+        return {"objects": proposals, "news": [{"id": n["id"], "name": n["name"], "type": n["type"]} for n in news],
+                "nb_rules": len(md.get("rules") or [])}
+
+    def merge_apply(self, raw: bytes, params: dict, user: str) -> dict:
+        """Importe le fragment (mode Compléter) puis fusionne la table New choisie dans la table définie."""
+        self.sync()
+        new_id_ = (params.get("new") or "").lower()
+        if new_id_ not in self.state["custom"]:
+            raise ApiError(HTTPStatus.BAD_REQUEST, "Choisissez la table New à fusionner")
+        md = self._parse_fragment(raw, params)
+        wanted = (params.get("object") or "").lower()
+        if wanted not in {o["id"] for o in md["objects"]}:
+            raise ApiError(HTTPStatus.BAD_REQUEST, "Table introuvable dans le code fourni")
+        new = self.state["custom"][new_id_]
+        if not new["columns"] or True:
+            pass
+        result = self._import(md, params.get("name") or f"fusion {new['name']}", {**params, "mode": "merge" if self.workspace.metadata_path() else ""}, user)
+        if not result["ok"]:
+            return result
+        mapping_target = wanted
+        meta = self.state.get("metadata") or {}
+        rec = meta.get("recognition") or {}
+        if wanted not in self._objects:                 # reconnu sous un autre identifiant (même nom unique)
+            same = [o for o in self._objects if o.split(".")[-1] == wanted.split(".")[-1] and o not in self.state["custom"]]
+            mapping_target = same[0] if len(same) == 1 else wanted
+        if mapping_target not in self._objects:
+            raise ApiError(HTTPStatus.CONFLICT, "La table n'a pas pu être reconnue après import")
+        self.workspace.append("object.merge", {"id": new_id_, "into": mapping_target}, user)
+        self._cache_key = None
+        self.sync(force=True)
+        return {**result, "merged": {"new": new_id_, "into": mapping_target}, "recognized": bool(rec)}
+
+    # ---- vue d'ensemble d'un périmètre (blocs par tag ou par base)
+
+    def overview(self, params: dict) -> dict:
+        self.sync()
+        group_by = params.get("by", "tag")
+        hidden = self.hidden()
+        wanted_tags = set(filter(None, (params.get("tags") or "").split(",")))
+        wanted_dbs = set(filter(None, (params.get("dbs") or "").split(",")))
+
+        def group_of(oid):
+            obj = self._objects[oid]
+            if group_by == "database":
+                return obj["database"]
+            return effective_tag(self.state, oid, obj["name"]) or UNTAGGED
+
+        members = defaultdict(list)
+        for oid, obj in self._objects.items():
+            if oid in hidden:
+                continue
+            tag = effective_tag(self.state, oid, obj["name"]) or UNTAGGED
+            if wanted_tags and tag not in wanted_tags:
+                continue
+            if wanted_dbs and obj["database"] not in wanted_dbs:
+                continue
+            members[group_of(oid)].append(oid)
+        selected = {o for ids in members.values() for o in ids}
+        if params.get("detail") == "1":
+            limit = int(params.get("max_nodes", 300))
+            ids = sorted(selected, key=lambda o: (self.tag_rank(o) or 0, o))[:limit]
+            keep = set(ids)
+            edges = [self.link_out(l) for l in self.state["links"].values() if l["source"] in keep and l["target"] in keep]
+            return {"mode": "objects", "nodes": [self.node(o) for o in ids], "edges": edges, "lanes": self.lanes(ids),
+                    "truncated": max(0, len(selected) - limit)}
+        groups = []
+        for key, ids in members.items():
+            tag = self.state["tags"].get(key) if group_by == "tag" else None
+            groups.append({"id": f"g:{key}", "key": key, "name": (tag["name"] if tag else ("Sans tag" if key == UNTAGGED else key)),
+                           "color": tag["color"] if tag else None, "order": tag.get("order") if tag else None,
+                           "count": len(ids), "new": sum(1 for o in ids if o in self.state["custom"]),
+                           "databases": dict(Counter(self._objects[o]["database"] for o in ids).most_common(6)),
+                           "sample": sorted(self._objects[o]["name"] for o in ids)[:12]})
+        groups.sort(key=lambda g: (g["order"] if isinstance(g["order"], (int, float)) else 9999, norm(g["name"])))
+        flows = defaultdict(lambda: {"count": 0, "validated": 0, "pending": 0})
+        inner = Counter()
+        for link in self.state["links"].values():
+            if link["source"] not in selected or link["target"] not in selected:
+                continue
+            ga, gb = group_of(link["source"]), group_of(link["target"])
+            if ga == gb:
+                inner[ga] += 1
+                continue
+            if link["kind"] == "JOIN" and ga > gb:
+                ga, gb = gb, ga
+            item = flows[(ga, gb, link["kind"])]
+            item["count"] += 1
+            item["validated" if link["status"] == "VALIDE" else "pending"] += 1
+        for g in groups:
+            g["inner_links"] = inner.get(g["key"], 0)
+        edges = [{"edge_id": f"o:{a}|{b}|{k}", "id": f"o:{a}|{b}|{k}", "source_object": f"g:{a}", "target_object": f"g:{b}",
+                  "kind": k, "status": "VALIDE" if v["pending"] == 0 else "A_VALIDER", **v, "label": str(v["count"])}
+                 for (a, b, k), v in flows.items()]
+        return {"mode": "groups", "by": group_by, "groups": groups, "edges": edges,
+                "databases": sorted({o["database"] for o in self._objects.values()})}
+
+    # ---- anomalies détectées automatiquement (à transformer en sujets de suivi)
+
+    @_closing
+    def anomalies(self) -> dict:
+        self.sync()
+        out = []
+        if self._objects:
+            conflicts = store.column_dictionary(self.con(), "", 50, 0, True)
+            for col in conflicts["items"]:
+                out.append({"kind": "TYPE", "title": f"Types différents pour la colonne {col['name']}",
+                            "detail": " / ".join(col["types"]), "column": col["name"], "object_id": None})
+        for link in self.state["links"].values():
+            lo = self.link_out(link)
+            if lo["orphan"]:
+                out.append({"kind": "ORPHELIN", "title": f"Lien orphelin {short_id(link['source'])} → {short_id(link['target'])}",
+                            "detail": "; ".join(lo["problems"]), "link_id": link["id"],
+                            "object_id": link["source"] if link["source"] in self._objects else link["target"]})
+            elif lo["against_order"]:
+                out.append({"kind": "SENS", "title": f"Sens inhabituel {short_id(link['source'])} → {short_id(link['target'])}",
+                            "detail": "La source a un tag placé après celui de la cible", "link_id": link["id"],
+                            "object_id": link["source"]})
+        rec = (self.state.get("metadata") or {}).get("recognition") or {}
+        for col in rec.get("unknown_columns") or []:
+            obj = col.rsplit(".", 1)[0]
+            out.append({"kind": "COLONNE_SQL", "title": f"Colonne lue dans le SQL mais absente de la structure : {col}",
+                        "detail": "Faute de frappe, colonne supprimée ou JSON pas à jour", "object_id": obj,
+                        "column": col.rsplit(".", 1)[-1]})
+        by_name = defaultdict(list)
+        for oid in self._objects:
+            by_name[oid.split(".")[-1]].append(oid)
+        for oid, obj in self.state["custom"].items():
+            twins = [o for o in by_name.get(obj["name"], []) if o != oid and o not in self.state["custom"]]
+            if obj["status"] == "NEW" and twins:
+                out.append({"kind": "DOUBLON", "title": f"La table New {obj['name']} existe maintenant : {twins[0]}",
+                            "detail": "Fusionnez-la pour garder ses liens sans doublon", "object_id": oid, "into": twins[0]})
+        untagged = sum(1 for o in self._objects.values() if not effective_tag(self.state, o["id"], o["name"]))
+        return {"items": out, "untagged": untagged, "counts": dict(Counter(a["kind"] for a in out))}
 
 
 # ====================================================================== transport HTTP
@@ -899,11 +1533,15 @@ def make_handler(api: LineageApi):
                     "suggestions": lambda: api.suggestions(params), "report": api.report, "versions": api.versions,
                     "version": lambda: api.version_detail(params), "activity": lambda: api.activity(params),
                     "examples": lambda: list(api.examples()),
+                    "history/at": lambda: api.history_at(params), "tickets": lambda: api.tickets(params),
+                    "overview": lambda: api.overview(params), "anomalies": api.anomalies,
                 }
                 if route in simple:
                     return self._json(simple[route]())
                 if route.startswith("object/"):
                     return self._json(api.object_detail(route[7:].lower()))
+                if route.startswith("link/"):
+                    return self._json(api.link_detail(route[5:]))
                 if route.startswith("graph/"):
                     return self._json(api.graph(route[6:].lower(), params))
                 if route.startswith("impact/") and route.endswith(".csv"):
@@ -918,6 +1556,10 @@ def make_handler(api: LineageApi):
             if method == "POST":
                 if route == "import":
                     return self._json(api.import_metadata(self._body(), params, self._user()))
+                if route == "merge/preview":
+                    return self._json(api.merge_preview(self._body(), params))
+                if route == "merge/apply":
+                    return self._json(api.merge_apply(self._body(), params, self._user()))
                 body = json.loads(self._body() or b"{}")
                 return self._json(api.write(route, body, self._user(body)))
             raise ApiError(HTTPStatus.NOT_FOUND, f"Route inconnue : {route}")

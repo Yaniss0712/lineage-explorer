@@ -75,6 +75,23 @@ def cmd_evaluate(args) -> int:
     return 0
 
 
+def cmd_compact(args) -> int:
+    """Regroupe l'ancien journal (un fichier par modification) en un seul fichier."""
+    from .workspace import Workspace
+    root = _config(args)["paths"]["workspace"]
+    ws = Workspace(root, compact=False)
+    plan = ws.compact_legacy(dry_run=True)
+    print(f"Espace : {root}")
+    print(f"Anciens fichiers à regrouper : {plan['files']} ({plan['events']} modification(s))")
+    if plan["unreadable"]:
+        print(f"Fichiers illisibles (en cours de synchronisation ?), laissés en place : {len(plan['unreadable'])}")
+    if args.dry_run or not plan["files"]:
+        return 0
+    removed = ws.compact_legacy(user=args.user or "manuel")
+    print(f"Regroupés : {removed} fichier(s) dans journal/archive__….jsonl ; originaux sauvegardés dans journal/sauvegardes/.")
+    return 0 if removed == plan["files"] else 1
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(prog="python -m engine", description="Lineage Explorer")
     parser.add_argument("--config", help="fichier de configuration (défaut : config.json s'il existe)")
@@ -105,6 +122,12 @@ def main(argv=None) -> int:
     p.add_argument("--min-score", default="0")
     p.add_argument("--workspace")
     p.set_defaults(func=cmd_evaluate)
+
+    p = sub.add_parser("compact", help="regrouper l'ancien journal (un fichier par modification) en un seul fichier")
+    p.add_argument("--workspace")
+    p.add_argument("--user")
+    p.add_argument("--dry-run", action="store_true", help="afficher le bilan sans rien modifier")
+    p.set_defaults(func=cmd_compact)
 
     args = parser.parse_args(argv)
     for stream in (sys.stdout, sys.stderr):

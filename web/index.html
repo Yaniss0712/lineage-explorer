@@ -12,13 +12,18 @@
   <div class="brand"><span class="logo"></span><span class="brand-text">Lineage</span></div>
   <div class="search">
     <svg class="search-icon" viewBox="0 0 24 24" width="16" height="16"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-    <input id="q" type="search" placeholder="Rechercher : table, colonne, tag, base…" title="Préfixes possibles : tag:  base:  table:  col:" autocomplete="off">
+    <input id="q" type="search" placeholder="Rechercher : table, colonne, tag, base…  ( / )" title="Préfixes possibles : tag:  base:  table:  col:" autocomplete="off">
   </div>
   <div class="actions">
+    <div class="undo-group">
+      <button id="btn-undo" class="icon-btn" title="Annuler (Ctrl+Z)" aria-label="Annuler" disabled><svg viewBox="0 0 24 24" width="16" height="16"><path d="M9 14L4 9l5-5M4 9h10a6 6 0 0 1 0 12h-3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button id="btn-redo" class="icon-btn" title="Rétablir (Ctrl+Y)" aria-label="Rétablir" disabled><svg viewBox="0 0 24 24" width="16" height="16"><path d="M15 14l5-5-5-5M20 9H10a6 6 0 0 0 0 12h3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
     <button id="btn-refresh" class="btn ghost refresh" title="Actualiser : relire l'espace partagé et recharger les données">
       <svg viewBox="0 0 24 24" width="15" height="15"><path d="M20 12a8 8 0 1 1-2.34-5.66M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       <span id="sync" class="sync">Actualiser</span>
     </button>
+    <button id="btn-overview" class="btn ghost" title="Vue d'ensemble d'un périmètre : un bloc par tag">Vue d'ensemble</button>
     <button id="btn-tags" class="btn ghost">Tags</button>
     <button id="btn-history" class="btn ghost">Historique</button>
     <button id="btn-save-version" class="btn" title="Enregistrer la version actuelle (tags, liens, documentation)">Enregistrer</button>
@@ -31,6 +36,7 @@
         <button data-menu="report">Rapport et indicateurs</button>
         <button data-menu="export">Exporter la documentation (Excel)</button>
         <button data-menu="settings">Réglages (colonnes ignorées, objets masqués)</button>
+        <button data-menu="help">Raccourcis clavier ( ? )</button>
         <label class="menu-field">Votre nom (auteur des modifications)<input id="user" class="input" maxlength="40"></label>
       </div>
     </div>
@@ -46,13 +52,15 @@
     <nav class="tabs">
       <button class="tab active" data-tab="catalog">Catalogue</button>
       <button class="tab" data-tab="review">À valider <span id="review-count" class="count"></span></button>
-      <button class="tab" data-tab="sugg" title="Suggestions">Suggestions <span id="sugg-count" class="count"></span></button>
+      <button class="tab" data-tab="sugg" title="Suggestions">Sugg. <span id="sugg-count" class="count"></span></button>
       <button class="tab" data-tab="cols">Colonnes</button>
+      <button class="tab" data-tab="track" title="Suivi des anomalies, modifications et améliorations">Suivi <span id="track-count" class="count"></span></button>
     </nav>
     <div id="tab-catalog" class="tab-body">
       <div class="list-tools">
         <span id="catalog-info" class="muted"></span>
-        <label class="check small"><input type="checkbox" id="select-mode"> Sélection multiple</label>
+        <button class="btn sm" id="btn-new-object" title="Créer un objet : objet métier, source, viz, table prévue…">+ Objet</button>
+        <label class="check small"><input type="checkbox" id="select-mode"> Sélection</label>
       </div>
       <div id="selection-bar" class="selection-bar hidden">
         <span id="selection-count"></span>
@@ -64,7 +72,7 @@
     </div>
     <div id="tab-review" class="tab-body hidden"><div id="review" class="list"></div></div>
     <div id="tab-sugg" class="tab-body hidden">
-      <p class="hint">Tables qui semblent liées (colonnes communes, requêtes SQL importées). Créez le lien dans le bon sens, ou écartez la suggestion.</p>
+      <p class="hint">Tables qui semblent liées (colonnes communes). Créez le lien dans le bon sens, ou écartez la suggestion.</p>
       <div id="sugg" class="list"></div>
     </div>
     <div id="tab-cols" class="tab-body hidden">
@@ -74,11 +82,25 @@
       </div>
       <div id="cols" class="list"></div>
     </div>
+    <div id="tab-track" class="tab-body hidden">
+      <div class="list-tools">
+        <select id="track-filter" class="input" style="width:auto">
+          <option value="OUVERT,EN_COURS">Ouverts et en cours</option><option value="">Tous</option>
+          <option value="RESOLU,REJETE">Résolus / rejetés</option>
+        </select>
+        <button class="btn sm primary" id="btn-new-ticket">+ Signaler</button>
+      </div>
+      <div id="track" class="list"></div>
+    </div>
   </aside>
-  <div class="splitter" data-split="left" title="Glisser pour élargir"></div>
+  <div class="splitter" data-split="left" title="Glisser pour élargir"><button class="collapse" data-collapse="left" title="Replier / déplier ( [ )">‹</button></div>
 
   <section class="canvas">
-    <div id="offline" class="offline hidden">Connexion perdue avec Lineage Explorer. La petite fenêtre « Lineage Explorer est ouvert » a peut-être été fermée : relancez <b>LineageExplorer.exe</b>. <button class="btn sm" id="offline-retry">Réessayer</button></div>
+    <div id="offline" class="offline hidden">Connexion perdue avec Lineage Explorer. La petite fenêtre « Lineage Explorer est ouvert » a peut-être été fermée : relancez <b>LineageExplorer.cmd</b>. <button class="btn sm" id="offline-retry">Réessayer</button></div>
+    <div class="navbar">
+      <button id="btn-back" class="icon-btn" title="Revenir à la vue précédente (Retour arrière)" disabled><svg viewBox="0 0 24 24" width="16" height="16"><path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div id="crumbs" class="crumbs"></div>
+    </div>
     <div class="floatbar" id="floatbar">
       <div class="seg" id="dir-seg">
         <button class="btn-seg" data-dir="up" title="D'où viennent les données">Amont</button>
@@ -90,6 +112,7 @@
         <input id="depth" type="number" min="1" max="20" value="2">
         <button data-step="1" aria-label="Plus profond">+</button>
       </div>
+      <button id="btn-360" class="btn sm ghost" title="Vue 360 : tout l'amont et tout l'aval ( F )">360°</button>
       <div class="popover-wrap">
         <button id="btn-options" class="icon-btn" title="Options d'affichage">
           <svg viewBox="0 0 24 24" width="16" height="16"><path d="M4 7h10M18 7h2M4 17h4M12 17h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="16" cy="7" r="2" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="10" cy="17" r="2" fill="none" stroke="currentColor" stroke-width="2"/></svg>
@@ -101,13 +124,19 @@
         </div>
       </div>
       <span class="sep"></span>
-      <button id="btn-recenter" class="icon-btn" title="Centrer sur la sélection"><svg viewBox="0 0 24 24" width="16" height="16"><circle cx="12" cy="12" r="3" fill="currentColor"/><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/></svg></button>
-      <button id="btn-fit" class="icon-btn" title="Ajuster à l'écran"><svg viewBox="0 0 24 24" width="16" height="16"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+      <span class="find"><input id="find" placeholder="Trouver dans le graphe ( G )" autocomplete="off"><span id="find-count" class="muted"></span></span>
     </div>
     <div id="colbar" class="floatbar colbar hidden">
-      <span>Vue colonne : <b id="colbar-name" class="mono"></b></span>
+      <span>Colonne : <b id="colbar-name" class="mono"></b></span>
       <label class="check small"><input type="checkbox" id="col-similar"> noms proches</label>
       <button class="btn sm ghost" id="colbar-close">Fermer</button>
+    </div>
+    <div id="ovbar" class="floatbar ovbar hidden">
+      <span><b>Vue d'ensemble</b></span>
+      <select id="ov-by" class="input sm"><option value="tag">par tag</option><option value="database">par base</option></select>
+      <button class="btn sm ghost" id="ov-tags">Périmètre…</button>
+      <label class="check small"><input type="checkbox" id="ov-detail"> objets</label>
+      <button class="btn sm ghost" id="ov-close">Fermer</button>
     </div>
 
     <svg id="graph" xmlns="http://www.w3.org/2000/svg"></svg>
@@ -115,19 +144,23 @@
     <div id="graph-empty" class="empty">
       <div class="empty-dot"></div>
       <h2>Explorez vos données</h2>
-      <p>Choisissez une table dans le catalogue à gauche, ou une colonne dans l'onglet « Colonnes ».</p>
+      <p>Choisissez une table dans le catalogue à gauche, une colonne dans l'onglet « Colonnes », ou ouvrez la vue d'ensemble.</p>
     </div>
 
-    <div class="legend">
-      <span class="ln"><svg width="22" height="8"><line x1="0" y1="4" x2="22" y2="4" class="lg-flow"/></svg>lien validé</span>
-      <span class="ln"><svg width="22" height="8"><line x1="0" y1="4" x2="22" y2="4" class="lg-pending"/></svg>à valider</span>
-      <span class="ln"><svg width="22" height="8"><line x1="0" y1="4" x2="22" y2="4" class="lg-sugg"/></svg>suggestion</span>
-      <span class="ln"><svg width="22" height="8"><line x1="0" y1="4" x2="22" y2="4" class="lg-join"/></svg>jointure</span>
+    <div class="zoombar">
+      <button data-zoom="in" title="Zoomer ( + )">+</button>
+      <span id="zoom-level">100 %</span>
+      <button data-zoom="out" title="Dézoomer ( − )">−</button>
+      <button data-zoom="fit" title="Tout afficher ( 0 )"><svg viewBox="0 0 24 24" width="14" height="14"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+      <button data-zoom="sel" title="Centrer sur la sélection ( C )"><svg viewBox="0 0 24 24" width="14" height="14"><circle cx="12" cy="12" r="3" fill="currentColor"/><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/></svg></button>
     </div>
+    <svg id="minimap" class="minimap hidden" xmlns="http://www.w3.org/2000/svg"></svg>
+
+    <div class="legend" id="legend"></div>
     <div id="graph-info" class="graph-info"></div>
     <div id="tooltip" class="tooltip hidden"></div>
   </section>
-  <div class="splitter" data-split="right" title="Glisser pour élargir"></div>
+  <div class="splitter" data-split="right" title="Glisser pour élargir"><button class="collapse" data-collapse="right" title="Replier / déplier ( ] )">›</button></div>
 
   <aside class="side right" id="detail">
     <div class="empty-detail"><p class="hint">Sélectionnez une table pour voir son détail.</p></div>
@@ -136,11 +169,11 @@
 
 <div id="modal" class="modal hidden" role="dialog" aria-modal="true">
   <div class="modal-box">
-    <button class="modal-close" aria-label="Fermer">×</button>
+    <button class="modal-close" aria-label="Fermer" title="Fermer (Échap)">×</button>
     <div id="modal-body"></div>
   </div>
 </div>
-<div id="toast" class="toast hidden"></div>
+<div id="toast" class="toast hidden"><span id="toast-text"></span><button id="toast-action" class="btn sm hidden"></button></div>
 
 <script src="graph.js"></script>
 <script src="app.js"></script>

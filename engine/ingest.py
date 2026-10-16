@@ -148,7 +148,7 @@ def _clean_rule(rule: dict) -> dict:
         "joins": [{"type": j.get("type") or "JOIN", "table": low(j.get("table")), "condition": j.get("condition") or ""}
                   for j in rule.get("joins") or []],
         "filters": rule.get("filters") or None, "group_by": rule.get("group_by") or None,
-        "having": rule.get("having") or None,
+        "having": rule.get("having") or None, "steps": rule.get("steps") or [], "parser": rule.get("parser"),
         "columns": [{"column": str(c.get("column") or "").lower(), "expression": c.get("expression") or ""}
                     for c in rule.get("columns") or []],
         "sql": (rule.get("sql") or "")[:8000], "source_file": rule.get("source_file"),
@@ -223,7 +223,7 @@ def merge_metadata(base: dict, extra: dict, extra_name: str) -> tuple[dict, dict
     rules = [r for r in base.get("rules", [])]
     for rule in extra.get("rules", []):
         rules.append({**rule, "target": remap(rule["target"]), "sources": [remap(s) for s in rule["sources"]],
-                      "from": remap(rule["from"]), "source_file": extra_name,
+                      "from": remap(rule["from"]), "source_file": rule.get("source_file") or extra_name,
                       "joins": [{**j, "table": remap(j["table"])} for j in rule["joins"]]})
 
     def dedupe(items, key):
@@ -247,7 +247,7 @@ def merge_metadata(base: dict, extra: dict, extra_name: str) -> tuple[dict, dict
     report = {"matched": sorted(set(matched)), "added": added, "ambiguous": ambiguous,
               "unknown_columns": sorted(unknown)[:300], "nb_unknown_columns": len(unknown),
               "nb_rules": len(extra.get("rules", [])), "nb_flows": len(extra["flows"]),
-              "nb_joins": len(extra["relations"])}
+              "nb_joins": len(extra["relations"]), "mapping": mapping}
     return merged, report
 
 

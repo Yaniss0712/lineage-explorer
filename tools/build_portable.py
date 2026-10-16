@@ -36,7 +36,7 @@ DLLS = ["_socket.pyd", "select.pyd", "_sqlite3.pyd", "sqlite3.dll", "unicodedata
         "_ctypes.pyd", "libffi-8.dll", "pyexpat.pyd"]
 STDLIB_EXCLUDE = {"test", "idlelib", "ensurepip", "turtledemo", "site-packages", "venv", "pydoc_data", "lib2to3",
                   "__pycache__", "tests", "__phello__", "_pyrepl", "distutils"}
-APP_ITEMS = [("engine", "engine"), ("web", "web"), ("lineage_explorer.py", "lineage_explorer.py")]
+APP_ITEMS = [("engine", "engine"), ("web", "web"), ("vendor", "vendor"), ("lineage_explorer.py", "lineage_explorer.py")]
 EXAMPLES = ["metadata.demo_une_base.json", "metadata.sample.json"]
 
 LAUNCHER = r"""@echo off
@@ -44,6 +44,15 @@ rem Lineage Explorer : lance l'outil (Python portable inclus, aucune installatio
 rem L'espace partage est le dossier de ce fichier (journal\, versions\, metadonnees\).
 set "LINEAGE_WORKSPACE=%~dp0"
 start "" "%~dp0app\python\pythonw.exe" "%~dp0app\lineage_explorer.py"
+"""
+
+MERGER = r"""@echo off
+rem Regroupe l'ancien journal (un fichier par modification, versions 0.1 a 0.3) en un seul fichier.
+rem Facultatif : la version 0.4 le fait toute seule au premier lancement.
+rem A lancer outil ferme sur tous les postes. Les originaux sont gardes dans journal\sauvegardes\.
+set "LINEAGE_WORKSPACE=%~dp0"
+"%~dp0app\python\python.exe" -m engine compact --workspace "%~dp0."
+pause
 """
 
 README = r"""LINEAGE EXPLORER — DOSSIER À DÉPOSER DANS TEAMS
@@ -62,7 +71,10 @@ les fichiers du canal Teams ou dans tout dossier partagé de l'équipe. Rien à 
 
 Créés automatiquement dans ce dossier (ne pas modifier ni supprimer à la main) :
    metadonnees\   les fichiers importés
-   journal\       une modification = un petit fichier (tags, liens, specs, notes…)
+   journal\       un fichier par version et par poste, une ligne par modification
+                  (tags, liens, objets, specs, notes, suivi). Les anciens journaux
+                  (un fichier par modification) sont regroupés automatiquement au
+                  premier lancement de la v0.4, ou avec FusionnerJournal.cmd.
    versions\      les « Enregistrer » (restaurables depuis « Historique »)
 
 Sur chaque poste, seul un index de recherche est recréé automatiquement dans
@@ -79,7 +91,7 @@ Guide complet : docs/10_deploiement_teams.md sur GitHub (Yaniss0712/lineage-expl
 def _clean_dest() -> None:
     """Supprime l'ancienne version (code et runtime), jamais les données d'un espace."""
     os.makedirs(DEST, exist_ok=True)
-    for name in ("app", "LineageExplorer.exe", "LineageExplorer.cmd", "LISEZMOI.txt"):
+    for name in ("app", "LineageExplorer.exe", "LineageExplorer.cmd", "FusionnerJournal.cmd", "LISEZMOI.txt"):
         path = os.path.join(DEST, name)
         if os.path.isdir(path):
             shutil.rmtree(path)
@@ -133,6 +145,8 @@ def main() -> int:
     _copy_app(app_dir)
     with open(os.path.join(DEST, "LineageExplorer.cmd"), "w", encoding="ascii", newline="\r\n") as handle:
         handle.write(LAUNCHER)
+    with open(os.path.join(DEST, "FusionnerJournal.cmd"), "w", encoding="ascii", newline="\r\n") as handle:
+        handle.write(MERGER)
     with open(os.path.join(DEST, "LISEZMOI.txt"), "w", encoding="utf-8-sig", newline="\r\n") as handle:
         handle.write(README)
     size = sum(os.path.getsize(os.path.join(d, f)) for d, _, fs in os.walk(DEST) for f in fs)

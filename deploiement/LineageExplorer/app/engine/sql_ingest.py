@@ -18,6 +18,10 @@ Chaque requête produit aussi des **règles de gestion** (`rules[]`) : tables lu
 leur condition, filtres (WHERE / HAVING), regroupement (GROUP BY) et formule de chaque colonne
 calculée, alias remplacés par les noms de tables, plus le texte SQL d'origine.
 
+Les requêtes (vues, CTAS, INSERT, SELECT) sont d'abord confiées à **sqlglot** (`sql_glot.py` :
+CTE, sous-requêtes, UNION, CASE, dialecte Hive) ; les expressions régulières ci-dessous
+servent de solution de secours si une requête n'est pas comprise, et lisent les DDL.
+
 Point d'entrée : `parse_sql_script(text, default_database)` → dict au format du contrat JSON
 (docs/04_format_json.md), à passer ensuite à `ingest.parse_metadata`.
 """
@@ -27,6 +31,7 @@ from __future__ import annotations
 import re
 from collections import OrderedDict
 
+from . import sql_glot
 from .lineage import (_COMMENT_RE, _CTE_RE, _RESERVED, _SOURCE_RE, _parse_select_item, _split_top_level,
                       _strip, _unquote)
 
@@ -168,7 +173,7 @@ class _Model:
                 obj["description"] = "Structure déduite des requêtes SQL (table non déclarée)"
             objects.append({**obj, "columns": [{**c, "position": i} for i, c in enumerate(obj["columns"].values(), 1)]})
         return {"meta": {"format_version": "1.0", "source": source, "extractor": "engine.sql_ingest",
-                         "warnings": self.warnings[:200]},
+                         "warnings": self.warnings[:200], "parsers": getattr(self, "parsers", {})},
                 "objects": objects, "flows": self.flows, "relations": list(self.relations.values()),
                 "rules": self.rules}
 
@@ -432,9 +437,76 @@ def _target_name(target_cols: list[str] | None, position: int, default: str) -> 
 # --------------------------------------------------------------------------- point d'entrée
 
 
-def parse_sql_script(text: str, default_database: str = "default", source: str = "sql") -> dict:
-    """Analyse un script SQL complet et renvoie des métadonnées au format du contrat JSON."""
+_QUERY_START_RE = re.compile(r"^\(?\s*(?:WITH|SELECT|INSERT|CREATE\s+(?:OR\s+REPLACE\s+)?(?:\w+\s+){0,3}(?:VIEW|TABLE))(?=\W|$)", re.I)
+
+
+def _apply_glot(model: _Model, info: dict, statement: str, job: str) -> None:
+    """Reporte l'analyse sqlglot d'une requête dans le modèle (objets, flux, jointures, règle)."""
+    kind, target = info["kind"], info["target"]
+    for src in info["sources"]:
+        model.obj(src)
+    for tid, cols in info["used"].items():
+        if tid in model.objects and tid not in model.declared:
+            for col in sorted(cols):
+                if col not in _TYPE_WORDS:
+                    model.add_column(tid, col)
+    for a, ac, b, bc in info["relations"]:
+        model.obj(a)
+        model.obj(b)
+        model.add_relation(a, ac, b, bc, "Jointure lue dans une requête SQL")
+    col_rules: list[dict] = []
+    if target:
+        otype = "VIEW" if kind == "VIEW" else "TABLE"
+        is_new = target not in model.declared
+        target_cols = info["target_cols"]
+        if not is_new and not target_cols and kind == "INSERT" and model.objects[target]["columns"]:
+            target_cols = list(model.objects[target]["columns"])    # INSERT positionnel dans une table déclarée
+        model.obj(target, otype)
+        if otype == "VIEW" or is_new:
+            model.declared.add(target)
+        mappings: dict[str, list[dict]] = {}
+        for i, col in enumerate(info["columns"]):
+            name = target_cols[i] if target_cols and i < len(target_cols) else col["name"]
+            refs = [{"source_object": t, "source": c} for t, c in col["refs"]]
+            ctype = _expression_type(col["expression"] or "", refs, model)
+            if not ctype and col["via"]:
+                ctype = _expression_type(col["via"][-1], refs, model)
+            model.add_column(target, name, ctype)
+            chain = ([] if col["plain"] else [col["expression"]]) + col["via"]   # calculs successifs (CTE…)
+            transformation = " ← ".join(chain) or None
+            if col["via"] or not re.fullmatch(r"(?:\w+\.)?" + re.escape(name), col["expression"] or ""):
+                col_rules.append({"column": name, "expression": transformation or col["expression"]})
+            for t, c in col["refs"]:
+                if t == target:
+                    continue
+                if t not in model.declared:
+                    model.add_column(t, c)
+                items = mappings.setdefault(t, [])
+                if not any(m["source"] == c and m["target"] == name for m in items):
+                    items.append({"source": c, "target": name,
+                                  "transformation": transformation or ("renommage" if c != name else None)})
+        for src in info["sources"]:
+            if src != target:
+                model.flows.append({"source": src, "target": target, "job": job, "origin": SQL_ORIGIN,
+                                    "column_mapping": mappings.get(src, [])})
+    rule = info["rule"]
+    entry = {"id": job, "kind": kind, "target": target, "sources": [s for s in info["sources"] if s != target],
+             "from": rule.get("from"), "joins": rule.get("joins") or [], "filters": rule.get("filters"),
+             "group_by": rule.get("group_by"), "having": rule.get("having"), "columns": col_rules,
+             "steps": rule.get("steps") or [], "sql": statement[:8000], "parser": "sqlglot"}
+    if entry["joins"] or entry["filters"] or entry["group_by"] or entry["columns"] or entry["steps"] or target:
+        model.rules.append(entry)
+    for name in info.get("unresolved") or []:
+        model.warnings.append(f"{job} : colonne « {name} » sans table identifiable (plusieurs tables possibles)")
+
+
+def parse_sql_script(text: str, default_database: str = "default", source: str = "sql",
+                     engine: str = "auto") -> dict:
+    """Analyse un script SQL complet et renvoie des métadonnées au format du contrat JSON.
+
+    `engine` : "auto" (sqlglot puis expressions régulières en secours) ou "regex"."""
     model = _Model(default_database.lower())
+    model.parsers = {"sqlglot": 0, "regex": 0}
     statements = split_statements(text)
     # 1er passage : DDL (structure explicite, prioritaire sur ce qui est déduit des requêtes).
     for stmt in statements:
@@ -444,6 +516,17 @@ def parse_sql_script(text: str, default_database: str = "default", source: str =
     # 2e passage : vues, CTAS, INSERT, SELECT, ALTER.
     for n, stmt in enumerate(statements, 1):
         job = f"requete_{n}"
+        ddl = _CREATE_TABLE_RE.match(stmt)
+        is_query = bool(_QUERY_START_RE.match(stmt)) and not (ddl and _ctas_query(ddl.group(2))[0] is None)
+        if engine != "regex" and is_query:
+            info = sql_glot.analyze(stmt, model.default_db,
+                                    lambda t: list(model.objects[t]["columns"]) if t in model.objects else [])
+            if info is not None:
+                _apply_glot(model, info, stmt, job)
+                model.parsers["sqlglot"] += 1
+                continue
+        if is_query:
+            model.parsers["regex"] += 1
         view = _CREATE_VIEW_RE.match(stmt)
         if view:
             _parse_query(model, view.group(3), _ident(view.group(1), model.default_db),
